@@ -1,0 +1,1821 @@
+{
+  "@@last_modified": "2020-10-28T14:53:57.250782",
+  "confirm": "confirm",
+  "@confirm": {
+    "description": "Confirm Security Code",
+    "type": "text",
+    "placeholders": {}
+  },
+  "register": "register",
+  "@register": {
+    "description": "register",
+    "type": "text",
+    "placeholders": {}
+  },
+  "securitycode": "securitycode",
+  "@securitycode": {
+    "description": "securitycode",
+    "type": "text",
+    "placeholders": {}
+  },
+  "help": "help",
+  "@help": {
+    "description": "Help",
+    "type": "text",
+    "placeholders": {}
+  },
+  "search": "search",
+  "@search": {
+    "description": "search",
+    "type": "text",
+    "placeholders": {}
+  },
+  "support": "support",
+  "@support": {
+    "description": "support",
+    "type": "text",
+    "placeholders": {}
+  },
+  "login": "login",
+  "@login": {
+    "description": "login",
+    "type": "text",
+    "placeholders": {}
+  },
+  "exit": "exit",
+  "@exit": {
+    "description": "exit",
+    "type": "text",
+    "placeholders": {}
+  },
+  "basket": "basket",
+  "@basket": {
+    "description": "basket",
+    "type": "text",
+    "placeholders": {}
+  },
+  "userName": "userName",
+  "@userName": {
+    "description": "userName",
+    "type": "text",
+    "placeholders": {}
+  },
+  "home": "home",
+  "@home": {
+    "description": "home",
+    "type": "text",
+    "placeholders": {}
+  },
+  "mobile": "mobile",
+  "@mobile": {
+    "description": "mobile",
+    "type": "text",
+    "placeholders": {}
+  },
+  "phone": "phone",
+  "@phone": {
+    "description": "phone",
+    "type": "text",
+    "placeholders": {}
+  },
+  "address": "address",
+  "@address": {
+    "description": "address",
+    "type": "text",
+    "placeholders": {}
+  },
+  "firstName": "firstName",
+  "@firstName": {
+    "description": "firstName",
+    "type": "text",
+    "placeholders": {}
+  },
+  "lastName": "lastName",
+  "@lastName": {
+    "description": "lastName",
+    "type": "text",
+    "placeholders": {}
+  },
+  "age": "age",
+  "@age": {
+    "description": "age",
+    "type": "text",
+    "placeholders": {}
+  },
+  "userinfo": "userinfo",
+  "@userinfo": {
+    "description": "userinfo",
+    "type": "text",
+    "placeholders": {}
+  },
+  "deviceinfo": "deviceinfo",
+  "@deviceinfo": {
+    "description": "deviceinfo",
+    "type": "text",
+    "placeholders": {}
+  },
+  "cartype": "cartype",
+  "@cartype": {
+    "description": "cartype",
+    "type": "text",
+    "placeholders": {}
+  },
+  "carcolor": "carcolor",
+  "@carcolor": {
+    "description": "carcolor",
+    "type": "text",
+    "placeholders": {}
+  },
+  "carfunction": "carfunction",
+  "@carfunction": {
+    "description": "carfunction",
+    "type": "text",
+    "placeholders": {}
+  },
+  "caryear": "caryear",
+  "@caryear": {
+    "description": "caryear",
+    "type": "text",
+    "placeholders": {}
+  },
+  "carmodel": "carmodel",
+  "@carmodel": {
+    "description": "carmodel",
+    "type": "text",
+    "placeholders": {}
+  },
+  "carbtitle": "carbtitle",
+  "@carbtitle": {
+    "description": "carbtitle",
+    "type": "text",
+    "placeholders": {}
+  },
+  "devicemobile": "devicemobile",
+  "@devicemobile": {
+    "description": "devicemobile",
+    "type": "text",
+    "placeholders": {}
+  },
+  "password": "password",
+  "@password": {
+    "description": "password",
+    "type": "text",
+    "placeholders": {}
+  },
+  "imei": "imei",
+  "@imei": {
+    "description": "imei",
+    "type": "text",
+    "placeholders": {}
+  },
+  "simcartno": "simcartno",
+  "@simcartno": {
+    "description": "simcartno",
+    "type": "text",
+    "placeholders": {}
+  },
+  "settings": "settings",
+  "@settings": {
+    "description": "settings",
+    "type": "text",
+    "placeholders": {}
+  },
+  "on": "ON",
+  "@on": {
+    "description": "on",
+    "type": "text",
+    "placeholders": {}
+  },
+  "off": "OFF",
+  "@off": {
+    "description": "off",
+    "type": "text",
+    "placeholders": {}
+  },
+  "mobilename": "mobilename",
+  "@mobilename": {
+    "description": "mobilename",
+    "type": "text",
+    "placeholders": {}
+  },
+  "pattern": "pattern",
+  "@pattern": {
+    "description": "pattern",
+    "type": "text",
+    "placeholders": {}
+  },
+  "admin": "admin",
+  "@admin": {
+    "description": "admin",
+    "type": "text",
+    "placeholders": {}
+  },
+  "edit": "edit",
+  "@edit": {
+    "description": "edit",
+    "type": "text",
+    "placeholders": {}
+  },
+  "carbrand": "carbrand",
+  "@carbrand": {
+    "description": "carbrand",
+    "type": "text",
+    "placeholders": {}
+  },
+  "carpelak": "carpelak",
+  "@carpelak": {
+    "description": "carpelak",
+    "type": "text",
+    "placeholders": {}
+  },
+  "loadingdata": "loadingdata",
+  "@loadingdata": {
+    "description": "loadingdata",
+    "type": "text",
+    "placeholders": {}
+  },
+  "confirmrecievecode": "confirmrecievecode",
+  "@confirmrecievecode": {
+    "description": "confirmrecievecode",
+    "type": "text",
+    "placeholders": {}
+  },
+  "send": "send",
+  "@send": {
+    "description": "send",
+    "type": "text",
+    "placeholders": {}
+  },
+  "noimage": "noimage",
+  "@noimage": {
+    "description": "noimage",
+    "type": "text",
+    "placeholders": {}
+  },
+  "dataloaded": "dataloaded",
+  "@dataloaded": {
+    "description": "dataloaded",
+    "type": "text",
+    "placeholders": {}
+  },
+  "email": "email",
+  "@email": {
+    "description": "email",
+    "type": "text",
+    "placeholders": {}
+  },
+  "profile": "profile",
+  "@profile": {
+    "description": "profile",
+    "type": "text",
+    "placeholders": {}
+  },
+  "authToAccess": "authToAccess",
+  "@authToAccess": {
+    "description": "authToAccess",
+    "type": "text",
+    "placeholders": {}
+  },
+  "car": "car",
+  "@car": {
+    "description": "car",
+    "type": "text",
+    "placeholders": {}
+  },
+  "security": "security",
+  "@security": {
+    "description": "security",
+    "type": "text",
+    "placeholders": {}
+  },
+  "pleaseEnterFirstName": "pleaseEnterFirstName",
+  "@pleaseEnterFirstName": {
+    "description": "pleaseEnterFirstName",
+    "type": "text",
+    "placeholders": {}
+  },
+  "pleaseEnterMobile": "pleaseEnterMobile",
+  "@pleaseEnterMobile": {
+    "description": "pleaseEnterMobile",
+    "type": "text",
+    "placeholders": {}
+  },
+  "pleaseEnterPassword": "pleaseEnterPassword",
+  "@pleaseEnterPassword": {
+    "description": "pleaseEnterPassword",
+    "type": "text",
+    "placeholders": {}
+  },
+  "profilePic": "profilePic",
+  "@profilePic": {
+    "description": "profilePic",
+    "type": "text",
+    "placeholders": {}
+  },
+  "pleaseEnterLastName": "pleaseEnterLastName",
+  "@pleaseEnterLastName": {
+    "description": "pleaseEnterLastName",
+    "type": "text",
+    "placeholders": {}
+  },
+  "serialNumber": "serialNumber",
+  "@serialNumber": {
+    "description": "serialNumber",
+    "type": "text",
+    "placeholders": {}
+  },
+  "pleaseEnterSimNumber": "pleaseEnterSimNumber",
+  "@pleaseEnterSimNumber": {
+    "description": "pleaseEnterSimNumber",
+    "type": "text",
+    "placeholders": {}
+  },
+  "simNumber": "simNumber",
+  "@simNumber": {
+    "description": "simNumber",
+    "type": "text",
+    "placeholders": {}
+  },
+  "reTypePassword": "reTypePassword",
+  "@reTypePassword": {
+    "description": "reTypePassword",
+    "type": "text",
+    "placeholders": {}
+  },
+  "addCar": "addCar",
+  "@addCar": {
+    "description": "addCar",
+    "type": "text",
+    "placeholders": {}
+  },
+  "skip": "skip",
+  "@skip": {
+    "description": "skip",
+    "type": "text",
+    "placeholders": {}
+  },
+  "addCarFormTitle": "addCarFormTitle",
+  "@addCarFormTitle": {
+    "description": "addCarFormTitle",
+    "type": "text",
+    "placeholders": {}
+  },
+  "hasErrors": "hasErrors",
+  "@hasErrors": {
+    "description": "hasErrors",
+    "type": "text",
+    "placeholders": {}
+  },
+  "thisFormHasErrors": "thisFormHasErrors",
+  "@thisFormHasErrors": {
+    "description": "thisFormHasErrors",
+    "type": "text",
+    "placeholders": {}
+  },
+  "doYouRealyWantToExit": "doYouRealyWantToExit",
+  "@doYouRealyWantToExit": {
+    "description": "doYouRealyWantToExit",
+    "type": "text",
+    "placeholders": {}
+  },
+  "yes": "Yes",
+  "@yes": {
+    "description": "yes",
+    "type": "text",
+    "placeholders": {}
+  },
+  "no": "No",
+  "@no": {
+    "description": "no",
+    "type": "text",
+    "placeholders": {}
+  },
+  "magicarTitle": "MAGICAR",
+  "@magicarTitle": {
+    "description": "magicarTitle",
+    "type": "text",
+    "placeholders": {}
+  },
+  "areYouSureToExit": "Are You Sure To Exit",
+  "@areYouSureToExit": {
+    "description": "areYouSureToExit",
+    "type": "text",
+    "placeholders": {}
+  },
+  "noFingerPrintSupport": "No Finger Print Support!",
+  "@noFingerPrintSupport": {
+    "description": "noFingerPrintSupport",
+    "type": "text",
+    "placeholders": {}
+  },
+  "fingerPrintHint": "fingerPrintHint",
+  "@fingerPrintHint": {
+    "description": "fingerPrintHint",
+    "type": "text",
+    "placeholders": {}
+  },
+  "fingerprintNotRecognized": "fingerprintNotRecognized",
+  "@fingerprintNotRecognized": {
+    "description": "fingerprintNotRecognized",
+    "type": "text",
+    "placeholders": {}
+  },
+  "fingerprintSuccess": "fingerprintSuccess",
+  "@fingerprintSuccess": {
+    "description": "fingerprintSuccess",
+    "type": "text",
+    "placeholders": {}
+  },
+  "cancel": "cancel",
+  "@cancel": {
+    "description": "cancel",
+    "type": "text",
+    "placeholders": {}
+  },
+  "signInTitle": "signInTitle",
+  "@signInTitle": {
+    "description": "signInTitle",
+    "type": "text",
+    "placeholders": {}
+  },
+  "fingerprintRequiredTitle": "fingerprintRequiredTitle",
+  "@fingerprintRequiredTitle": {
+    "description": "fingerprintRequiredTitle",
+    "type": "text",
+    "placeholders": {}
+  },
+  "goToSettingsButton": "goToSettingsButton",
+  "@goToSettingsButton": {
+    "description": "goToSettingsButton",
+    "type": "text",
+    "placeholders": {}
+  },
+  "goToSettingsDescription": "goToSettingsDescription",
+  "@goToSettingsDescription": {
+    "description": "goToSettingsDescription",
+    "type": "text",
+    "placeholders": {}
+  },
+  "lockOut": "lockOut",
+  "@lockOut": {
+    "description": "lockOut",
+    "type": "text",
+    "placeholders": {}
+  },
+  "enable": "enable",
+  "@enable": {
+    "description": "enable",
+    "type": "text",
+    "placeholders": {}
+  },
+  "disable": "disable",
+  "@disable": {
+    "description": "disable",
+    "type": "text",
+    "placeholders": {}
+  },
+  "engineStart": "Start",
+  "@engineStart": {
+    "description": "engineStart",
+    "type": "text",
+    "placeholders": {}
+  },
+  "darkTheme": "Dark",
+  "@darkTheme": {
+    "description": "darkTheme",
+    "type": "text",
+    "placeholders": {}
+  },
+  "lightTheme": "Light",
+  "@lightTheme": {
+    "description": "lightTheme",
+    "type": "text",
+    "placeholders": {}
+  },
+  "appTheme": "Current App Theme",
+  "@appTheme": {
+    "description": "appTheme",
+    "type": "text",
+    "placeholders": {}
+  },
+  "withLogin": "Enter with Login",
+  "@withLogin": {
+    "description": "withLogin",
+    "type": "text",
+    "placeholders": {}
+  },
+  "noLogin": "Enter with no Login",
+  "@noLogin": {
+    "description": "noLogin",
+    "type": "text",
+    "placeholders": {}
+  },
+  "withFinger": "Enter wtih Finger Print",
+  "@withFinger": {
+    "description": "withFinger",
+    "type": "text",
+    "placeholders": {}
+  },
+  "withPassword": "Enter wtih Password",
+  "@withPassword": {
+    "description": "withPassword",
+    "type": "text",
+    "placeholders": {}
+  },
+  "withPattern": "Enetr with Pattern",
+  "@withPattern": {
+    "description": "withPattern",
+    "type": "text",
+    "placeholders": {}
+  },
+  "statusLogin": "Login Type",
+  "@statusLogin": {
+    "description": "statusLogin",
+    "type": "text",
+    "placeholders": {}
+  },
+  "carsNo": "Cars Counts",
+  "@carsNo": {
+    "description": "carsNo",
+    "type": "text",
+    "placeholders": {}
+  },
+  "counts": "Cars Counts",
+  "@counts": {
+    "description": "counts",
+    "type": "text",
+    "placeholders": {}
+  },
+  "allLoginFieldsRequired": "All Login Fields Required",
+  "@allLoginFieldsRequired": {
+    "description": "allLoginFieldsRequired",
+    "type": "text",
+    "placeholders": {}
+  },
+  "goBack": "Back",
+  "@goBack": {
+    "description": "goBack",
+    "type": "text",
+    "placeholders": {}
+  },
+  "forgotPassword": "Forgot Password",
+  "@forgotPassword": {
+    "description": "forgotPassword",
+    "type": "text",
+    "placeholders": {}
+  },
+  "recoverPassword": "Recover Password",
+  "@recoverPassword": {
+    "description": "recoverPassword",
+    "type": "text",
+    "placeholders": {}
+  },
+  "confirmSecurityCode": "Confirm Security Code",
+  "@confirmSecurityCode": {
+    "description": "confirmSecurityCode",
+    "type": "text",
+    "placeholders": {}
+  },
+  "distance": "Distance",
+  "@distance": {
+    "description": "distance",
+    "type": "text",
+    "placeholders": {}
+  },
+  "carTip": "Car Tip",
+  "@carTip": {
+    "description": "carTip",
+    "type": "text",
+    "placeholders": {}
+  },
+  "inLoadingApp": "Loading App...",
+  "@inLoadingApp": {
+    "description": "inLoadingApp",
+    "type": "text",
+    "placeholders": {}
+  },
+  "noConnection": "No Connection...",
+  "@noConnection": {
+    "description": "noConnection",
+    "type": "text",
+    "placeholders": {}
+  },
+  "description": "Description",
+  "@description": {
+    "description": "description",
+    "type": "text",
+    "placeholders": {}
+  },
+  "errorFetchData": "Error while fetching data",
+  "@errorFetchData": {
+    "description": "errorFetchData",
+    "type": "text",
+    "placeholders": {}
+  },
+  "users": "Users",
+  "@users": {
+    "description": "users",
+    "type": "text",
+    "placeholders": {}
+  },
+  "noDatatoShow": "No Data to Show",
+  "@noDatatoShow": {
+    "description": "noDatatoShow",
+    "type": "text",
+    "placeholders": {}
+  },
+  "useLogin": "Use Login",
+  "@useLogin": {
+    "description": "useLogin",
+    "type": "text",
+    "placeholders": {}
+  },
+  "usePassword": "Use Password",
+  "@usePassword": {
+    "description": "usePassword",
+    "type": "text",
+    "placeholders": {}
+  },
+  "useFingerPrint": "Use FingerPrint",
+  "@useFingerPrint": {
+    "description": "useFingerPrint",
+    "type": "text",
+    "placeholders": {}
+  },
+  "usePattern": "Use Pattern",
+  "@usePattern": {
+    "description": "usePattern",
+    "type": "text",
+    "placeholders": {}
+  },
+  "resetPassword": "Reset Password",
+  "@resetPassword": {
+    "description": "resetPassword",
+    "type": "text",
+    "placeholders": {}
+  },
+  "currentPlan": "Current Plan",
+  "@currentPlan": {
+    "description": "currentPlan",
+    "type": "text",
+    "placeholders": {}
+  },
+  "planCode": "Plan Code",
+  "@planCode": {
+    "description": "planCode",
+    "type": "text",
+    "placeholders": {}
+  },
+  "planTitle": "Plan Title",
+  "@planTitle": {
+    "description": "planTitle",
+    "type": "text",
+    "placeholders": {}
+  },
+  "invoiceDate": "Invoice Date",
+  "@invoiceDate": {
+    "description": "invoiceDate",
+    "type": "text",
+    "placeholders": {}
+  },
+  "startDate": "Start Date",
+  "@startDate": {
+    "description": "startDate",
+    "type": "text",
+    "placeholders": {}
+  },
+  "endDate": "End Date",
+  "@endDate": {
+    "description": "endDate",
+    "type": "text",
+    "placeholders": {}
+  },
+  "active": "Active",
+  "@active": {
+    "description": "active",
+    "type": "text",
+    "placeholders": {}
+  },
+  "deactive": "Deactive",
+  "@deactive": {
+    "description": "deactive",
+    "type": "text",
+    "placeholders": {}
+  },
+  "planStatus": "Plan Status",
+  "@planStatus": {
+    "description": "planStatus",
+    "type": "text",
+    "placeholders": {}
+  },
+  "planType": "Plan Type",
+  "@planType": {
+    "description": "planType",
+    "type": "text",
+    "placeholders": {}
+  },
+  "errorInUIs": "Error in Null Widget...",
+  "@errorInUIs": {
+    "description": "errorInUIs",
+    "type": "text",
+    "placeholders": {}
+  },
+  "errorInUIsDescription": "Error in Widget! Null Widget...",
+  "@errorInUIsDescription": {
+    "description": "errorInUIsDescription",
+    "type": "text",
+    "placeholders": {}
+  },
+  "reportModeTitle": "Report Problems us",
+  "@reportModeTitle": {
+    "description": "reportModeTitle",
+    "type": "text",
+    "placeholders": {}
+  },
+  "plans": "Plans",
+  "@plans": {
+    "description": "plans",
+    "type": "text",
+    "placeholders": {}
+  },
+  "pleaseEnterSecurityCode": "Please Enter Recieved Code",
+  "@pleaseEnterSecurityCode": {
+    "description": "pleaseEnterSecurityCode",
+    "type": "text",
+    "placeholders": {}
+  },
+  "notValidSecurityCode": "SecurityCode is not Valid",
+  "@notValidSecurityCode": {
+    "description": "notValidSecurityCode",
+    "type": "text",
+    "placeholders": {}
+  },
+  "plzEnterRecievedSecurityCode": "Enter Recieved SecurityCode",
+  "@plzEnterRecievedSecurityCode": {
+    "description": "plzEnterRecievedSecurityCode",
+    "type": "text",
+    "placeholders": {}
+  },
+  "userCounts": "User Counts",
+  "@userCounts": {
+    "description": "userCounts",
+    "type": "text",
+    "placeholders": {}
+  },
+  "resendSecurityCode": "Resend Code",
+  "@resendSecurityCode": {
+    "description": "resendSecurityCode",
+    "type": "text",
+    "placeholders": {}
+  },
+  "fromDate": "From Date",
+  "@fromDate": {
+    "description": "fromDate",
+    "type": "text",
+    "placeholders": {}
+  },
+  "cars": "Cars",
+  "@cars": {
+    "description": "cars",
+    "type": "text",
+    "placeholders": {}
+  },
+  "resetPasswordSuccessful": "Reset Password Successful",
+  "@resetPasswordSuccessful": {
+    "description": "resetPasswordSuccessful",
+    "type": "text",
+    "placeholders": {}
+  },
+  "resetPasswordUnSuccessful": "Reset Password UnSuccessful",
+  "@resetPasswordUnSuccessful": {
+    "description": "resetPasswordUnSuccessful",
+    "type": "text",
+    "placeholders": {}
+  },
+  "sendingCommand": "Sending",
+  "@sendingCommand": {
+    "description": "sendingCommand",
+    "type": "text",
+    "placeholders": {}
+  },
+  "sentCommand": "Sent",
+  "@sentCommand": {
+    "description": "sentCommand",
+    "type": "text",
+    "placeholders": {}
+  },
+  "sentCommandHasError": "Error",
+  "@sentCommandHasError": {
+    "description": "sentCommandHasError",
+    "type": "text",
+    "placeholders": {}
+  },
+  "hasFinger": "Device has FingerPrint",
+  "@hasFinger": {
+    "description": "hasFinger",
+    "type": "text",
+    "placeholders": {}
+  },
+  "noFinger": "Device does not Support FingerPrint",
+  "@noFinger": {
+    "description": "noFinger",
+    "type": "text",
+    "placeholders": {}
+  },
+  "loginWithPassword": "Login With Password",
+  "@loginWithPassword": {
+    "description": "loginWithPassword",
+    "type": "text",
+    "placeholders": {}
+  },
+  "authorizedSuccessfull": "Authorized Successfull",
+  "@authorizedSuccessfull": {
+    "description": "authorizedSuccessfull",
+    "type": "text",
+    "placeholders": {}
+  },
+  "authorizedFaild": "Authorized Faild",
+  "@authorizedFaild": {
+    "description": "authorizedFaild",
+    "type": "text",
+    "placeholders": {}
+  },
+  "authorized": "Authorized",
+  "@authorized": {
+    "description": "authorized",
+    "type": "text",
+    "placeholders": {}
+  },
+  "notAuthorized": "Not Authorized",
+  "@notAuthorized": {
+    "description": "notAuthorized",
+    "type": "text",
+    "placeholders": {}
+  },
+  "deviceNotAvailable": "Device Not Available",
+  "@deviceNotAvailable": {
+    "description": "deviceNotAvailable",
+    "type": "text",
+    "placeholders": {}
+  },
+  "registerSuccessful": "Register Successful",
+  "@registerSuccessful": {
+    "description": "registerSuccessful",
+    "type": "text",
+    "placeholders": {}
+  },
+  "noCarExist": "No Car Exist",
+  "@noCarExist": {
+    "description": "noCarExist",
+    "type": "text",
+    "placeholders": {}
+  },
+  "searchCar": "Search Car",
+  "@searchCar": {
+    "description": "searchCar",
+    "type": "text",
+    "placeholders": {}
+  },
+  "currentPassword": "Current Password",
+  "@currentPassword": {
+    "description": "currentPassword",
+    "type": "text",
+    "placeholders": {}
+  },
+  "plzWaiting": "Please Wait...",
+  "@plzWaiting": {
+    "description": "plzWaiting",
+    "type": "text",
+    "placeholders": {}
+  },
+  "toDate": "To Date",
+  "@toDate": {
+    "description": "toDate",
+    "type": "text",
+    "placeholders": {}
+  },
+  "planCost": "Plan Cost",
+  "@planCost": {
+    "description": "planCost",
+    "type": "text",
+    "placeholders": {}
+  },
+  "buyPlan": "Buy Plan",
+  "@buyPlan": {
+    "description": "buyPlan",
+    "type": "text",
+    "placeholders": {}
+  },
+  "invoiceAmount": "Invoice Amount",
+  "@invoiceAmount": {
+    "description": "invoiceAmount",
+    "type": "text",
+    "placeholders": {}
+  },
+  "carId": "Car ID",
+  "@carId": {
+    "description": "carId",
+    "type": "text",
+    "placeholders": {}
+  },
+  "plzSelectDeviceModel": "Please Select Device Model",
+  "@plzSelectDeviceModel": {
+    "description": "plzSelectDeviceModel",
+    "type": "text",
+    "placeholders": {}
+  },
+  "accessToActions": "Access To Actions",
+  "@accessToActions": {
+    "description": "accessToActions",
+    "type": "text",
+    "placeholders": {}
+  },
+  "confirmCarSuccessful": "Confirm Car Successful",
+  "@confirmCarSuccessful": {
+    "description": "confirmCarSuccessful",
+    "type": "text",
+    "placeholders": {}
+  },
+  "actionsCounts": "Actions Counts",
+  "@actionsCounts": {
+    "description": "actionsCounts",
+    "type": "text",
+    "placeholders": {}
+  },
+  "plzSelectNewRole": "Please Select New Role",
+  "@plzSelectNewRole": {
+    "description": "plzSelectNewRole",
+    "type": "text",
+    "placeholders": {}
+  },
+  "roleTitle": "Role Title",
+  "@roleTitle": {
+    "description": "roleTitle",
+    "type": "text",
+    "placeholders": {}
+  },
+  "changeRoleSuccessful": "Change Role Successful",
+  "@changeRoleSuccessful": {
+    "description": "changeRoleSuccessful",
+    "type": "text",
+    "placeholders": {}
+  },
+  "changeRoleUnSuccessful": "Change Role UnSuccessful",
+  "@changeRoleUnSuccessful": {
+    "description": "changeRoleUnSuccessful",
+    "type": "text",
+    "placeholders": {}
+  },
+  "rolesTitle": "Roles",
+  "@rolesTitle": {
+    "description": "rolesTitle",
+    "type": "text",
+    "placeholders": {}
+  },
+  "buyPlanSuccessful": "Buy Plan Successful",
+  "@buyPlanSuccessful": {
+    "description": "buyPlanSuccessful",
+    "type": "text",
+    "placeholders": {}
+  },
+  "buyPlanUnSuccessful": "Buy Plan UnSuccessful",
+  "@buyPlanUnSuccessful": {
+    "description": "buyPlanUnSuccessful",
+    "type": "text",
+    "placeholders": {}
+  },
+  "activateSuccessful": "Activate Successful",
+  "@activateSuccessful": {
+    "description": "activateSuccessful",
+    "type": "text",
+    "placeholders": {}
+  },
+  "activateunSuccessful": "Activateun Successful",
+  "@activateunSuccessful": {
+    "description": "activateunSuccessful",
+    "type": "text",
+    "placeholders": {}
+  },
+  "activatePlan": "Activate Plan",
+  "@activatePlan": {
+    "description": "activatePlan",
+    "type": "text",
+    "placeholders": {}
+  },
+  "planIsActive": "Plan Is Active",
+  "@planIsActive": {
+    "description": "planIsActive",
+    "type": "text",
+    "placeholders": {}
+  },
+  "carTitle": "Title",
+  "@carTitle": {
+    "description": "carTitle",
+    "type": "text",
+    "placeholders": {}
+  },
+  "carModelTitle": "Car Model",
+  "@carModelTitle": {
+    "description": "carModelTitle",
+    "type": "text",
+    "placeholders": {}
+  },
+  "carModelDetailTitle": "Tip",
+  "@carModelDetailTitle": {
+    "description": "carModelDetailTitle",
+    "type": "text",
+    "placeholders": {}
+  },
+  "changeUserRole": "Change User Role",
+  "@changeUserRole": {
+    "description": "changeUserRole",
+    "type": "text",
+    "placeholders": {}
+  },
+  "adminUserName": "Admin UserName",
+  "@adminUserName": {
+    "description": "adminUserName",
+    "type": "text",
+    "placeholders": {}
+  },
+  "carIsWaitingForConfirm": "Car Is Waiting For Confirm",
+  "@carIsWaitingForConfirm": {
+    "description": "carIsWaitingForConfirm",
+    "type": "text",
+    "placeholders": {}
+  },
+  "showAccessablActions": "Accessable Actions",
+  "@showAccessablActions": {
+    "description": "showAccessablActions",
+    "type": "text",
+    "placeholders": {}
+  },
+  "foundCar": "Found Car",
+  "@foundCar": {
+    "description": "foundCar",
+    "type": "text",
+    "placeholders": {}
+  },
+  "appSettings": "App Settings",
+  "@appSettings": {
+    "description": "appSettings",
+    "type": "text",
+    "placeholders": {}
+  },
+  "loadingLogin": "Loading Login",
+  "@loadingLogin": {
+    "description": "loadingLogin",
+    "type": "text",
+    "placeholders": {}
+  },
+  "close": "Close",
+  "@close": {
+    "description": "close",
+    "type": "text",
+    "placeholders": {}
+  },
+  "sendChanges": "Send Changes",
+  "@sendChanges": {
+    "description": "sendChanges",
+    "type": "text",
+    "placeholders": {}
+  },
+  "plzEnterRequiredData": "Please Enter Required Data",
+  "@plzEnterRequiredData": {
+    "description": "plzEnterRequiredData",
+    "type": "text",
+    "placeholders": {}
+  },
+  "logoutAccount": "Logout Account",
+  "@logoutAccount": {
+    "description": "logoutAccount",
+    "type": "text",
+    "placeholders": {}
+  },
+  "logoutSuccessful": "Logout Successful",
+  "@logoutSuccessful": {
+    "description": "logoutSuccessful",
+    "type": "text",
+    "placeholders": {}
+  },
+  "editProfileSuccessful": "Edit Profile Successful",
+  "@editProfileSuccessful": {
+    "description": "editProfileSuccessful",
+    "type": "text",
+    "placeholders": {}
+  },
+  "routeCars": "Route Cars",
+  "@routeCars": {
+    "description": "routeCars",
+    "type": "text",
+    "placeholders": {}
+  },
+  "getRouteCars": "Get Route Cars",
+  "@getRouteCars": {
+    "description": "getRouteCars",
+    "type": "text",
+    "placeholders": {}
+  },
+  "lastPostionOfCar": "Last Postion Of Car",
+  "@lastPostionOfCar": {
+    "description": "lastPostionOfCar",
+    "type": "text",
+    "placeholders": {}
+  },
+  "confirmPasswordError": "Confirm Password Error",
+  "@confirmPasswordError": {
+    "description": "confirmPasswordError",
+    "type": "text",
+    "placeholders": {}
+  },
+  "pelakNotvalid": "Pelak Not Valid",
+  "@pelakNotvalid": {
+    "description": "pelakNotvalid",
+    "type": "text",
+    "placeholders": {}
+  },
+  "carList": "Car List",
+  "@carList": {
+    "description": "carList",
+    "type": "text",
+    "placeholders": {}
+  },
+  "joinCars": "Join Cars",
+  "@joinCars": {
+    "description": "joinCars",
+    "type": "text",
+    "placeholders": {}
+  },
+  "report": "Report",
+  "@report": {
+    "description": "report",
+    "type": "text",
+    "placeholders": {}
+  },
+  "enablePlan": "Enable",
+  "@enablePlan": {
+    "description": "enablePlan",
+    "type": "text",
+    "placeholders": {}
+  },
+  "doFilter": "Do Filter",
+  "@doFilter": {
+    "description": "doFilter",
+    "type": "text",
+    "placeholders": {}
+  },
+  "delete": "Delete",
+  "@delete": {
+    "description": "delete",
+    "type": "text",
+    "placeholders": {}
+  },
+  "activateCar": "Activate",
+  "@activateCar": {
+    "description": "activateCar",
+    "type": "text",
+    "placeholders": {}
+  },
+  "messageTitle": "Action",
+  "@messageTitle": {
+    "description": "messageTitle",
+    "type": "text",
+    "placeholders": {}
+  },
+  "serviceDate": "Service Date",
+  "@serviceDate": {
+    "description": "serviceDate",
+    "type": "text",
+    "placeholders": {}
+  },
+  "alarmDate": "Alarm Date",
+  "@alarmDate": {
+    "description": "alarmDate",
+    "type": "text",
+    "placeholders": {}
+  },
+  "alarmCount": "Alarm Count",
+  "@alarmCount": {
+    "description": "alarmCount",
+    "type": "text",
+    "placeholders": {}
+  },
+  "actionDate": "Action Date",
+  "@actionDate": {
+    "description": "actionDate",
+    "type": "text",
+    "placeholders": {}
+  },
+  "serviceCost": "Service Cost",
+  "@serviceCost": {
+    "description": "serviceCost",
+    "type": "text",
+    "placeholders": {}
+  },
+  "allFieldsRequired": "All Fields Required",
+  "@allFieldsRequired": {
+    "description": "allFieldsRequired",
+    "type": "text",
+    "placeholders": {}
+  },
+  "alarmDurationDay": "alarmDurationDay",
+  "@alarmDurationDay": {
+    "description": "alarmDurationDay",
+    "type": "text",
+    "placeholders": {}
+  },
+  "automationInsert": "automationInsert",
+  "@automationInsert": {
+    "description": "automationInsert",
+    "type": "text",
+    "placeholders": {}
+  },
+  "durationCountValue": "durationCountValue",
+  "@durationCountValue": {
+    "description": "durationCountValue",
+    "type": "text",
+    "placeholders": {}
+  },
+  "durationValue": "durationValue",
+  "@durationValue": {
+    "description": "durationValue",
+    "type": "text",
+    "placeholders": {}
+  },
+  "serviceTypeCode": "serviceTypeCode",
+  "@serviceTypeCode": {
+    "description": "serviceTypeCode",
+    "type": "text",
+    "placeholders": {}
+  },
+  "serviceTypeTitle": "serviceTypeTitle",
+  "@serviceTypeTitle": {
+    "description": "serviceTypeTitle",
+    "type": "text",
+    "placeholders": {}
+  },
+  "plzSelectACarToRoute": "plz Select A Car To Route",
+  "@plzSelectACarToRoute": {
+    "description": "plzSelectACarToRoute",
+    "type": "text",
+    "placeholders": {}
+  },
+  "yourLocationNotFound": "yourLocationNotFound",
+  "@yourLocationNotFound": {
+    "description": "yourLocationNotFound",
+    "type": "text",
+    "placeholders": {}
+  },
+  "carJoindBefore": "Last Cars",
+  "@carJoindBefore": {
+    "description": "carJoindBefore",
+    "type": "text",
+    "placeholders": {}
+  },
+  "selectForJoin": "Select to Join",
+  "@selectForJoin": {
+    "description": "selectForJoin",
+    "type": "text",
+    "placeholders": {}
+  },
+  "editCarSuccessful": "Edit Car Successful",
+  "@editCarSuccessful": {
+    "description": "editCarSuccessful",
+    "type": "text",
+    "placeholders": {}
+  },
+  "editCarUnSuccessful": "Edit Car UnSuccessful",
+  "@editCarUnSuccessful": {
+    "description": "editCarUnSuccessful",
+    "type": "text",
+    "placeholders": {}
+  },
+  "messageDate": "Message Date",
+  "@messageDate": {
+    "description": "messageDate",
+    "type": "text",
+    "placeholders": {}
+  },
+  "messageSubject": "Message Subject",
+  "@messageSubject": {
+    "description": "messageSubject",
+    "type": "text",
+    "placeholders": {}
+  },
+  "messageBody": "Message Body",
+  "@messageBody": {
+    "description": "messageBody",
+    "type": "text",
+    "placeholders": {}
+  },
+  "messageSentUnSuccessfull": "Message Sent UnSuccessfull",
+  "@messageSentUnSuccessfull": {
+    "description": "messageSentUnSuccessfull",
+    "type": "text",
+    "placeholders": {}
+  },
+  "messageHasSentSuccessfull": "Message Sent Successfull",
+  "@messageHasSentSuccessfull": {
+    "description": "messageHasSentSuccessfull",
+    "type": "text",
+    "placeholders": {}
+  },
+  "sendMessage": "Sending Message",
+  "@sendMessage": {
+    "description": "sendMessage",
+    "type": "text",
+    "placeholders": {}
+  },
+  "noServiceTypes": "No ServiceTypes",
+  "@noServiceTypes": {
+    "description": "noServiceTypes",
+    "type": "text",
+    "placeholders": {}
+  },
+  "showDetails": "Show Details",
+  "@showDetails": {
+    "description": "showDetails",
+    "type": "text",
+    "placeholders": {}
+  },
+  "confimDelete": "Alarm to Delete!",
+  "@confimDelete": {
+    "description": "confimDelete",
+    "type": "text",
+    "placeholders": {}
+  },
+  "areYouSureToDelete": "Are You Sure To Delete?",
+  "@areYouSureToDelete": {
+    "description": "areYouSureToDelete",
+    "type": "text",
+    "placeholders": {}
+  },
+  "carNotFound": "Car Not Found",
+  "@carNotFound": {
+    "description": "carNotFound",
+    "type": "text",
+    "placeholders": {}
+  },
+  "serviceType": "Service Type",
+  "@serviceType": {
+    "description": "serviceType",
+    "type": "text",
+    "placeholders": {}
+  },
+  "serviceTypeIsDurational": "Durational",
+  "@serviceTypeIsDurational": {
+    "description": "serviceTypeIsDurational",
+    "type": "text",
+    "placeholders": {}
+  },
+  "serviceTypeIsFunctionality": "Functional",
+  "@serviceTypeIsFunctionality": {
+    "description": "serviceTypeIsFunctionality",
+    "type": "text",
+    "placeholders": {}
+  },
+  "functional": "Functional",
+  "@functional": {
+    "description": "functional",
+    "type": "text",
+    "placeholders": {}
+  },
+  "durational": "Durational",
+  "@durational": {
+    "description": "durational",
+    "type": "text",
+    "placeholders": {}
+  },
+  "both": "Both",
+  "@both": {
+    "description": "both",
+    "type": "text",
+    "placeholders": {}
+  },
+  "durationDay": "Day",
+  "@durationDay": {
+    "description": "durationDay",
+    "type": "text",
+    "placeholders": {}
+  },
+  "durationMonth": "Month",
+  "@durationMonth": {
+    "description": "durationMonth",
+    "type": "text",
+    "placeholders": {}
+  },
+  "durationYear": "Year",
+  "@durationYear": {
+    "description": "durationYear",
+    "type": "text",
+    "placeholders": {}
+  },
+  "remaind": "Remaind",
+  "@remaind": {
+    "description": "remaind",
+    "type": "text",
+    "placeholders": {}
+  },
+  "durationFunctionalCountValue": "durationFunctionalCountValue",
+  "@durationFunctionalCountValue": {
+    "description": "durationFunctionalCountValue",
+    "type": "text",
+    "placeholders": {}
+  },
+  "durationFunctionalValue": "durationFunctionalValue",
+  "@durationFunctionalValue": {
+    "description": "durationFunctionalValue",
+    "type": "text",
+    "placeholders": {}
+  },
+  "securityCodeWillSmsYou": "Your Password SMS you",
+  "@securityCodeWillSmsYou": {
+    "description": "securityCodeWillSmsYou",
+    "type": "text",
+    "placeholders": {}
+  },
+  "smsHasRead": "Read",
+  "@smsHasRead": {
+    "description": "smsHasRead",
+    "type": "text",
+    "placeholders": {}
+  },
+  "smsHasUnRead": "UnRead",
+  "@smsHasUnRead": {
+    "description": "smsHasUnRead",
+    "type": "text",
+    "placeholders": {}
+  },
+  "loginAndThenEditYourProfile": "Login And Then Edit Your Profile With Password: 1111",
+  "@loginAndThenEditYourProfile": {
+    "description": "loginAndThenEditYourProfile",
+    "type": "text",
+    "placeholders": {}
+  },
+  "passwordHasChanged": "PasswordHas Changed",
+  "@passwordHasChanged": {
+    "description": "passwordHasChanged",
+    "type": "text",
+    "placeholders": {}
+  },
+  "changePasswordError": "Change Password Has Error",
+  "@changePasswordError": {
+    "description": "changePasswordError",
+    "type": "text",
+    "placeholders": {}
+  },
+  "changePasswordTitle": "Change Password Title",
+  "@changePasswordTitle": {
+    "description": "changePasswordTitle",
+    "type": "text",
+    "placeholders": {}
+  },
+  "replyMessage": "Reply Message",
+  "@replyMessage": {
+    "description": "replyMessage",
+    "type": "text",
+    "placeholders": {}
+  },
+  "actionService": "Action Service",
+  "@actionService": {
+    "description": "actionService",
+    "type": "text",
+    "placeholders": {}
+  },
+  "done": "Done",
+  "@done": {
+    "description": "done",
+    "type": "text",
+    "placeholders": {}
+  },
+  "notDone": "Not Done",
+  "@notDone": {
+    "description": "notDone",
+    "type": "text",
+    "placeholders": {}
+  },
+  "fromDateToDate": "From Date by Date",
+  "@fromDateToDate": {
+    "description": "fromDateToDate",
+    "type": "text",
+    "placeholders": {}
+  },
+  "showReportBaseOnDate": "Show Report BaseOn Date",
+  "@showReportBaseOnDate": {
+    "description": "showReportBaseOnDate",
+    "type": "text",
+    "placeholders": {}
+  },
+  "showReportBaseOnDays": "Show Report Base On Last Days",
+  "@showReportBaseOnDays": {
+    "description": "showReportBaseOnDays",
+    "type": "text",
+    "placeholders": {}
+  },
+  "fromLastDays": "From Last Days",
+  "@fromLastDays": {
+    "description": "fromLastDays",
+    "type": "text",
+    "placeholders": {}
+  },
+  "alarmDistance": "Alarm Distance",
+  "@alarmDistance": {
+    "description": "alarmDistance",
+    "type": "text",
+    "placeholders": {}
+  },
+  "areYouSureToExitForBackTouchCancel": "Are You Sure To Exit ? For Back Touch Cancel",
+  "@areYouSureToExitForBackTouchCancel": {
+    "description": "areYouSureToExitForBackTouchCancel",
+    "type": "text",
+    "placeholders": {}
+  },
+  "carPairedCounts": "carPairedCounts",
+  "@carPairedCounts": {
+    "description": "carPairedCounts",
+    "type": "text",
+    "placeholders": {}
+  },
+  "carToRequestForPair": "carToRequestForPair",
+  "@carToRequestForPair": {
+    "description": "carToRequestForPair",
+    "type": "text",
+    "placeholders": {}
+  },
+  "addToPaired": "addToPaired",
+  "@addToPaired": {
+    "description": "addToPaired",
+    "type": "text",
+    "placeholders": {}
+  },
+  "masterCarId": "masterCarId",
+  "@masterCarId": {
+    "description": "masterCarId",
+    "type": "text",
+    "placeholders": {}
+  },
+  "thisCarPaired": "thisCarPaired",
+  "@thisCarPaired": {
+    "description": "thisCarPaired",
+    "type": "text",
+    "placeholders": {}
+  },
+  "messageRead": "Read",
+  "@messageRead": {
+    "description": "messageRead",
+    "type": "text",
+    "placeholders": {}
+  },
+  "errorinSignUp": "errorinSignUp",
+  "@errorinSignUp": {
+    "description": "errorinSignUp",
+    "type": "text",
+    "placeholders": {}
+  },
+  "navigateToCurrent": "navigateToCurrent",
+  "@navigateToCurrent": {
+    "description": "navigateToCurrent",
+    "type": "text",
+    "placeholders": {}
+  },
+  "payPlan": "payPlan",
+  "@payPlan": {
+    "description": "payPlan",
+    "type": "text",
+    "placeholders": {}
+  },
+  "actionUsername": "actionUsername",
+  "@actionUsername": {
+    "description": "actionUsername",
+    "type": "text",
+    "placeholders": {}
+  },
+  "chargeAmount": "chargeAmount",
+  "@chargeAmount": {
+    "description": "chargeAmount",
+    "type": "text",
+    "placeholders": {}
+  },
+  "chargeSimCard": "chargeSimCard",
+  "@chargeSimCard": {
+    "description": "chargeSimCard",
+    "type": "text",
+    "placeholders": {}
+  },
+  "getHardwareVersion": "getHardwareVersion",
+  "@getHardwareVersion": {
+    "description": "getHardwareVersion",
+    "type": "text",
+    "placeholders": {}
+  },
+  "sendInfoAccuracy": "sendInfoAccuracy",
+  "@sendInfoAccuracy": {
+    "description": "sendInfoAccuracy",
+    "type": "text",
+    "placeholders": {}
+  },
+  "gethHrdwareVersion": "gethHrdwareVersion",
+  "@gethHrdwareVersion": {
+    "description": "gethHrdwareVersion",
+    "type": "text",
+    "placeholders": {}
+  },
+  "forGethwareVersionClickGetButton": "forGethwareVersionClickGetButton",
+  "@forGethwareVersionClickGetButton": {
+    "description": "forGethwareVersionClickGetButton",
+    "type": "text",
+    "placeholders": {}
+  },
+  "getChargeAmount": "getChargeAmount",
+  "@getChargeAmount": {
+    "description": "getChargeAmount",
+    "type": "text",
+    "placeholders": {}
+  },
+  "maxSpeed": "maxSpeed",
+  "@maxSpeed": {
+    "description": "maxSpeed",
+    "type": "text",
+    "placeholders": {}
+  },
+  "minSpeed": "minSpeed",
+  "@minSpeed": {
+    "description": "minSpeed",
+    "type": "text",
+    "placeholders": {}
+  },
+  "periodicSendTime": "periodicSendTime",
+  "@periodicSendTime": {
+    "description": "periodicSendTime",
+    "type": "text",
+    "placeholders": {}
+  },
+  "periodicAccuracy": "periodicAccuracy",
+  "@periodicAccuracy": {
+    "description": "periodicAccuracy",
+    "type": "text",
+    "placeholders": {}
+  },
+  "hardWareVersion": "hardWareVersion",
+  "@hardWareVersion": {
+    "description": "hardWareVersion",
+    "type": "text",
+    "placeholders": {}
+  },
+  "plzEnterChargePassword": "plzEnterChargePassword",
+  "@plzEnterChargePassword": {
+    "description": "plzEnterChargePassword",
+    "type": "text",
+    "placeholders": {}
+  },
+  "iranTitle": "iranTitle",
+  "@iranTitle": {
+    "description": "iranTitle",
+    "type": "text",
+    "placeholders": {}
+  },
+  "services": "services",
+  "@services": {
+    "description": "services",
+    "type": "text",
+    "placeholders": {}
+  },
+  "cancelService": "cancelService",
+  "@cancelService": {
+    "description": "cancelService",
+    "type": "text",
+    "placeholders": {}
+  },
+  "notDoneService": "notDoneService",
+  "@notDoneService": {
+    "description": "notDoneService",
+    "type": "text",
+    "placeholders": {}
+  },
+  "denyRequest": "denyRequest",
+  "@denyRequest": {
+    "description": "denyRequest",
+    "type": "text",
+    "placeholders": {}
+  },
+  "accuracyInfo": "accuracyInfo",
+  "@accuracyInfo": {
+    "description": "accuracyInfo",
+    "type": "text",
+    "placeholders": {}
+  },
+  "sendCommand": "sendCommand",
+  "@sendCommand": {
+    "description": "sendCommand",
+    "type": "text",
+    "placeholders": {}
+  },
+  "sabteInfo": "sabteInfo",
+  "@sabteInfo": {
+    "description": "sabteInfo",
+    "type": "text",
+    "placeholders": {}
+  },
+  "lowLevel": "lowLevel",
+  "@lowLevel": {
+    "description": "lowLevel",
+    "type": "text",
+    "placeholders": {}
+  },
+  "mediumLevel": "mediumLevel",
+  "@mediumLevel": {
+    "description": "mediumLevel",
+    "type": "text",
+    "placeholders": {}
+  },
+  "highLevel": "highLevel",
+  "@highLevel": {
+    "description": "highLevel",
+    "type": "text",
+    "placeholders": {}
+  },
+  "minStopTime": "minStopTime",
+  "@minStopTime": {
+    "description": "minStopTime",
+    "type": "text",
+    "placeholders": {}
+  },
+  "showReport": "showReport",
+  "@showReport": {
+    "description": "showReport",
+    "type": "text",
+    "placeholders": {}
+  },
+  "remaindToNextService": "remaindToNextService",
+  "@remaindToNextService": {
+    "description": "remaindToNextService",
+    "type": "text",
+    "placeholders": {}
+  },
+  "forGetChargeAmount": "forGetChargeAmount",
+  "@forGetChargeAmount": {
+    "description": "forGetChargeAmount",
+    "type": "text",
+    "placeholders": {}
+  },
+  "messageCount": "messageCount",
+  "@messageCount": {
+    "description": "messageCount",
+    "type": "text",
+    "placeholders": {}
+  },
+  "distanceDone": "distanceDone",
+  "@distanceDone": {
+    "description": "distanceDone",
+    "type": "text",
+    "placeholders": {}
+  },
+  "serviceDoneDate": "serviceDoneDate",
+  "@serviceDoneDate": {
+    "description": "serviceDoneDate",
+    "type": "text",
+    "placeholders": {}
+  },
+  "currentDistance": "currentDistance",
+  "@currentDistance": {
+    "description": "currentDistance",
+    "type": "text",
+    "placeholders": {}
+  },
+  "securitySettings": "securitySettings",
+  "@securitySettings": {
+    "description": "securitySettings",
+    "type": "text",
+    "placeholders": {}
+  },
+  "reservationIsDisabled": "reservationIsDisabled",
+  "@reservationIsDisabled": {
+    "description": "reservationIsDisabled",
+    "type": "text",
+    "placeholders": {}
+  },
+  "document": "document",
+  "@document": {
+    "description": "document",
+    "type": "text",
+    "placeholders": {}
+  },
+  "shareHelpText": "shareHelpText",
+  "@shareHelpText": {
+    "description": "shareHelpText",
+    "type": "text",
+    "placeholders": {}
+  },
+  "shareHelpSubject": "shareHelpSubject",
+  "@shareHelpSubject": {
+    "description": "shareHelpSubject",
+    "type": "text",
+    "placeholders": {}
+  },
+  "title": "MagiCar",
+  "@title": {
+    "description": "MagiCar Co.",
+    "type": "text",
+    "placeholders": {}
+  }
+}

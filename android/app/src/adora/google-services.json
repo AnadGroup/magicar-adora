@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "617970284324",
+    "firebase_url": "https://adora-6c29e.firebaseio.com",
+    "project_id": "adora-6c29e",
+    "storage_bucket": "adora-6c29e.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:617970284324:android:615bd2afdee2bf7753a5b1",
+        "android_client_info": {
+          "package_name": "com.adora"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "617970284324-ecbk2lfnq2jn9ofedn301s3naosfn7bi.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCYb39gjD-kaKiqoE3dblsArnw8OgqOVk0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "617970284324-ecbk2lfnq2jn9ofedn301s3naosfn7bi.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

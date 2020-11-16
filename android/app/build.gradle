@@ -1,0 +1,192 @@
+import java.util.regex.Matcher
+import java.util.regex.Pattern
+
+def localProperties = new Properties()
+def localPropertiesFile = rootProject.file('local.properties')
+if (localPropertiesFile.exists()) {
+    localPropertiesFile.withReader('UTF-8') { reader ->
+        localProperties.load(reader)
+    }
+}
+
+def flutterRoot = localProperties.getProperty('flutter.sdk')
+if (flutterRoot == null) {
+    throw new GradleException("Flutter SDK not found. Define location with flutter.sdk in the local.properties file.")
+}
+
+def flutterVersionCode = localProperties.getProperty('flutter.versionCode')
+if (flutterVersionCode == null) {
+    flutterVersionCode = '1'
+}
+
+def flutterVersionName = localProperties.getProperty('flutter.versionName')
+if (flutterVersionName == null) {
+    flutterVersionName = '1.0.3'
+}
+
+def getCurrentFlavour() {
+    Gradle gradle = getGradle()
+    String  tskReqStr = gradle.getStartParameter().getTaskRequests().toString()
+
+    Pattern pattern
+
+    if( tskReqStr.contains( "assemble" ) )
+        pattern = Pattern.compile("assemble(\\w+)(Release|Debug)")
+    else
+        pattern = Pattern.compile("generate(\\w+)(Release|Debug)")
+
+    Matcher matcher = pattern.matcher( tskReqStr )
+
+    if( matcher.find() )
+        return matcher.group(1).toLowerCase()
+    else
+    {
+        println "NO MATCH FOUND"
+        return ""
+    }
+}
+
+def getCurrentVariant() {
+    Gradle gradle = getGradle()
+    String tskReqStr = gradle.getStartParameter().getTaskRequests().toString()
+
+    Pattern pattern
+
+    if (tskReqStr.contains("assemble"))
+        pattern = Pattern.compile("assemble(\\w+)(Release|Debug)")
+    else
+        pattern = Pattern.compile("generate(\\w+)(Release|Debug)")
+
+    Matcher matcher = pattern.matcher(tskReqStr)
+
+    if (matcher.find()){
+        return matcher.group(2).toLowerCase()
+    }else{
+        println "NO MATCH FOUND"
+        return ""
+    }
+}
+
+def getCurrentApplicationId() {
+    def currFlavor = getCurrentFlavor()
+
+    def outStr = ''
+    android.productFlavors.all{ flavor ->
+
+        if( flavor.name==currFlavor )
+            outStr=flavor.applicationId
+    }
+
+    return outStr
+}
+
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'com.google.gms.google-services'
+apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
+
+android {
+
+    flavorDimensions "flavor-type"
+
+    productFlavors {
+        magicar {
+            dimension "flavor-type"
+            applicationId "com.magicar"
+            resValue "string", "app_name", "Magicar"
+            resValue "string" ,"default_notification_channel_id","magicar_channel"
+            manifestPlaceholders = [
+                    appIcon: "@mipmap/magicar_icon",
+                    appIconRound: "@mipmap/magicar_icon"
+            ]
+        }
+        adora {
+            dimension "flavor-type"
+            applicationId "com.adora"
+            resValue "string", "app_name", "Adora"
+            resValue "string" ,"default_notification_channel_id","adora_channel"
+            manifestPlaceholders = [
+                    appIcon: "@mipmap/adora_icon",
+                    appIconRound: "@mipmap/adora_icon"
+            ]
+        }
+    }
+
+
+
+
+
+    compileSdkVersion 28
+
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'  
+    }
+
+    lintOptions {
+        disable 'InvalidPackage'
+    }
+
+    defaultConfig {
+        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
+        applicationId "com.anad.magicar.anad_magicar"
+      
+        
+
+        minSdkVersion 20
+        targetSdkVersion 28
+        multiDexEnabled true
+        versionCode flutterVersionCode.toInteger()
+        versionName flutterVersionName
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+      
+
+    }
+ def flavourName = getCurrentFlavour()
+  if (flavourName == "originalFlavour") {
+    println("This is Dev")
+   } else if (flavourName == "freeFlavour") {
+    println("This is Staging")
+   }  else {
+    println("NA")
+   }
+
+
+
+    
+    buildTypes {
+
+    
+        release {
+            // TODO: Add your own signing config for the release build.
+            // Signing with the debug keys for now, so `flutter run --release` works.
+            signingConfig signingConfigs.debug
+        }
+
+
+    }
+
+
+}
+
+flutter {
+    source '../..'
+}
+
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'androidx.test:runner:1.1.1'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
+    //implementation 'com.google.firebase:firebase-core:17.2.2'
+    //implementation "com.google.firebase:firebase-analytics:17.2.2"
+    implementation "com.google.firebase:firebase-messaging:20.1.0"
+    //implementation "com.google.firebase:firebase-iid:20.0.2"
+    implementation "androidx.core:core:1.1.0"
+    implementation "androidx.media:media:1.2.0-alpha01"
+}
+
+
+
+
+

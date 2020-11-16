@@ -1,0 +1,1809 @@
+{
+  "@@last_modified": "2020-10-28T14:53:57.250782",
+  "confirm": "تایید",
+  "@confirm": {
+    "description": "Confirm Security Code",
+    "type": "text",
+    "placeholders": {}
+  },
+  "register": "ثبت نام",
+  "@register": {
+    "description": "register",
+    "type": "text",
+    "placeholders": {}
+  },
+  "securitycode": "کد امنیتی",
+  "@securitycode": {
+    "description": "securitycode",
+    "type": "text",
+    "placeholders": {}
+  },
+  "help": "راهنما",
+  "@help": {
+    "description": "Help",
+    "type": "text",
+    "placeholders": {}
+  },
+  "search": "جستجو",
+  "@search": {
+    "description": "search",
+    "type": "text",
+    "placeholders": {}
+  },
+  "support": "پشتیبانی",
+  "@support": {
+    "description": "support",
+    "type": "text",
+    "placeholders": {}
+  },
+  "login": "ورود",
+  "@login": {
+    "description": "login",
+    "type": "text",
+    "placeholders": {}
+  },
+  "exit": "خروج",
+  "@exit": {
+    "description": "exit",
+    "type": "text",
+    "placeholders": {}
+  },
+  "basket": "سبد",
+  "@basket": {
+    "description": "basket",
+    "type": "text",
+    "placeholders": {}
+  },
+  "userName": "نام کاربری",
+  "@userName": {
+    "description": "userName",
+    "type": "text",
+    "placeholders": {}
+  },
+  "home": "خانه",
+  "@home": {
+    "description": "home",
+    "type": "text",
+    "placeholders": {}
+  },
+  "mobile": "همراه",
+  "@mobile": {
+    "description": "mobile",
+    "type": "text",
+    "placeholders": {}
+  },
+  "phone": "تلفن",
+  "@phone": {
+    "description": "phone",
+    "type": "text",
+    "placeholders": {}
+  },
+  "address": "آدرس",
+  "@address": {
+    "description": "address",
+    "type": "text",
+    "placeholders": {}
+  },
+  "firstName": "نام",
+  "@firstName": {
+    "description": "firstName",
+    "type": "text",
+    "placeholders": {}
+  },
+  "lastName": "نام خانوادگی",
+  "@lastName": {
+    "description": "lastName",
+    "type": "text",
+    "placeholders": {}
+  },
+  "age": "سن",
+  "@age": {
+    "description": "age",
+    "type": "text",
+    "placeholders": {}
+  },
+  "userinfo": "اطلاعات کاربری",
+  "@userinfo": {
+    "description": "userinfo",
+    "type": "text",
+    "placeholders": {}
+  },
+  "deviceinfo": "اطلاعات دستگاه",
+  "@deviceinfo": {
+    "description": "deviceinfo",
+    "type": "text",
+    "placeholders": {}
+  },
+  "cartype": "نوع خودرو",
+  "@cartype": {
+    "description": "cartype",
+    "type": "text",
+    "placeholders": {}
+  },
+  "carcolor": "رنگ خودرو",
+  "@carcolor": {
+    "description": "carcolor",
+    "type": "text",
+    "placeholders": {}
+  },
+  "carfunction": "کارکرد خودرو",
+  "@carfunction": {
+    "description": "carfunction",
+    "type": "text",
+    "placeholders": {}
+  },
+  "caryear": "سال ساخت",
+  "@caryear": {
+    "description": "caryear",
+    "type": "text",
+    "placeholders": {}
+  },
+  "carmodel": "مدل",
+  "@carmodel": {
+    "description": "carmodel",
+    "type": "text",
+    "placeholders": {}
+  },
+  "carbtitle": "عنوان",
+  "@carbtitle": {
+    "description": "carbtitle",
+    "type": "text",
+    "placeholders": {}
+  },
+  "devicemobile": "شماره همراه دستگاه",
+  "@devicemobile": {
+    "description": "devicemobile",
+    "type": "text",
+    "placeholders": {}
+  },
+  "password": "رمز عبور",
+  "@password": {
+    "description": "password",
+    "type": "text",
+    "placeholders": {}
+  },
+  "imei": "IMEI",
+  "@imei": {
+    "description": "imei",
+    "type": "text",
+    "placeholders": {}
+  },
+  "simcartno": "شماره سیم کارت",
+  "@simcartno": {
+    "description": "simcartno",
+    "type": "text",
+    "placeholders": {}
+  },
+  "settings": "تنظیمات",
+  "@settings": {
+    "description": "settings",
+    "type": "text",
+    "placeholders": {}
+  },
+  "on": "روشن",
+  "@on": {
+    "description": "on",
+    "type": "text",
+    "placeholders": {}
+  },
+  "off": "خاموش",
+  "@off": {
+    "description": "off",
+    "type": "text",
+    "placeholders": {}
+  },
+  "mobilename": "همراه",
+  "@mobilename": {
+    "description": "mobilename",
+    "type": "text",
+    "placeholders": {}
+  },
+  "pattern": "الگو",
+  "@pattern": {
+    "description": "pattern",
+    "type": "text",
+    "placeholders": {}
+  },
+  "admin": "Admin",
+  "@admin": {
+    "description": "admin",
+    "type": "text",
+    "placeholders": {}
+  },
+  "edit": "ویرایش",
+  "@edit": {
+    "description": "edit",
+    "type": "text",
+    "placeholders": {}
+  },
+  "carbrand": "برند خودرو",
+  "@carbrand": {
+    "description": "carbrand",
+    "type": "text",
+    "placeholders": {}
+  },
+  "carpelak": "پلاک",
+  "@carpelak": {
+    "description": "carpelak",
+    "type": "text",
+    "placeholders": {}
+  },
+  "loadingdata": "بارگذاری اطلاعات...",
+  "@loadingdata": {
+    "description": "loadingdata",
+    "type": "text",
+    "placeholders": {}
+  },
+  "confirmrecievecode": "تایید کد دریافتی",
+  "@confirmrecievecode": {
+    "description": "confirmrecievecode",
+    "type": "text",
+    "placeholders": {}
+  },
+  "send": "ارسال",
+  "@send": {
+    "description": "send",
+    "type": "text",
+    "placeholders": {}
+  },
+  "noimage": "بدون عکس",
+  "@noimage": {
+    "description": "noimage",
+    "type": "text",
+    "placeholders": {}
+  },
+  "dataloaded": "اطلاعات بارگذاری شد",
+  "@dataloaded": {
+    "description": "dataloaded",
+    "type": "text",
+    "placeholders": {}
+  },
+  "email": "ایمیل",
+  "@email": {
+    "description": "email",
+    "type": "text",
+    "placeholders": {}
+  },
+  "profile": "پروفایل",
+  "@profile": {
+    "description": "profile",
+    "type": "text",
+    "placeholders": {}
+  },
+  "authToAccess": "مجوز دسترسی",
+  "@authToAccess": {
+    "description": "authToAccess",
+    "type": "text",
+    "placeholders": {}
+  },
+  "car": "خودرو",
+  "@car": {
+    "description": "car",
+    "type": "text",
+    "placeholders": {}
+  },
+  "security": "امنیتی",
+  "@security": {
+    "description": "security",
+    "type": "text",
+    "placeholders": {}
+  },
+  "pleaseEnterFirstName": "لطفا نام را وارد کنید",
+  "@pleaseEnterFirstName": {
+    "description": "pleaseEnterFirstName",
+    "type": "text",
+    "placeholders": {}
+  },
+  "pleaseEnterMobile": "لطفا همراه را وارد کنید",
+  "@pleaseEnterMobile": {
+    "description": "pleaseEnterMobile",
+    "type": "text",
+    "placeholders": {}
+  },
+  "pleaseEnterPassword": "لطفا رمز عبور را وارد کنید",
+  "@pleaseEnterPassword": {
+    "description": "pleaseEnterPassword",
+    "type": "text",
+    "placeholders": {}
+  },
+  "profilePic": "تصویر پروفایل",
+  "@profilePic": {
+    "description": "profilePic",
+    "type": "text",
+    "placeholders": {}
+  },
+  "pleaseEnterLastName": "لطفا نام خانوادگی را وارد کنید",
+  "@pleaseEnterLastName": {
+    "description": "pleaseEnterLastName",
+    "type": "text",
+    "placeholders": {}
+  },
+  "serialNumber": "شماره سریال",
+  "@serialNumber": {
+    "description": "serialNumber",
+    "type": "text",
+    "placeholders": {}
+  },
+  "pleaseEnterSimNumber": "لطفا شماره سیم کارت را وارد کنید",
+  "@pleaseEnterSimNumber": {
+    "description": "pleaseEnterSimNumber",
+    "type": "text",
+    "placeholders": {}
+  },
+  "simNumber": "شماره سیم کارت",
+  "@simNumber": {
+    "description": "simNumber",
+    "type": "text",
+    "placeholders": {}
+  },
+  "reTypePassword": "ورود مجدد رمز",
+  "@reTypePassword": {
+    "description": "reTypePassword",
+    "type": "text",
+    "placeholders": {}
+  },
+  "addCar": "افزودن خودرو",
+  "@addCar": {
+    "description": "addCar",
+    "type": "text",
+    "placeholders": {}
+  },
+  "skip": "نادیده گرفتن",
+  "@skip": {
+    "description": "skip",
+    "type": "text",
+    "placeholders": {}
+  },
+  "addCarFormTitle": "افزودن خودرو",
+  "@addCarFormTitle": {
+    "description": "addCarFormTitle",
+    "type": "text",
+    "placeholders": {}
+  },
+  "hasErrors": "خطا وجود دارد!",
+  "@hasErrors": {
+    "description": "hasErrors",
+    "type": "text",
+    "placeholders": {}
+  },
+  "thisFormHasErrors": "خطا رخ داده است!",
+  "@thisFormHasErrors": {
+    "description": "thisFormHasErrors",
+    "type": "text",
+    "placeholders": {}
+  },
+  "doYouRealyWantToExit": "از خورج مطمئن هستید؟",
+  "@doYouRealyWantToExit": {
+    "description": "doYouRealyWantToExit",
+    "type": "text",
+    "placeholders": {}
+  },
+  "yes": "بله",
+  "@yes": {
+    "description": "yes",
+    "type": "text",
+    "placeholders": {}
+  },
+  "no": "خیر",
+  "@no": {
+    "description": "no",
+    "type": "text",
+    "placeholders": {}
+  },
+  "magicarTitle": "MAGICAR",
+  "@magicarTitle": {
+    "description": "magicarTitle",
+    "type": "text",
+    "placeholders": {}
+  },
+  "areYouSureToExit": "از خروج مطمئن هستید؟",
+  "@areYouSureToExit": {
+    "description": "areYouSureToExit",
+    "type": "text",
+    "placeholders": {}
+  },
+  "noFingerPrintSupport": "اثرانگشت قابل پشتیبانی نیست",
+  "@noFingerPrintSupport": {
+    "description": "noFingerPrintSupport",
+    "type": "text",
+    "placeholders": {}
+  },
+  "fingerPrintHint": "اثرانگشت",
+  "@fingerPrintHint": {
+    "description": "fingerPrintHint",
+    "type": "text",
+    "placeholders": {}
+  },
+  "fingerprintNotRecognized": "اثر انگشت قابل تشخیص نیست",
+  "@fingerprintNotRecognized": {
+    "description": "fingerprintNotRecognized",
+    "type": "text",
+    "placeholders": {}
+  },
+  "fingerprintSuccess": "ورود با اثر انگشت موفق!",
+  "@fingerprintSuccess": {
+    "description": "fingerprintSuccess",
+    "type": "text",
+    "placeholders": {}
+  },
+  "cancel": "انصراف",
+  "@cancel": {
+    "description": "cancel",
+    "type": "text",
+    "placeholders": {}
+  },
+  "signInTitle": "ورود",
+  "@signInTitle": {
+    "description": "signInTitle",
+    "type": "text",
+    "placeholders": {}
+  },
+  "fingerprintRequiredTitle": "ورود با اثر انگشت الزامی است",
+  "@fingerprintRequiredTitle": {
+    "description": "fingerprintRequiredTitle",
+    "type": "text",
+    "placeholders": {}
+  },
+  "goToSettingsButton": "تنظیمات اثر انگشت",
+  "@goToSettingsButton": {
+    "description": "goToSettingsButton",
+    "type": "text",
+    "placeholders": {}
+  },
+  "goToSettingsDescription": "جهت افزودن الگوی اثر انگشت به تنظیمات بروید",
+  "@goToSettingsDescription": {
+    "description": "goToSettingsDescription",
+    "type": "text",
+    "placeholders": {}
+  },
+  "lockOut": "lockOut",
+  "@lockOut": {
+    "description": "lockOut",
+    "type": "text",
+    "placeholders": {}
+  },
+  "enable": "فعال",
+  "@enable": {
+    "description": "enable",
+    "type": "text",
+    "placeholders": {}
+  },
+  "disable": "غیرفعال",
+  "@disable": {
+    "description": "disable",
+    "type": "text",
+    "placeholders": {}
+  },
+  "engineStart": "Start",
+  "@engineStart": {
+    "description": "engineStart",
+    "type": "text",
+    "placeholders": {}
+  },
+  "darkTheme": "تاریک",
+  "@darkTheme": {
+    "description": "darkTheme",
+    "type": "text",
+    "placeholders": {}
+  },
+  "lightTheme": "روشن",
+  "@lightTheme": {
+    "description": "lightTheme",
+    "type": "text",
+    "placeholders": {}
+  },
+  "appTheme": "تم جاری",
+  "@appTheme": {
+    "description": "appTheme",
+    "type": "text",
+    "placeholders": {}
+  },
+  "withLogin": "ورود با لاگین",
+  "@withLogin": {
+    "description": "withLogin",
+    "type": "text",
+    "placeholders": {}
+  },
+  "noLogin": "بدون لاگین",
+  "@noLogin": {
+    "description": "noLogin",
+    "type": "text",
+    "placeholders": {}
+  },
+  "withFinger": "ورود با اثر انگشت",
+  "@withFinger": {
+    "description": "withFinger",
+    "type": "text",
+    "placeholders": {}
+  },
+  "withPassword": "ورود با رمز عبور",
+  "@withPassword": {
+    "description": "withPassword",
+    "type": "text",
+    "placeholders": {}
+  },
+  "withPattern": "ورود با الگو",
+  "@withPattern": {
+    "description": "withPattern",
+    "type": "text",
+    "placeholders": {}
+  },
+  "statusLogin": "نوع ورود به برنامه",
+  "@statusLogin": {
+    "description": "statusLogin",
+    "type": "text",
+    "placeholders": {}
+  },
+  "carsNo": "تعداد خودروها",
+  "@carsNo": {
+    "description": "carsNo",
+    "type": "text",
+    "placeholders": {}
+  },
+  "counts": "دعداد خودروها",
+  "@counts": {
+    "description": "counts",
+    "type": "text",
+    "placeholders": {}
+  },
+  "allLoginFieldsRequired": "تمامی اطلاعات برای ورود الزامی است",
+  "@allLoginFieldsRequired": {
+    "description": "allLoginFieldsRequired",
+    "type": "text",
+    "placeholders": {}
+  },
+  "goBack": "برگشت",
+  "@goBack": {
+    "description": "goBack",
+    "type": "text",
+    "placeholders": {}
+  },
+  "forgotPassword": "رمز را فراموش کرده ام",
+  "@forgotPassword": {
+    "description": "forgotPassword",
+    "type": "text",
+    "placeholders": {}
+  },
+  "recoverPassword": "بازیابی رمز",
+  "@recoverPassword": {
+    "description": "recoverPassword",
+    "type": "text",
+    "placeholders": {}
+  },
+  "confirmSecurityCode": "تایید کد امنیتی",
+  "@confirmSecurityCode": {
+    "description": "confirmSecurityCode",
+    "type": "text",
+    "placeholders": {}
+  },
+  "distance": "کارکرد خودرو",
+  "@distance": {
+    "description": "distance",
+    "type": "text",
+    "placeholders": {}
+  },
+  "carTip": "تیپ خودرو",
+  "@carTip": {
+    "description": "carTip",
+    "type": "text",
+    "placeholders": {}
+  },
+  "inLoadingApp": "در حال بارگذاری برنامه",
+  "@inLoadingApp": {
+    "description": "inLoadingApp",
+    "type": "text",
+    "placeholders": {}
+  },
+  "noConnection": "اینترنت قطع می باشد",
+  "@noConnection": {
+    "description": "noConnection",
+    "type": "text",
+    "placeholders": {}
+  },
+  "description": "توضیحات",
+  "@description": {
+    "description": "description",
+    "type": "text",
+    "placeholders": {}
+  },
+  "errorFetchData": "خطا در دریافت اطلاعات",
+  "@errorFetchData": {
+    "description": "errorFetchData",
+    "type": "text",
+    "placeholders": {}
+  },
+  "users": "کاربران",
+  "@users": {
+    "description": "users",
+    "type": "text",
+    "placeholders": {}
+  },
+  "noDatatoShow": "داده ای برای نمایش وجود ندارد",
+  "@noDatatoShow": {
+    "description": "noDatatoShow",
+    "type": "text",
+    "placeholders": {}
+  },
+  "useLogin": "ورود با لاگین",
+  "@useLogin": {
+    "description": "useLogin",
+    "type": "text",
+    "placeholders": {}
+  },
+  "usePassword": "استفاده از رمز عبور",
+  "@usePassword": {
+    "description": "usePassword",
+    "type": "text",
+    "placeholders": {}
+  },
+  "useFingerPrint": "استفاده از اثرانگشت",
+  "@useFingerPrint": {
+    "description": "useFingerPrint",
+    "type": "text",
+    "placeholders": {}
+  },
+  "usePattern": "استفاده از الگو",
+  "@usePattern": {
+    "description": "usePattern",
+    "type": "text",
+    "placeholders": {}
+  },
+  "resetPassword": "بازنشانی رمز",
+  "@resetPassword": {
+    "description": "resetPassword",
+    "type": "text",
+    "placeholders": {}
+  },
+  "currentPlan": "طرح جاری",
+  "@currentPlan": {
+    "description": "currentPlan",
+    "type": "text",
+    "placeholders": {}
+  },
+  "planCode": "کد طرح",
+  "@planCode": {
+    "description": "planCode",
+    "type": "text",
+    "placeholders": {}
+  },
+  "planTitle": "عنوان طرح",
+  "@planTitle": {
+    "description": "planTitle",
+    "type": "text",
+    "placeholders": {}
+  },
+  "invoiceDate": "تاریخ",
+  "@invoiceDate": {
+    "description": "invoiceDate",
+    "type": "text",
+    "placeholders": {}
+  },
+  "startDate": "تاریخ شروع",
+  "@startDate": {
+    "description": "startDate",
+    "type": "text",
+    "placeholders": {}
+  },
+  "endDate": "تا تاریخ",
+  "@endDate": {
+    "description": "endDate",
+    "type": "text",
+    "placeholders": {}
+  },
+  "active": "فعال",
+  "@active": {
+    "description": "active",
+    "type": "text",
+    "placeholders": {}
+  },
+  "deactive": "غیرفعال",
+  "@deactive": {
+    "description": "deactive",
+    "type": "text",
+    "placeholders": {}
+  },
+  "planStatus": "وضعیت طرح",
+  "@planStatus": {
+    "description": "planStatus",
+    "type": "text",
+    "placeholders": {}
+  },
+  "planType": "نوع طرح",
+  "@planType": {
+    "description": "planType",
+    "type": "text",
+    "placeholders": {}
+  },
+  "errorInUIs": "Error in Null Widget...",
+  "@errorInUIs": {
+    "description": "errorInUIs",
+    "type": "text",
+    "placeholders": {}
+  },
+  "errorInUIsDescription": "خطا در ویجت",
+  "@errorInUIsDescription": {
+    "description": "errorInUIsDescription",
+    "type": "text",
+    "placeholders": {}
+  },
+  "reportModeTitle": "حطا را گزارش دهید",
+  "@reportModeTitle": {
+    "description": "reportModeTitle",
+    "type": "text",
+    "placeholders": {}
+  },
+  "plans": "طرح ها",
+  "@plans": {
+    "description": "plans",
+    "type": "text",
+    "placeholders": {}
+  },
+  "pleaseEnterSecurityCode": "کد دریافتی را وارد کنید",
+  "@pleaseEnterSecurityCode": {
+    "description": "pleaseEnterSecurityCode",
+    "type": "text",
+    "placeholders": {}
+  },
+  "notValidSecurityCode": "کد امنیتی وارد شده صحیحی نیست",
+  "@notValidSecurityCode": {
+    "description": "notValidSecurityCode",
+    "type": "text",
+    "placeholders": {}
+  },
+  "plzEnterRecievedSecurityCode": "کد دریافتی را وارد نمایید",
+  "@plzEnterRecievedSecurityCode": {
+    "description": "plzEnterRecievedSecurityCode",
+    "type": "text",
+    "placeholders": {}
+  },
+  "userCounts": "تعداد کاربران",
+  "@userCounts": {
+    "description": "userCounts",
+    "type": "text",
+    "placeholders": {}
+  },
+  "resendSecurityCode": "ارسال مجدد",
+  "@resendSecurityCode": {
+    "description": "resendSecurityCode",
+    "type": "text",
+    "placeholders": {}
+  },
+  "fromDate": "ازتاریخ",
+  "@fromDate": {
+    "description": "fromDate",
+    "type": "text",
+    "placeholders": {}
+  },
+  "cars": "خودروها",
+  "@cars": {
+    "description": "cars",
+    "type": "text",
+    "placeholders": {}
+  },
+  "resetPasswordSuccessful": "بازنشانس رمز با موفقیت انجام شد",
+  "@resetPasswordSuccessful": {
+    "description": "resetPasswordSuccessful",
+    "type": "text",
+    "placeholders": {}
+  },
+  "resetPasswordUnSuccessful": "بازنشانی رمز با شکست مواجه شد",
+  "@resetPasswordUnSuccessful": {
+    "description": "resetPasswordUnSuccessful",
+    "type": "text",
+    "placeholders": {}
+  },
+  "sendingCommand": "درحال ارسال",
+  "@sendingCommand": {
+    "description": "sendingCommand",
+    "type": "text",
+    "placeholders": {}
+  },
+  "sentCommand": "ارسال شد",
+  "@sentCommand": {
+    "description": "sentCommand",
+    "type": "text",
+    "placeholders": {}
+  },
+  "sentCommandHasError": "خطا",
+  "@sentCommandHasError": {
+    "description": "sentCommandHasError",
+    "type": "text",
+    "placeholders": {}
+  },
+  "hasFinger": "اثرانگشت وجود دارد",
+  "@hasFinger": {
+    "description": "hasFinger",
+    "type": "text",
+    "placeholders": {}
+  },
+  "noFinger": "دستگاه از اثرانگشت پشتیبانی نمیکند",
+  "@noFinger": {
+    "description": "noFinger",
+    "type": "text",
+    "placeholders": {}
+  },
+  "loginWithPassword": "ورود با رمز عبور",
+  "@loginWithPassword": {
+    "description": "loginWithPassword",
+    "type": "text",
+    "placeholders": {}
+  },
+  "authorizedSuccessfull": "شناسایی با موفقیت انجام شد",
+  "@authorizedSuccessfull": {
+    "description": "authorizedSuccessfull",
+    "type": "text",
+    "placeholders": {}
+  },
+  "authorizedFaild": "شناسایی رد شد",
+  "@authorizedFaild": {
+    "description": "authorizedFaild",
+    "type": "text",
+    "placeholders": {}
+  },
+  "authorized": "شناسایی شد",
+  "@authorized": {
+    "description": "authorized",
+    "type": "text",
+    "placeholders": {}
+  },
+  "notAuthorized": "شناسایی نشد",
+  "@notAuthorized": {
+    "description": "notAuthorized",
+    "type": "text",
+    "placeholders": {}
+  },
+  "deviceNotAvailable": "دستگاه وجود نداردد یا قابل شناسایی نیست",
+  "@deviceNotAvailable": {
+    "description": "deviceNotAvailable",
+    "type": "text",
+    "placeholders": {}
+  },
+  "registerSuccessful": "ثبت نام با موفقیت انجام شد",
+  "@registerSuccessful": {
+    "description": "registerSuccessful",
+    "type": "text",
+    "placeholders": {}
+  },
+  "noCarExist": "هنوز خودرویی معرفی نشده است",
+  "@noCarExist": {
+    "description": "noCarExist",
+    "type": "text",
+    "placeholders": {}
+  },
+   "searchCar": "جستجوی خودرو",
+    "@searchCar": {
+      "description": "searchCar",
+      "type": "text",
+      "placeholders": {}
+    },
+    "currentPassword": "رمز جاری",
+    "@currentPassword": {
+      "description": "currentPassword",
+      "type": "text",
+      "placeholders": {}
+    },
+    "plzWaiting": "لطفا صبر کنید...",
+    "@plzWaiting": {
+      "description": "plzWaiting",
+      "type": "text",
+      "placeholders": {}
+    },
+    "toDate": "تا تاریخ",
+    "@toDate": {
+      "description": "toDate",
+      "type": "text",
+      "placeholders": {}
+    },
+    "planCost": "مبلغ طرح",
+    "@planCost": {
+      "description": "planCost",
+      "type": "text",
+      "placeholders": {}
+    },
+    "buyPlan": "خرید طرح",
+    "@buyPlan": {
+      "description": "buyPlan",
+      "type": "text",
+      "placeholders": {}
+    },
+    "invoiceAmount": "مبلغ فاکتور",
+    "@invoiceAmount": {
+      "description": "invoiceAmount",
+      "type": "text",
+      "placeholders": {}
+    },
+    "carId": "شناسه خودرو",
+    "@carId": {
+      "description": "carId",
+      "type": "text",
+      "placeholders": {}
+    },
+    "plzSelectDeviceModel": "لطفا مدل دستگاه را انتخاب کنید",
+    "@plzSelectDeviceModel": {
+      "description": "plzSelectDeviceModel",
+      "type": "text",
+      "placeholders": {}
+    },
+    "accessToActions": "دسترسی به اکشن ها",
+    "@accessToActions": {
+      "description": "accessToActions",
+      "type": "text",
+      "placeholders": {}
+    },
+    "confirmCarSuccessful": "تایید خودرو با موفقیت انجام شد",
+    "@confirmCarSuccessful": {
+      "description": "confirmCarSuccessful",
+      "type": "text",
+      "placeholders": {}
+    },
+    "actionsCounts": "تعداد اکشن ها",
+    "@actionsCounts": {
+      "description": "actionsCounts",
+      "type": "text",
+      "placeholders": {}
+    },
+    "plzSelectNewRole": "لطفا نقش جدید را انتخاب کنید",
+    "@plzSelectNewRole": {
+      "description": "plzSelectNewRole",
+      "type": "text",
+      "placeholders": {}
+    },
+    "roleTitle": "عنوان نقش",
+    "@roleTitle": {
+      "description": "roleTitle",
+      "type": "text",
+      "placeholders": {}
+    },
+    "changeRoleSuccessful": "تغییر نقش با موفقیت انجام شد",
+    "@changeRoleSuccessful": {
+      "description": "changeRoleSuccessful",
+      "type": "text",
+      "placeholders": {}
+    },
+    "changeRoleUnSuccessful": "تغییر نقش با موفیت انجام نشد",
+    "@changeRoleUnSuccessful": {
+      "description": "changeRoleUnSuccessful",
+      "type": "text",
+      "placeholders": {}
+    },
+    "rolesTitle": "نقش ها",
+    "@rolesTitle": {
+      "description": "rolesTitle",
+      "type": "text",
+      "placeholders": {}
+    },
+    "buyPlanSuccessful": "خرید طرح با موفقیت انجام شد",
+    "@buyPlanSuccessful": {
+      "description": "buyPlanSuccessful",
+      "type": "text",
+      "placeholders": {}
+    },
+    "buyPlanUnSuccessful": "خرید طرح با موفقیت انجام نشد",
+    "@buyPlanUnSuccessful": {
+      "description": "buyPlanUnSuccessful",
+      "type": "text",
+      "placeholders": {}
+    },
+    "activateSuccessful": "فعال سازی با موفقیت انجام شد",
+    "@activateSuccessful": {
+      "description": "activateSuccessful",
+      "type": "text",
+      "placeholders": {}
+    },
+    "activateunSuccessful": "فعال سازی با موفقیت انجام نشد",
+    "@activateunSuccessful": {
+      "description": "activateunSuccessful",
+      "type": "text",
+      "placeholders": {}
+    },
+    "activatePlan": "فعال سازی طرح",
+    "@activatePlan": {
+      "description": "activatePlan",
+      "type": "text",
+      "placeholders": {}
+    },
+    "planIsActive": "طرح فعال می باشد",
+    "@planIsActive": {
+      "description": "planIsActive",
+      "type": "text",
+      "placeholders": {}
+    },
+    "carTitle": "عنوان خودرو",
+    "@carTitle": {
+      "description": "carTitle",
+      "type": "text",
+      "placeholders": {}
+    },
+    "carModelTitle": "مدل خودرو",
+    "@carModelTitle": {
+      "description": "carModelTitle",
+      "type": "text",
+      "placeholders": {}
+    },
+    "carModelDetailTitle": "تیپ",
+    "@carModelDetailTitle": {
+      "description": "carModelDetailTitle",
+      "type": "text",
+      "placeholders": {}
+    },
+    "changeUserRole": "تغییر نقش کاربر",
+    "@changeUserRole": {
+      "description": "changeUserRole",
+      "type": "text",
+      "placeholders": {}
+    },
+     "adminUserName": "نام کاربری ادمین",
+      "@adminUserName": {
+        "description": "adminUserName",
+        "type": "text",
+        "placeholders": {}
+      },
+      "carIsWaitingForConfirm": "خودروهای در حال انتظار برای تایید",
+      "@carIsWaitingForConfirm": {
+        "description": "carIsWaitingForConfirm",
+        "type": "text",
+        "placeholders": {}
+      },
+      "showAccessablActions": "فرمان های در دسترس",
+      "@showAccessablActions": {
+        "description": "showAccessablActions",
+        "type": "text",
+        "placeholders": {}
+      },
+      "foundCar": "خودرو یافت شد",
+      "@foundCar": {
+        "description": "foundCar",
+        "type": "text",
+        "placeholders": {}
+      },
+      "appSettings": "تنظیمات برنامه",
+      "@appSettings": {
+        "description": "appSettings",
+        "type": "text",
+        "placeholders": {}
+      },
+      "loadingLogin": "در حال ورود",
+      "@loadingLogin": {
+        "description": "loadingLogin",
+        "type": "text",
+        "placeholders": {}
+      },
+      "close": "بستن",
+      "@close": {
+        "description": "close",
+        "type": "text",
+        "placeholders": {}
+      },
+      "sendChanges": "ارسال تغییرات",
+      "@sendChanges": {
+        "description": "sendChanges",
+        "type": "text",
+        "placeholders": {}
+      },
+      "plzEnterRequiredData": "لطفا تمامی اطلاعات لازم را وارد کنید",
+      "@plzEnterRequiredData": {
+        "description": "plzEnterRequiredData",
+        "type": "text",
+        "placeholders": {}
+      },
+      "logoutAccount": "خروج از حساب کاربری",
+      "@logoutAccount": {
+        "description": "logoutAccount",
+        "type": "text",
+        "placeholders": {}
+      },
+      "logoutSuccessful": "خروج با موفقیت انجام شد",
+      "@logoutSuccessful": {
+        "description": "logoutSuccessful",
+        "type": "text",
+        "placeholders": {}
+      },
+      "editProfileSuccessful": "ویرایش اطلاعات پروفایل با موفقیت انجام شد",
+      "@editProfileSuccessful": {
+        "description": "editProfileSuccessful",
+        "type": "text",
+        "placeholders": {}
+      },
+  "routeCars": "مسیربای خودروها",
+  "@routeCars": {
+    "description": "routeCars",
+    "type": "text",
+    "placeholders": {}
+  },
+  "getRouteCars": "دریافت مسیر خودروها",
+  "@getRouteCars": {
+    "description": "getRouteCars",
+    "type": "text",
+    "placeholders": {}
+  },
+  "lastPostionOfCar": "موقعیت آخر خودرو",
+  "@lastPostionOfCar": {
+    "description": "lastPostionOfCar",
+    "type": "text",
+    "placeholders": {}
+  },
+  "confirmPasswordError": "خطای رمز عبور مجدد",
+  "@confirmPasswordError": {
+    "description": "confirmPasswordError",
+    "type": "text",
+    "placeholders": {}
+  },
+  "pelakNotvalid": "پلاک معتبر نیست",
+  "@pelakNotvalid": {
+    "description": "pelakNotvalid",
+    "type": "text",
+    "placeholders": {}
+  },
+  "carList": "لیست خودروها",
+  "@carList": {
+    "description": "carList",
+    "type": "text",
+    "placeholders": {}
+  },
+  "joinCars": "ارتباط گروهی خودروها",
+  "@joinCars": {
+    "description": "joinCars",
+    "type": "text",
+    "placeholders": {}
+  },
+  "report": "گزارش",
+  "@report": {
+    "description": "report",
+    "type": "text",
+    "placeholders": {}
+  },
+  "enablePlan": "فعال سازی",
+  "@enablePlan": {
+    "description": "enablePlan",
+    "type": "text",
+    "placeholders": {}
+  },
+  "doFilter": "اعمال فیلتر",
+  "@doFilter": {
+    "description": "doFilter",
+    "type": "text",
+    "placeholders": {}
+  },
+  "delete": "حذف",
+  "@delete": {
+    "description": "delete",
+    "type": "text",
+    "placeholders": {}
+  },
+  "activateCar": "فعال سازی",
+  "@activateCar": {
+    "description": "activateCar",
+    "type": "text",
+    "placeholders": {}
+  },
+  "messageTitle": "عملیات",
+  "@messageTitle": {
+    "description": "messageTitle",
+    "type": "text",
+    "placeholders": {}
+  },
+  "serviceDate": "تاریخ سرویس",
+  "@serviceDate": {
+    "description": "serviceDate",
+    "type": "text",
+    "placeholders": {}
+  },
+  "alarmDate": "تاریخ هشدار",
+  "@alarmDate": {
+    "description": "alarmDate",
+    "type": "text",
+    "placeholders": {}
+  },
+  "alarmCount": "کارکرد هشدار",
+  "@alarmCount": {
+    "description": "alarmCount",
+    "type": "text",
+    "placeholders": {}
+  },
+  "actionDate": "تاریخ انجام سرویس",
+  "@actionDate": {
+    "description": "actionDate",
+    "type": "text",
+    "placeholders": {}
+  },
+  "serviceCost": "مبلغ سرویس",
+  "@serviceCost": {
+    "description": "serviceCost",
+    "type": "text",
+    "placeholders": {}
+  },
+  "allFieldsRequired": "ورود تمامی فیلدها الزامی است",
+  "@allFieldsRequired": {
+    "description": "allFieldsRequired",
+    "type": "text",
+    "placeholders": {}
+  },
+  "alarmDurationDay": "روز هشدار",
+  "@alarmDurationDay": {
+    "description": "alarmDurationDay",
+    "type": "text",
+    "placeholders": {}
+  },
+  "automationInsert": "درج خودکار",
+  "@automationInsert": {
+    "description": "automationInsert",
+    "type": "text",
+    "placeholders": {}
+  },
+  "durationCountValue": "فاصله زمانی",
+  "@durationCountValue": {
+    "description": "durationCountValue",
+    "type": "text",
+    "placeholders": {}
+  },
+  "durationValue": "مقدار زمانی",
+  "@durationValue": {
+    "description": "durationValue",
+    "type": "text",
+    "placeholders": {}
+  },
+  "serviceTypeCode": "کد سرویس",
+  "@serviceTypeCode": {
+    "description": "serviceTypeCode",
+    "type": "text",
+    "placeholders": {}
+  },
+  "serviceTypeTitle": "عنوان نوع سرویس",
+  "@serviceTypeTitle": {
+    "description": "serviceTypeTitle",
+    "type": "text",
+    "placeholders": {}
+  },
+  "plzSelectACarToRoute": "لطفا یه خودرو را برای مسیریابی انتخاب کنید",
+  "@plzSelectACarToRoute": {
+    "description": "plzSelectACarToRoute",
+    "type": "text",
+    "placeholders": {}
+  },
+  "yourLocationNotFound": "آخرین موقعیت شما یافت نشد",
+  "@yourLocationNotFound": {
+    "description": "yourLocationNotFound",
+    "type": "text",
+    "placeholders": {}
+  },
+  "carJoindBefore": "آخرین خودروهای اضافه شده به گروه",
+  "@carJoindBefore": {
+    "description": "carJoindBefore",
+    "type": "text",
+    "placeholders": {}
+  },
+  "selectForJoin": "برای اضافه شدن انتخاب کنید",
+  "@selectForJoin": {
+    "description": "selectForJoin",
+    "type": "text",
+    "placeholders": {}
+  },
+  "editCarSuccessful": "ویرایش خودرو با موفقیت انجام شد",
+  "@editCarSuccessful": {
+    "description": "editCarSuccessful",
+    "type": "text",
+    "placeholders": {}
+  },
+  "editCarUnSuccessful": "ویرایش خودرو با خطا مواجه شد",
+  "@editCarUnSuccessful": {
+    "description": "editCarUnSuccessful",
+    "type": "text",
+    "placeholders": {}
+  },
+  "messageDate": "تاریخ پیام",
+  "@messageDate": {
+    "description": "messageDate",
+    "type": "text",
+    "placeholders": {}
+  },
+  "messageSubject": "موضوع پیام",
+  "@messageSubject": {
+    "description": "messageSubject",
+    "type": "text",
+    "placeholders": {}
+  },
+  "messageBody": "متن پیام",
+  "@messageBody": {
+    "description": "messageBody",
+    "type": "text",
+    "placeholders": {}
+  },
+  "messageSentUnSuccessfull": "پیام ارسال نشد",
+  "@messageSentUnSuccessfull": {
+    "description": "messageSentUnSuccessfull",
+    "type": "text",
+    "placeholders": {}
+  },
+  "messageHasSentSuccessfull": "ارسال پیام با موفقیت انجام شد",
+  "@messageHasSentSuccessfull": {
+    "description": "messageHasSentSuccessfull",
+    "type": "text",
+    "placeholders": {}
+  },
+  "sendMessage": "ارسال پیام",
+  "@sendMessage": {
+    "description": "sendMessage",
+    "type": "text",
+    "placeholders": {}
+  },
+  "noServiceTypes": "نوع سرویسی یافت نشد",
+  "@noServiceTypes": {
+    "description": "noServiceTypes",
+    "type": "text",
+    "placeholders": {}
+  },
+  "showDetails": "نمایش جزییات",
+  "@showDetails": {
+    "description": "showDetails",
+    "type": "text",
+    "placeholders": {}
+  },
+  "confimDelete": "هشدار برای حذف!",
+  "@confimDelete": {
+    "description": "confimDelete",
+    "type": "text",
+    "placeholders": {}
+  },
+  "areYouSureToDelete": "آیا از حذف مطمئن هستید؟",
+  "@areYouSureToDelete": {
+    "description": "areYouSureToDelete",
+    "type": "text",
+    "placeholders": {}
+  },
+  "carNotFound": "خودرو یافت نشد",
+  "@carNotFound": {
+    "description": "carNotFound",
+    "type": "text",
+    "placeholders": {}
+  },
+  "serviceType": "نوع سرویس",
+  "@serviceType": {
+    "description": "serviceType",
+    "type": "text",
+    "placeholders": {}
+  },
+  "serviceTypeIsDurational": "سرویس از نوع دوره ای است",
+  "@serviceTypeIsDurational": {
+    "description": "serviceTypeIsDurational",
+    "type": "text",
+    "placeholders": {}
+  },
+  "serviceTypeIsFunctionality": "سرویس از نوع کارکردی است",
+  "@serviceTypeIsFunctionality": {
+    "description": "serviceTypeIsFunctionality",
+    "type": "text",
+    "placeholders": {}
+  },
+  "functional": "کارکردی",
+  "@functional": {
+    "description": "functional",
+    "type": "text",
+    "placeholders": {}
+  },
+  "durational": "دوره ای",
+  "@durational": {
+    "description": "durational",
+    "type": "text",
+    "placeholders": {}
+  },
+  "both": "کارکردی-دوره ای",
+  "@both": {
+    "description": "both",
+    "type": "text",
+    "placeholders": {}
+  },
+  "durationDay": "روز",
+  "@durationDay": {
+    "description": "durationDay",
+    "type": "text",
+    "placeholders": {}
+  },
+  "durationMonth": "ماه",
+  "@durationMonth": {
+    "description": "durationMonth",
+    "type": "text",
+    "placeholders": {}
+  },
+  "durationYear": "سال",
+  "@durationYear": {
+    "description": "durationYear",
+    "type": "text",
+    "placeholders": {}
+  },
+  "remaind": "مانده روز",
+  "@remaind": {
+    "description": "remaind",
+    "type": "text",
+    "placeholders": {}
+  },
+  "durationFunctionalCountValue": "کارکرد",
+  "@durationFunctionalCountValue": {
+    "description": "durationFunctionalCountValue",
+    "type": "text",
+    "placeholders": {}
+  },
+  "durationFunctionalValue": "مقدار",
+  "@durationFunctionalValue": {
+    "description": "durationFunctionalValue",
+    "type": "text",
+    "placeholders": {}
+  },
+  "securityCodeWillSmsYou": "رمز عبور به همراه شما پیامک شد",
+  "@securityCodeWillSmsYou": {
+    "description": "securityCodeWillSmsYou",
+    "type": "text",
+    "placeholders": {}
+  },
+  "smsHasRead": "خوانده شده",
+  "@smsHasRead": {
+    "description": "smsHasRead",
+    "type": "text",
+    "placeholders": {}
+  },
+  "smsHasUnRead": "خوانده نشده",
+  "@smsHasUnRead": {
+    "description": "smsHasUnRead",
+    "type": "text",
+    "placeholders": {}
+  },
+  "loginAndThenEditYourProfile": "لطفا در صفحه ورود به برنامه با رمز عبور 1111 وارد شوید و سپس رمز خود را در پروفایل ویرایش کنید",
+  "@loginAndThenEditYourProfile": {
+    "description": "loginAndThenEditYourProfile",
+    "type": "text",
+    "placeholders": {}
+  },
+  "passwordHasChanged": "رمز عبور به پیش فرض تغییر کرد",
+  "@passwordHasChanged": {
+    "description": "passwordHasChanged",
+    "type": "text",
+    "placeholders": {}
+  },
+  "changePasswordError": "تغییر رمز با خطا مواجه شد",
+  "@changePasswordError": {
+    "description": "changePasswordError",
+    "type": "text",
+    "placeholders": {}
+  },
+  "changePasswordTitle": "بازیابی رمز",
+  "@changePasswordTitle": {
+    "description": "changePasswordTitle",
+    "type": "text",
+    "placeholders": {}
+  },
+  "replyMessage": "پاسخ به پیام",
+  "@replyMessage": {
+    "description": "replyMessage",
+    "type": "text",
+    "placeholders": {}
+  },
+  "actionService": "انجام سرویس",
+  "@actionService": {
+    "description": "actionService",
+    "type": "text",
+    "placeholders": {}
+  },
+  "done": "انجام شده",
+  "@done": {
+    "description": "done",
+    "type": "text",
+    "placeholders": {}
+  },
+  "notDone": "انجام نشده",
+  "@notDone": {
+    "description": "notDone",
+    "type": "text",
+    "placeholders": {}
+  },
+  "fromDateToDate": "گزارش بر اساس از تاریخ تا تاریخ",
+  "@fromDateToDate": {
+    "description": "fromDateToDate",
+    "type": "text",
+    "placeholders": {}
+  },
+  "showReportBaseOnDate": "گزارش براساس تاریخ",
+  "@showReportBaseOnDate": {
+    "description": "showReportBaseOnDate",
+    "type": "text",
+    "placeholders": {}
+  },
+  "showReportBaseOnDays": "گزارش براساس چند روز قبل",
+  "@showReportBaseOnDays": {
+    "description": "showReportBaseOnDays",
+    "type": "text",
+    "placeholders": {}
+  },
+  "fromLastDays": "گزارش براساس چند روز قبل",
+  "@fromLastDays": {
+    "description": "fromLastDays",
+    "type": "text",
+    "placeholders": {}
+  },
+  "alarmDistance": "کارکرد هشدار",
+  "@alarmDistance": {
+    "description": "alarmDistance",
+    "type": "text",
+    "placeholders": {}
+  },
+  "areYouSureToExitForBackTouchCancel": "آیا از خروج مطمئن هستید؟ جهت برگشت میتوانید دکمه انصراف در فرم اصلی را لمس کنید.",
+    "@areYouSureToExitForBackTouchCancel": {
+      "description": "areYouSureToExitForBackTouchCancel",
+      "type": "text",
+      "placeholders": {}
+    },
+    "carPairedCounts": "تعداد درگروه",
+      "@carPairedCounts": {
+        "description": "carPairedCounts",
+        "type": "text",
+        "placeholders": {}
+      },
+      "carToRequestForPair": "خودروی درخواست دهنده",
+      "@carToRequestForPair": {
+        "description": "carToRequestForPair",
+        "type": "text",
+        "placeholders": {}
+      },
+      "addToPaired": "افزودن به گروه",
+      "@addToPaired": {
+        "description": "addToPaired",
+        "type": "text",
+        "placeholders": {}
+      },
+      "masterCarId": "شناسه درخواست دهنده",
+      "@masterCarId": {
+        "description": "masterCarId",
+        "type": "text",
+        "placeholders": {}
+      },
+      "thisCarPaired": "خودرو افزوده شد",
+      "@thisCarPaired": {
+        "description": "thisCarPaired",
+        "type": "text",
+        "placeholders": {}
+      },
+      "messageRead": "خوانده شده",
+      "@messageRead": {
+        "description": "messageRead",
+        "type": "text",
+        "placeholders": {}
+      },
+  "errorinSignUp": "در روند ثبت نام خطایی وجود دارد",
+  "@errorinSignUp": {
+    "description": "errorinSignUp",
+    "type": "text",
+    "placeholders": {}
+  },
+  "navigateToCurrent": "مسیریابی به محل جاری",
+  "@navigateToCurrent": {
+    "description": "navigateToCurrent",
+    "type": "text",
+    "placeholders": {}
+  },
+  "payPlan": "پرداخت",
+  "@payPlan": {
+    "description": "payPlan",
+    "type": "text",
+    "placeholders": {}
+  },
+  "actionUsername": "کاربر انجام دهنده",
+  "@actionUsername": {
+    "description": "actionUsername",
+    "type": "text",
+    "placeholders": {}
+  },
+  "chargeAmount": "میزان شارژ",
+  "@chargeAmount": {
+    "description": "chargeAmount",
+    "type": "text",
+    "placeholders": {}
+  },
+  "chargeSimCard": "شارژ سیم کارت",
+  "@chargeSimCard": {
+    "description": "chargeSimCard",
+    "type": "text",
+    "placeholders": {}
+  },
+  "getHardwareVersion": "دریافت نسخه سخت افزار",
+  "@getHardwareVersion": {
+    "description": "getHardwareVersion",
+    "type": "text",
+    "placeholders": {}
+  },
+  "sendInfoAccuracy": "ارسال دقت اطلاعات",
+  "@sendInfoAccuracy": {
+    "description": "sendInfoAccuracy",
+    "type": "text",
+    "placeholders": {}
+  },
+  "gethHrdwareVersion": "دریافت نسخه سخت افزار",
+  "@gethHrdwareVersion": {
+    "description": "gethHrdwareVersion",
+    "type": "text",
+    "placeholders": {}
+  },
+  "forGethwareVersionClickGetButton": "با فشردن کلید زیر نسخه سخت افزار دریافت می شود",
+  "@forGethwareVersionClickGetButton": {
+    "description": "forGethwareVersionClickGetButton",
+    "type": "text",
+    "placeholders": {}
+  },
+  "getChargeAmount": "دریافت میزان شارژ",
+  "@getChargeAmount": {
+    "description": "getChargeAmount",
+    "type": "text",
+    "placeholders": {}
+  },
+  "maxSpeed": "حداکثر سرعت",
+  "@maxSpeed": {
+    "description": "maxSpeed",
+    "type": "text",
+    "placeholders": {}
+  },
+  "minSpeed": "حداقل سرعت",
+  "@minSpeed": {
+    "description": "minSpeed",
+    "type": "text",
+    "placeholders": {}
+  },
+  "periodicSendTime": "بازه زمانی ارسال اطلاعات",
+  "@periodicSendTime": {
+    "description": "periodicSendTime",
+    "type": "text",
+    "placeholders": {}
+  },
+  "periodicAccuracy": "بازه زمانی ارسال دقت اطلاعات",
+  "@periodicAccuracy": {
+    "description": "periodicAccuracy",
+    "type": "text",
+    "placeholders": {}
+  },
+  "hardWareVersion": "نسخه سخت افزار",
+  "@hardWareVersion": {
+    "description": "hardWareVersion",
+    "type": "text",
+    "placeholders": {}
+  },
+  "plzEnterChargePassword": "رمز شارژ را وارد نمایید",
+  "@plzEnterChargePassword": {
+    "description": "plzEnterChargePassword",
+    "type": "text",
+    "placeholders": {}
+  },
+  "iranTitle": "ایران",
+  "@iranTitle": {
+    "description": "iranTitle",
+    "type": "text",
+    "placeholders": {}
+  },
+  "services": "سرویس ها",
+  "@services": {
+    "description": "services",
+    "type": "text",
+    "placeholders": {}
+  },
+  "cancelService": "انصراف",
+  "@cancelService": {
+    "description": "cancelService",
+    "type": "text",
+    "placeholders": {}
+  },
+  "notDoneService": "عدم انجام",
+  "@notDoneService": {
+    "description": "notDoneService",
+    "type": "text",
+    "placeholders": {}
+  },
+  "denyRequest": "رد درخواست",
+  "@denyRequest": {
+    "description": "denyRequest",
+    "type": "text",
+    "placeholders": {}
+  },
+  "accuracyInfo": "دقت اطلاعات",
+  "@accuracyInfo": {
+    "description": "accuracyInfo",
+    "type": "text",
+    "placeholders": {}
+  },
+  "sendCommand": "ارسال فرامین",
+  "@sendCommand": {
+    "description": "sendCommand",
+    "type": "text",
+    "placeholders": {}
+  },
+  "sabteInfo": "ثبت اطلاعات",
+  "@sabteInfo": {
+    "description": "sabteInfo",
+    "type": "text",
+    "placeholders": {}
+  },
+  "lowLevel": "پایین",
+  "@lowLevel": {
+    "description": "lowLevel",
+    "type": "text",
+    "placeholders": {}
+  },
+  "mediumLevel": "متوسط",
+  "@mediumLevel": {
+    "description": "mediumLevel",
+    "type": "text",
+    "placeholders": {}
+  },
+  "highLevel": "بالا",
+  "@highLevel": {
+    "description": "highLevel",
+    "type": "text",
+    "placeholders": {}
+  },
+  "minStopTime": "حداقل زمان توقف",
+  "@minStopTime": {
+    "description": "minStopTime",
+    "type": "text",
+    "placeholders": {}
+  },
+  "showReport": "نمایش گزارش در مسیر",
+  "@showReport": {
+    "description": "showReport",
+    "type": "text",
+    "placeholders": {}
+  },
+  "remaindToNextService": "مانده روز تا سرویس :",
+  "@remaindToNextService": {
+    "description": "remaindToNextService",
+    "type": "text",
+    "placeholders": {}
+  },
+  "forGetChargeAmount": "با فشردن کلید زیر، آخرین میزان شارژ سیم کارت خودرو استخراج و در صفحه هشدارها نمایش داده می شود.",
+    "@forGetChargeAmount": {
+      "description": "forGetChargeAmount",
+      "type": "text",
+      "placeholders": {}
+    },
+     "messageCount": "تعداد پیام ها",
+      "@messageCount": {
+        "description": "messageCount",
+        "type": "text",
+        "placeholders": {}
+      },
+      "distanceDone": "کارکرد انجام",
+      "@distanceDone": {
+        "description": "distanceDone",
+        "type": "text",
+        "placeholders": {}
+      },
+      "serviceDoneDate": "تاریخ انجام سرویس",
+      "@serviceDoneDate": {
+        "description": "serviceDoneDate",
+        "type": "text",
+        "placeholders": {}
+      },
+       "reservationIsDisabled": "زمانی که رزرویشن فعال نیست امکان  روشن کردن خودرو وجود ندارد",
+            "@reservationIsDisabled": {
+              "description": "reservationIsDisabled",
+              "type": "text",
+              "placeholders": {}
+            },
+  "document": "راهنما",
+  "@document": {
+    "description": "document",
+    "type": "text",
+    "placeholders": {}
+  },
+  "shareHelpText": "اشتراک گذاری راهنما",
+  "@shareHelpText": {
+    "description": "shareHelpText",
+    "type": "text",
+    "placeholders": {}
+  },
+  "shareHelpSubject": "راهنمای استفاده از برنامه",
+  "@shareHelpSubject": {
+    "description": "shareHelpSubject",
+    "type": "text",
+    "placeholders": {}
+  },
+  "title": "MagiCar",
+  "@title": {
+    "description": "MagiCar Co.",
+    "type": "text",
+    "placeholders": {}
+  }
+}

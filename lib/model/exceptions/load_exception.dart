@@ -1,0 +1,5 @@
+
+class LoadException implements Exception
+{
+
+}

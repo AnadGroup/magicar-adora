@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "208245795180",
+    "firebase_url": "https://cardo-71005.firebaseio.com",
+    "project_id": "cardo-71005",
+    "storage_bucket": "cardo-71005.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:208245795180:android:b0e4f45acef82deb38ab49",
+        "android_client_info": {
+          "package_name": "com.magicar"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "208245795180-mkpv8cbv62tqna4me6frumdkjfac2q56.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDu5uc0mgGt3LRIRKW9gb8C2F5q_nLyIIg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "208245795180-mkpv8cbv62tqna4me6frumdkjfac2q56.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "208245795180-kf4p5bu1arhvrp6um82044157feli2ek.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.anad.magicar.anadMagicar"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

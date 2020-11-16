@@ -1,0 +1,6 @@
+#include "Generated.xcconfig"
+
+FLUTTER_TARGET=lib/main-magicar.dart
+
+ASSET_PREFIX=magicar
+BUNDLE_NAME=Magicar

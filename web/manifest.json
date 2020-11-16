@@ -1,0 +1,23 @@
+{
+    "name": "Adora",
+    "short_name": "Adora",
+    "start_url": ".",
+    "display": "standalone",
+    "background_color": "#FF8F00" ,
+    "theme_color": "#FF8F00",
+    "description": "Adora",
+    "orientation": "portrait-primary",
+    "prefer_related_applications": true,
+    "icons": [
+        {
+            "src": "icons/adora/Icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "icons/adora/Icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ]
+}

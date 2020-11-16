@@ -1,0 +1,45 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+
+
+        {
+            "name": "anad_magicar",
+            "request": "launch",
+            "type": "dart",
+            //"program": "lib/main-magicar.dart",
+            "args": [
+              "--flavor",
+              "magicar",
+              "-t",
+              "lib/main-magicar.dart"
+            ]
+        },
+        {
+          "name": "adora",
+          "request": "launch",
+          "type": "dart",
+          //"program": "lib/main-adora.dart",
+          "args": [
+            "--flavor",
+            "adora",
+            "-t",
+            "lib/main-adora.dart"
+          ]
+      },
+
+        {
+            "name": "Flutter for web",
+            "type": "dart",
+            "request": "launch",
+            "program": "lib/main.dart",
+            "args": [
+              "-d",
+              "chrome"          
+            ]
+          }
+    ]
+}
