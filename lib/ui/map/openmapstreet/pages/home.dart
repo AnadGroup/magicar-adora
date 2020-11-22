@@ -209,9 +209,9 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
   StreamSubscription<loc.LocationData> _locationSubscription;
   //var location =  loc.Location();
   //var geolocator = locator.Geolocator();
-   loc.LocationData _lastKnownPosition;
-   loc.LocationData _currentPosition;
-  
+  loc.LocationData _lastKnownPosition;
+  loc.LocationData _currentPosition;
+
   //Future<locator.GeolocationStatus> gpsStatus;
   bool gpsDialogGasShownBefore = false;
   List<Marker> markers = [];
@@ -260,6 +260,11 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
   loc.Location location = loc.Location();
   loc.PermissionStatus _permissionGranted;
   loc.LocationData _locationData;
+
+//برای تشخیص زوم شدن توسط کاربر
+  StreamSubscription _changefeed;
+  double _myzoom = 15.0;
+  double _zoom = 15.0;
 
   Future<void> _checkService() async {
     final bool serviceEnabledResult = await location.serviceEnabled();
@@ -325,14 +330,9 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
 
   registerRxBus() {
     RxBus.register<ChangeEvent>().listen((ChangeEvent event) {
-      if (event.type == 'GPS_STATUS') {
-       
-      }
+      if (event.type == 'GPS_STATUS') {}
     });
   }
-
-
-
 
   double getDirection(double lat1, double lng1, double lat2, double lng2) {
     double PI = math.pi;
@@ -419,9 +419,7 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
           point: LatLng(result.latitude, result.longitude),
           builder: (ctx) {
             return GestureDetector(
-              onTap: () {
-               
-              },
+              onTap: () {},
               child: Container(
                 width: markerSize + 28,
                 height: markerSize + 28,
@@ -435,14 +433,12 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
             );
           });
       currentMarker = marker;
-      if(!kIsWeb) {
-      liveMapController.mapController
-          .move(LatLng(result.latitude, result.longitude), 18);
+      if (!kIsWeb) {
+        liveMapController.mapController
+            .move(LatLng(result.latitude, result.longitude), 18);
       } else {
-        mapController
-          .move(LatLng(result.latitude, result.longitude), 18);
+        mapController.move(LatLng(result.latitude, result.longitude), 18);
       }
-      
     }
     statusNoty.updateValue(Message(type: 'CURRENT_LOCATION_UPDATED'));
   }
@@ -475,9 +471,9 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
         _spoint = _polyLine.points[next];
         points..add(_fpoint)..add(_spoint);
         maptoolkit.LatLng slng =
-            new maptoolkit.LatLng(_fpoint.latitude, _fpoint.longitude);
+            maptoolkit.LatLng(_fpoint.latitude, _fpoint.longitude);
         maptoolkit.LatLng slng2 =
-            new maptoolkit.LatLng(_spoint.latitude, _spoint.longitude);
+            maptoolkit.LatLng(_spoint.latitude, _spoint.longitude);
 
         double deg = maptoolkit.SphericalUtil.computeHeading(slng2,
             slng); //getDirection(_fpoint.latitude, _fpoint.longitude, _spoint.latitude, _spoint.longitude);
@@ -486,25 +482,25 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
       if ((_pointIndex + 1) >= _polyLine.points.length) {
         _timerLine.cancel();
       }
-      _polyLineAnim = new Polyline(
-          strokeWidth: 8.0, color: Colors.blueAccent, points: points);
+      _polyLineAnim = Polyline(
+          strokeWidth: (8.0 * _myzoom) / _zoom,
+          color: Colors.blueAccent,
+          points: points);
 
       if (degress != null && degress.length > 0) {
+        double _size = (markerSize + 28) * _myzoom / _zoom;
         var marker = Marker(
-            width: markerSize + 28,
-            height: markerSize + 28,
+            width: _size,
+            height: _size,
             point: _spoint,
             builder: (ctx) {
               return GestureDetector(
-                onTap: () {
-                  // _showInfoPopUp = true;
-                  // showSpeedDialog(0);
-                },
+                onTap: () {},
                 child: Container(
-                    width: markerSize + 28,
-                    height: markerSize + 28,
+                    width: _size,
+                    height: _size,
                     child: CircleAvatar(
-                      radius: markerSize + 28,
+                      radius: _size,
                       backgroundColor: Colors.transparent,
                       child: Transform.rotate(
                         angle: (math.pi * (degress[index - 1] - 90)) / 180,
@@ -516,7 +512,7 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
             });
         markers[0] = marker;
       }
-      animateNoty.updateValue(new Message(type: 'LINE_ANIM'));
+      animateNoty.updateValue(Message(type: 'LINE_ANIM'));
     });
   }
 
@@ -1956,11 +1952,11 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
         if (!fromGo) {
           RxBus.post(new ChangeEvent(type: 'CLOSE_MORE_BUTTON'));
         }
-        if(!kIsWeb) {
-        liveMapController.mapController.move(firstPoint, 15);
-      } else {
-      mapController.move(firstPoint, 15);
-      }
+        if (!kIsWeb) {
+          liveMapController.mapController.move(firstPoint, 15);
+        } else {
+          mapController.move(firstPoint, 15);
+        }
         return lines;
       }
     } else {
@@ -2194,10 +2190,11 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
       // moreButtonNoty.updateValue(new Message(type: 'CLOSE_MORE_BUTTON'));
       RxBus.post(new ChangeEvent(type: 'CLOSE_MORE_BUTTON'));
 
-     if(!kIsWeb){ liveMapController.mapController.move(firstPoint, 15);}
-     else {
-       mapController.move(firstPoint, 15);
-     }
+      if (!kIsWeb) {
+        liveMapController.mapController.move(firstPoint, 15);
+      } else {
+        mapController.move(firstPoint, 15);
+      }
       reportNoty.updateValue(new Message(type: 'HAS_MARKERS'));
 
       return markers;
@@ -2231,8 +2228,8 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
     try {
       //final locator.Geolocator geolocator = locator.Geolocator();
       await _getLocation();
-      if(_locationData!=null) {
-        position =_locationData;
+      if (_locationData != null) {
+        position = _locationData;
       }
     } on PlatformException {
       position = null;
@@ -2250,30 +2247,26 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
 
   // Platform messages are asynchronous, so we initialize in an async method.
   _initCurrentLocation() async {
-   
-
     await _getLocation();
-  
-        if (_locationData != null) {
-          currentLocation = getLocationDataFromPosition(_locationData);
-        }
 
-        _currentPosition = _locationData;
+    if (_locationData != null) {
+      currentLocation = getLocationDataFromPosition(_locationData);
+    }
 
+    _currentPosition = _locationData;
 
-    
-      if (_locationData != null) {
-        currentLocation = LocationDataLocator.fromMap({
-          'latitude': _locationData.latitude,
-          'longitude': _locationData.longitude,
-          'speed': _locationData.speed,
-          'accuracy': _locationData.accuracy,
-          'altitude': _locationData.altitude,
-          'speedAccuracy': _locationData.speedAccuracy
-        });
-        mapController.move(LatLng(_locationData.latitude,_locationData.longitude), 16);
-      }
-  
+    if (_locationData != null) {
+      currentLocation = LocationDataLocator.fromMap({
+        'latitude': _locationData.latitude,
+        'longitude': _locationData.longitude,
+        'speed': _locationData.speed,
+        'accuracy': _locationData.accuracy,
+        'altitude': _locationData.altitude,
+        'speedAccuracy': _locationData.speedAccuracy
+      });
+      mapController.move(
+          LatLng(_locationData.latitude, _locationData.longitude), 16);
+    }
   }
 
   @override
@@ -2353,14 +2346,12 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
         ));
   }
 
-
   Future<void> _listenLocation() async {
     _locationSubscription =
         location.onLocationChanged.handleError((dynamic err) {
-  
       _locationSubscription.cancel();
     }).listen((loc.LocationData currentLocation) {
-        _locationData = currentLocation;
+      _locationData = currentLocation;
     });
   }
 
@@ -2408,8 +2399,9 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
     );
 
     getUserId();
-    getPeriodicTimePosition();
-
+    if (!kIsWeb) {
+      getPeriodicTimePosition();
+    }
     currentMarker = Marker(
         width: markerSize + 28,
         height: markerSize + 28,
@@ -2440,33 +2432,40 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
     showAllItemsdNoty = NotyBloc<Message>();
     showAllItemsdNoty2 = NotyBloc<Message>();
 
-    pcarsPairedActivated =  List();
+    pcarsPairedActivated = List();
     carInfoss = getCarInfo(false);
 
-  if(!kIsWeb) { 
-    liveMapController = LiveMapController(
-      autoCenter: true,
-      mapController: mapController,
-      verbose: true,
-      autoRotate: true,
-      positionStreamEnabled: true,
-      updateTimeInterval: 1,
-      updateDistanceFilter: 1,
-    );
-  } else {
-    
-  }
-     _listenLocation();
+    if (!kIsWeb) {
+      liveMapController = LiveMapController(
+        autoCenter: true,
+        mapController: mapController,
+        verbose: true,
+        autoRotate: true,
+        positionStreamEnabled: true,
+        updateTimeInterval: 1,
+        updateDistanceFilter: 1,
+      );
+      liveMapController.onReady.then((_) {
+        _myzoom = liveMapController.zoom;
+        _changefeed = liveMapController.changeFeed.listen((change) {
+          if (change.name == "zoom") {
+            print("New zoom value: ${change.value}");
+          }
+        });
+      });
+    } else {}
+    _listenLocation();
 
     //gpsStatus = checkGPSStatus();
 
-   // geolocator.getPositionStream().listen((event) {});
+    // geolocator.getPositionStream().listen((event) {});
     markerlocationStream.stream.asBroadcastStream().listen((onData) {
       print(onData.latitude);
     });
     userLocationOptions = UserLocationOptions(
         context: context,
-        mapController: !kIsWeb ? liveMapController.mapController : mapController,
+        mapController:
+            !kIsWeb ? liveMapController.mapController : mapController,
         markers: markers,
         onLocationUpdate: (LatLng pos) {
           print("onLocationUpdate ${pos.toString()}");
@@ -2484,35 +2483,32 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
     super.initState();
 
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      _checkService() .then((value) {
-        if (_serviceEnabled==null || !_serviceEnabled){
+      _checkService().then((value) {
+        if (_serviceEnabled == null || !_serviceEnabled) {
           CenterRepository.isFromMapForGPSCheckForFirstTime = true;
           showGPSAlertDialog(context);
         } else {
-         
-              animateToCurrentLocation();
-              CenterRepository.GPS_STATUS = true;
-              CenterRepository.GPS_STATUS_CONFIRMED = true;
-              if (widget.mapVM != null &&
-                  widget.mapVM.forReport != null &&
-                  widget.mapVM.forReport &&
-                  (CenterRepository.GPS_STATUS ||
-                      CenterRepository.GPS_STATUS_CONFIRMED)) {
-                lines2 = processLineData(false, '', '', widget.mapVM.fromDate,
-                    widget.mapVM.toDate, widget.mapVM.forReport, false, false);
-              }
-              if (carInfos != null &&
-                  carInfos.isNotEmpty &&
-                  (CenterRepository.GPS_STATUS ||
-                      CenterRepository.GPS_STATUS_CONFIRMED)) {
-                navigateToCarSelected(
-                    0, false, carInfos[0].carId, true, false, false);
-              }
-            }
-    
-        });
-     
-  });
+          animateToCurrentLocation();
+          CenterRepository.GPS_STATUS = true;
+          CenterRepository.GPS_STATUS_CONFIRMED = true;
+          if (widget.mapVM != null &&
+              widget.mapVM.forReport != null &&
+              widget.mapVM.forReport &&
+              (CenterRepository.GPS_STATUS ||
+                  CenterRepository.GPS_STATUS_CONFIRMED)) {
+            lines2 = processLineData(false, '', '', widget.mapVM.fromDate,
+                widget.mapVM.toDate, widget.mapVM.forReport, false, false);
+          }
+          if (carInfos != null &&
+              carInfos.isNotEmpty &&
+              (CenterRepository.GPS_STATUS ||
+                  CenterRepository.GPS_STATUS_CONFIRMED)) {
+            navigateToCarSelected(
+                0, false, carInfos[0].carId, true, false, false);
+          }
+        }
+      });
+    });
   }
 
   _onConfirmDefaultSettings(String type, BuildContext context) async {
@@ -2863,7 +2859,6 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
   Future<loc.LocationData> getCurrentLoaction() async {
     _initLastKnownLocation();
     _initCurrentLocation();
-
   }
 
   double ConvertDegreeAngleToDouble(
@@ -2966,12 +2961,12 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
       carInMarkerMap.putIfAbsent(lastCarIdSelected, () => latLng);
     }
 
-if(!kIsWeb) {
-    if (liveMapController != null && liveMapController.mapController != null)
-      liveMapController.mapController.move(latLng, 14);
-} else {
-  mapController.move(latLng, 14);
-}
+    if (!kIsWeb) {
+      if (liveMapController != null && liveMapController.mapController != null)
+        liveMapController.mapController.move(latLng, 14);
+    } else {
+      mapController.move(latLng, 14);
+    }
   }
 
   Future<bool> getParkAndSpeedStatus(NotyBloc<CarStateVM> notyBloc) async {
@@ -3576,7 +3571,6 @@ if(!kIsWeb) {
                                                             .toList(),
                                                       ),
                                                     ),
-                                                   
                                                   ],
                                                 );
                                               },
@@ -3627,7 +3621,6 @@ if(!kIsWeb) {
                                         backTransparent: true),
                                   )),
                             ),
-                           
                             new GestureDetector(
                               onTap: () {
                                 Navigator.pop(context);
@@ -4440,7 +4433,7 @@ if(!kIsWeb) {
 
   @override
   void dispose() {
-   // geolocator = null;
+    // geolocator = null;
     userLocationOptions = null;
     reportNoty?.dispose();
     statusNoty?.dispose();
@@ -4534,8 +4527,8 @@ if(!kIsWeb) {
             1000,
       );
     });
-    if (location.result.isSuccessful)
-    if(!kIsWeb) {  liveMapController.mapController.move(
+    if (location.result.isSuccessful) if (!kIsWeb) {
+      liveMapController.mapController.move(
           LatLng(location.result.locations[0].latitude,
               location.result.locations[0].latitude),
           15);
@@ -4551,8 +4544,7 @@ if(!kIsWeb) {
   Widget build(BuildContext context) {
     popmenu.PopupMenu.context = context;
 
-    return 
-        FutureBuilder<List<CarInfoVM>>(
+    return FutureBuilder<List<CarInfoVM>>(
       future: carInfoss,
       builder: (context, snapshot) {
         if (snapshot.hasData && snapshot.data != null) {
@@ -4573,663 +4565,214 @@ if(!kIsWeb) {
             }
           }
         }
-          final parallaxCardItemsList = <ParallaxCardItem>[
-            for (var car in carInfos)
-              ParallaxCardItem(
-                  backColor: (car.hasJoind != null && car.hasJoind)
-                      ? Colors.lightBlue
-                      : Colors.white,
-                  title: DartHelper.isNullOrEmptyString(car.car.pelaueNumber),
-                  body: DartHelper.isNullOrEmptyString(car.carId.toString()),
-                  background: Container(
-                    margin: EdgeInsets.only(top: 5, bottom: 5),
-                    width: 50.0,
-                    // color: (car.hasJoind!=null && car.hasJoind) ? Colors.lightBlue : Colors.white,
-                    child: CircleAvatar(
-                      backgroundColor: Colors.transparent,
-                      radius: 30.0,
-                      child: Image.asset(car.imageUrl),
-                    ),
-                  )),
-          ];
-
-          final carPairedItemsList = <ParallaxCardItem>[
-            for (var carp in pcarsPairedActivated)
-              ParallaxCardItem(
-                backColor: Colors.blueAccent,
-                title:
-                    DartHelper.isNullOrEmptyString(carp.SecondCar.pelaueNumber),
-                body: DartHelper.isNullOrEmptyString(
-                    carp.SecondCar.carId.toString()),
+        final parallaxCardItemsList = <ParallaxCardItem>[
+          for (var car in carInfos)
+            ParallaxCardItem(
+                backColor: (car.hasJoind != null && car.hasJoind)
+                    ? Colors.lightBlue
+                    : Colors.white,
+                title: DartHelper.isNullOrEmptyString(car.car.pelaueNumber),
+                body: DartHelper.isNullOrEmptyString(car.carId.toString()),
                 background: Container(
-                  width: 160.0,
-                  color: Colors.blueAccent,
-                  child: Container(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: <Widget>[
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            Text(Translations.current.masterCarId(),
-                                style: TextStyle(fontSize: 10.0)),
-                            Text(
-                                DartHelper.isNullOrEmptyString(
-                                    carp.MasterCar.carId.toString()),
-                                style: TextStyle(fontSize: 10.0)),
-                          ],
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: <Widget>[
-                            Text(
-                                DartHelper.isNullOrEmptyString(
-                                    carp.SecondCar.carModelTitle),
-                                style: TextStyle(fontSize: 10.0)),
-                            Container(
-                              width: 50.0,
-                              // color:  Colors.lightBlue ,
-                              child: CircleAvatar(
-                                backgroundColor: Colors.transparent,
-                                radius: 30.0,
-                                child: Image.asset(CenterRepository
-                                    .getCarImageURlByColorConstId(
-                                        carp.SecondCar.colorTypeConstId)),
-                              ),
-                            )
-                          ],
-                        ),
-                        Row(
-                          children: <Widget>[
-                            Text(
-                                DartHelper.isNullOrEmptyString(
-                                    carp.SecondCar.carModelDetailTitle),
-                                style: TextStyle(fontSize: 10.0)),
-                          ],
-                        ),
-                      ],
-                    ),
+                  margin: EdgeInsets.only(top: 5, bottom: 5),
+                  width: 50.0,
+                  // color: (car.hasJoind!=null && car.hasJoind) ? Colors.lightBlue : Colors.white,
+                  child: CircleAvatar(
+                    backgroundColor: Colors.transparent,
+                    radius: 30.0,
+                    child: Image.asset(car.imageUrl),
+                  ),
+                )),
+        ];
+
+        final carPairedItemsList = <ParallaxCardItem>[
+          for (var carp in pcarsPairedActivated)
+            ParallaxCardItem(
+              backColor: Colors.blueAccent,
+              title:
+                  DartHelper.isNullOrEmptyString(carp.SecondCar.pelaueNumber),
+              body: DartHelper.isNullOrEmptyString(
+                  carp.SecondCar.carId.toString()),
+              background: Container(
+                width: 160.0,
+                color: Colors.blueAccent,
+                child: Container(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Text(Translations.current.masterCarId(),
+                              style: TextStyle(fontSize: 10.0)),
+                          Text(
+                              DartHelper.isNullOrEmptyString(
+                                  carp.MasterCar.carId.toString()),
+                              style: TextStyle(fontSize: 10.0)),
+                        ],
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: <Widget>[
+                          Text(
+                              DartHelper.isNullOrEmptyString(
+                                  carp.SecondCar.carModelTitle),
+                              style: TextStyle(fontSize: 10.0)),
+                          Container(
+                            width: 50.0,
+                            // color:  Colors.lightBlue ,
+                            child: CircleAvatar(
+                              backgroundColor: Colors.transparent,
+                              radius: 30.0,
+                              child: Image.asset(
+                                  CenterRepository.getCarImageURlByColorConstId(
+                                      carp.SecondCar.colorTypeConstId)),
+                            ),
+                          )
+                        ],
+                      ),
+                      Row(
+                        children: <Widget>[
+                          Text(
+                              DartHelper.isNullOrEmptyString(
+                                  carp.SecondCar.carModelDetailTitle),
+                              style: TextStyle(fontSize: 10.0)),
+                        ],
+                      ),
+                    ],
                   ),
                 ),
               ),
-          ];
-          if (carInfos != null && carInfos.length > 0)
-            navigateToCarSelected(
-                0, false, carInfos[0].carId, true, false, false);
-          return StreamBuilder<Message>(
-            //initialData: new Message(t),
-            stream: pairedChangedNoty.noty,
-            builder: (context, snapshot) {
-              if (snapshot.hasData && snapshot.data != null) {
-                if (snapshot.data.type == 'CAR_PAIRED')
-                  carInfoss = getCarInfo(true);
-              }
+            ),
+        ];
+        if (carInfos != null && carInfos.length > 0)
+          navigateToCarSelected(
+              0, false, carInfos[0].carId, true, false, false);
+        return StreamBuilder<Message>(
+          //initialData: new Message(t),
+          stream: pairedChangedNoty.noty,
+          builder: (context, snapshot) {
+            if (snapshot.hasData && snapshot.data != null) {
+              if (snapshot.data.type == 'CAR_PAIRED')
+                carInfoss = getCarInfo(true);
+            }
 
-              return Scaffold(
-               
-                body:
-                
-                    Stack(
-                  overflow: Overflow.visible,
-                  children: <Widget>[
-                    FutureBuilder<List<Polyline>>(
-                        future: lines2,
-                        builder: (context, snapshot) {
-                          if (snapshot.hasData && snapshot.data != null) {
-                            centerRepository.dismissDialog(context);
+            return Scaffold(
+              body: Stack(
+                overflow: Overflow.visible,
+                children: <Widget>[
+                  FutureBuilder<List<Polyline>>(
+                      future: lines2,
+                      builder: (context, snapshot) {
+                        if (snapshot.hasData && snapshot.data != null) {
+                          centerRepository.dismissDialog(context);
 
-                            return StreamBuilder<Message>(
-                              stream: reportNoty.noty,
-                              builder: (context, snapshot) {
-                                if (snapshot.hasData && snapshot.data != null) {
-                                  Message msg = snapshot.data;
-                                  if (msg.type == 'ANIM_ROUTE') {
-                                    // if (forAnim) {
-                                    animateRoutecarPolyLines();
-                                    // }
+                          return StreamBuilder<Message>(
+                            stream: reportNoty.noty,
+                            builder: (context, snapshot) {
+                              if (snapshot.hasData && snapshot.data != null) {
+                                Message msg = snapshot.data;
+                                if (msg.type == 'ANIM_ROUTE') {
+                                  // if (forAnim) {
+                                  animateRoutecarPolyLines();
+                                  // }
+                                }
+                                if (msg.type == 'CLEAR_MAP') {
+                                  if (_timerLine != null &&
+                                      _timerLine.isActive) {
+                                    //_timerLine=null;
+                                    _timerLine.cancel();
                                   }
-                                  if (msg.type == 'CLEAR_MAP') {
-                                    if (_timerLine != null &&
-                                        _timerLine.isActive) {
-                                      //_timerLine=null;
-                                      _timerLine.cancel();
-                                    }
-                                    if (_timerupdate != null &&
-                                        _timerupdate.isActive) {
-                                      _timerupdate.cancel();
-                                    }
-                                    if (_polyLineAnim != null) {
-                                      forAnim = false;
-                                      _polyLineAnim.points.clear();
-                                      _polyLineAnim = null;
-                                    }
+                                  if (_timerupdate != null &&
+                                      _timerupdate.isActive) {
+                                    _timerupdate.cancel();
+                                  }
+                                  if (_polyLineAnim != null) {
+                                    forAnim = false;
+                                    _polyLineAnim.points.clear();
+                                    _polyLineAnim = null;
+                                  }
 
-                                    if (lines != null && lines.length > 0) {
-                                      lines.clear();
-                                    }
-                                    if (carInMarkerMap != null &&
-                                        carInMarkerMap.length > 0)
-                                      carInMarkerMap.clear();
-                                    if (carMarkersMap != null &&
-                                        carMarkersMap.length > 0)
-                                      carMarkersMap.clear();
-                                    if (carIndexMarkerMap != null &&
-                                        carIndexMarkerMap.length > 0)
-                                      carIndexMarkerMap.clear();
-                                    if (markers != null && markers.length > 0) {
-                                      markers.clear();
-                                    }
-                                    if (lines2 != null) {
-                                      lines2 = null;
-                                    }
+                                  if (lines != null && lines.length > 0) {
+                                    lines.clear();
+                                  }
+                                  if (carInMarkerMap != null &&
+                                      carInMarkerMap.length > 0)
+                                    carInMarkerMap.clear();
+                                  if (carMarkersMap != null &&
+                                      carMarkersMap.length > 0)
+                                    carMarkersMap.clear();
+                                  if (carIndexMarkerMap != null &&
+                                      carIndexMarkerMap.length > 0)
+                                    carIndexMarkerMap.clear();
+                                  if (markers != null && markers.length > 0) {
+                                    markers.clear();
+                                  }
+                                  if (lines2 != null) {
+                                    lines2 = null;
                                   }
                                 }
-                                return StreamBuilder<Message>(
-                                  stream: animateNoty.noty,
-                                  builder: (context, snapshot) {
-                                    if (snapshot.hasData &&
-                                        snapshot.data != null) {
-                                      if (_fpoint != null)
-                                       if(!kIsWeb) {  liveMapController.mapController
-                                            .move(_fpoint, 15);
-                                       } else {
-                                         mapController
-                                            .move(_fpoint, 15);
-                                       }
-                                    }
-                                    return StreamBuilder<Message>(
-                                      stream: statusNoty.noty,
-                                      builder: (context, snapshot) {
-                                        if (snapshot.hasData &&
-                                            snapshot.data != null) {
-                                          if (snapshot.data.type ==
-                                              'GPS_GPRS_UPDATE') {}
-                                        }
-                                        return StreamBuilder<Message>(
-                                          stream: showAllItemsdNoty.noty,
-                                          builder: (context, snapshot) {
-                                            if (snapshot.hasData &&
-                                                snapshot.data != null) {}
-                                            return Padding(
-                                              padding: EdgeInsets.all(0.0),
-                                              child: Column(
-                                                children: [
-                                                  Padding(
-                                                    padding: EdgeInsets.only(
-                                                        top: 0.0, bottom: 0.0),
-                                                    child: Text(''),
-                                                  ),
-                                                  Flexible(
-                                                    child: Stack(
-                                                      children: <Widget>[
-                                                        FlutterMap(
-                                                          mapController:
-                                                             !kIsWeb ? liveMapController
-                                                                  .mapController : mapController,
-                                                          options: MapOptions(
-                                                            center: firstPoint !=
-                                                                    null
-                                                                ? firstPoint
-                                                                : currentLocation !=
-                                                                        null
-                                                                    ? LatLng(
-                                                                        currentLocation
-                                                                            .latitude,
-                                                                        currentLocation
-                                                                            .longitude)
-                                                                    : LatLng(
-                                                                        35.6917856,
-                                                                        51.4204603),
-                                                            zoom: 15.0,
-                                                            /*plugins: [
-                                                                      UserLocationPlugin()
-                                                                    ],*/
-                                                          ),
-                                                          layers: [
-                                                            showSattelite
-                                                                ? TileLayerOptions(
-                                                                    //urlTemplate: 'https://{s}.tiles.mapbox.com/v3/pk.eyJ1IjoicmV6YW5kIiwiYSI6ImNrNWNkdnB2dDAwdGwzZnMwc2lhcTlxd3QifQ.61hONdUooWn7aBJs-Km8OA/{z}/{x}/{y}.png',
-                                                                    // urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-                                                                    //urlTemplate:'https://api.mapbox.com/styles/v1/rezand/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoicmV6YW5kIiwiYSI6ImNrNWNkdHg3djAwdDAzZnMwcTc1N2ZpY2YifQ.fl5LG72G5Uz6CLVfhbazNw',
-
-                                                                    urlTemplate:
-                                                                        'https://api.mapbox.com/styles/v1/rezand/ck7d3ul4c0k3w1ir0n2a419pd/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoicmV6YW5kIiwiYSI6ImNrNWNkdHg3djAwdDAzZnMwcTc1N2ZpY2YifQ.fl5LG72G5Uz6CLVfhbazNw',
-                                                                    additionalOptions: {
-                                                                      'accessToken':
-                                                                          'pk.eyJ1IjoicmV6YW5kIiwiYSI6ImNrNWNkdHg3djAwdDAzZnMwcTc1N2ZpY2YifQ.fl5LG72G5Uz6CLVfhbazNw',
-                                                                      //'id': 'mapbox.mapbox-streets-v7'
-                                                                    },
-                                                                    subdomains: [
-                                                                      'a',
-                                                                      'b',
-                                                                      'c',
-                                                                      'd'
-                                                                    ],
-                                                                  )
-                                                                : TileLayerOptions(
-                                                                    //urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-                                                                    urlTemplate:
-                                                                        'https://api.mapbox.com/styles/v1/rezand/ck7ge41221jke1inrbezkflve/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoicmV6YW5kIiwiYSI6ImNrNWNkdHg3djAwdDAzZnMwcTc1N2ZpY2YifQ.fl5LG72G5Uz6CLVfhbazNw',
-                                                                    additionalOptions: {
-                                                                      'accessToken':
-                                                                          'pk.eyJ1IjoicmV6YW5kIiwiYSI6ImNrNWNkdHg3djAwdDAzZnMwcTc1N2ZpY2YifQ.fl5LG72G5Uz6CLVfhbazNw',
-                                                                      'id':
-                                                                          'mapbox.mapbox-streets-v7'
-                                                                    },
-                                                                    subdomains: [
-                                                                      'a',
-                                                                      'b',
-                                                                      'c'
-                                                                    ],
-                                                                    //additionalOptions: {'key':'2UnTxClTTOQ2d3xsUL5T'},
-                                                                  ),
-                                                            (forAnim &&
-                                                                    _polyLineAnim !=
-                                                                        null)
-                                                                ? PolylineLayerOptions(
-                                                                    polylines: <
-                                                                        Polyline>[
-                                                                        _polyLineAnim
-                                                                      ])
-                                                                : PolylineLayerOptions(
-                                                                    polylines:
-                                                                        lines),
-                                                            MarkerLayerOptions(
-                                                                markers:
-                                                                    markers),
-                                                            MarkerLayerOptions(
-                                                                markers: [
-                                                                  currentMarker
-                                                                ]),
-                                                            //userLocationOptions,
-                                                          ],
-                                                        ),
-                                                        Positioned(
-                                                          right: 20.0,
-                                                          bottom: 90.0,
-                                                          child: Container(
-                                                            width: 38.0,
-                                                            height: 38.0,
-                                                            child:
-                                                                FloatingActionButton(
-                                                              onPressed:
-                                                                  () async {
-                                                                animateToCurrentLocation();
-                                                              },
-                                                              child: Container(
-                                                                width: 38.0,
-                                                                height: 38.0,
-                                                                child:
-                                                                    Image.asset(
-                                                                  'assets/images/location.png',
-                                                                  color: Colors
-                                                                      .white,
-                                                                ),
-                                                              ),
-                                                              elevation: 0.0,
-                                                              backgroundColor:
-                                                                  Colors
-                                                                      .blueAccent,
-                                                              heroTag:
-                                                                  'CURRENTLOCATION1',
-                                                            ),
-                                                          ),
-                                                        ),
-                                                        showAllItemsOnMap
-                                                            ? Positioned(
-                                                                right: 20.0,
-                                                                bottom: 340.0,
-                                                                child:
-                                                                    Container(
-                                                                  width: 38.0,
-                                                                  height: 38.0,
-                                                                  child:
-                                                                      FloatingActionButton(
-                                                                    onPressed:
-                                                                        () {
-                                                                      showSattelite =
-                                                                          !showSattelite;
-                                                                      showAllItemsdNoty
-                                                                          .updateValue(
-                                                                              new Message(type: 'SATTELITE'));
-                                                                    },
-                                                                    child:
-                                                                        Container(
-                                                                      width:
-                                                                          38.0,
-                                                                      height:
-                                                                          38.0,
-                                                                      child: Image
-                                                                          .asset(
-                                                                        'assets/images/sattelite.png',
-                                                                        color: !showSattelite
-                                                                            ? Colors.white
-                                                                            : Colors.amber,
-                                                                      ),
-                                                                    ),
-                                                                    elevation:
-                                                                        0.0,
-                                                                    backgroundColor:
-                                                                        Colors
-                                                                            .blueAccent,
-                                                                    heroTag:
-                                                                        'SATTELITE1',
-                                                                  ),
-                                                                ),
-                                                              )
-                                                            : Container(),
-                                                        Positioned(
-                                                          right: 20.0,
-                                                          bottom: 140.0,
-                                                          child: Container(
-                                                            width: 38.0,
-                                                            height: 38.0,
-                                                            child:
-                                                                FloatingActionButton(
-                                                              onPressed: () {
-                                                                showAllItemsOnMap =
-                                                                    !showAllItemsOnMap;
-
-                                                                showAllItemsdNoty
-                                                                    .updateValue(
-                                                                        new Message(
-                                                                            type:
-                                                                                'CLEAR_ALL'));
-                                                                showAllItemsdNoty2.updateValue(
-                                                                    new Message(
-                                                                        status:
-                                                                            showAllItemsOnMap,
-                                                                        type:
-                                                                            'CLEAR_ALL'));
-                                                              },
-                                                              child: Container(
-                                                                width: 38.0,
-                                                                height: 38.0,
-                                                                child:
-                                                                    Image.asset(
-                                                                  'assets/images/clear_all.png',
-                                                                  color: showAllItemsOnMap
-                                                                      ? Colors
-                                                                          .white
-                                                                      : Colors
-                                                                          .amber,
-                                                                ),
-                                                              ),
-                                                              elevation: 0.0,
-                                                              backgroundColor:
-                                                                  Colors
-                                                                      .blueAccent,
-                                                              heroTag:
-                                                                  'CLEARALL1',
-                                                            ),
-                                                          ),
-                                                        ),
-                                                        showAllItemsOnMap
-                                                            ? Positioned(
-                                                                right: 20.0,
-                                                                bottom: 240.0,
-                                                                child:
-                                                                    Container(
-                                                                  width: 38.0,
-                                                                  height: 38.0,
-                                                                  child:
-                                                                      FloatingActionButton(
-                                                                    onPressed:
-                                                                        () {
-                                                                      reportNoty
-                                                                          .updateValue(
-                                                                              new Message(type: 'CLEAR_MAP'));
-                                                                    },
-                                                                    child:
-                                                                        Container(
-                                                                      width:
-                                                                          38.0,
-                                                                      height:
-                                                                          38.0,
-                                                                      child: Image
-                                                                          .asset(
-                                                                        'assets/images/clear_map.png',
-                                                                        color: Colors
-                                                                            .white,
-                                                                      ),
-                                                                    ),
-                                                                    elevation:
-                                                                        3.0,
-                                                                    backgroundColor:
-                                                                        Colors
-                                                                            .blueAccent,
-                                                                    heroTag:
-                                                                        'ClearMap1',
-                                                                  ),
-                                                                ),
-                                                              )
-                                                            : Container(),
-                                                        showAllItemsOnMap
-                                                            ? Positioned(
-                                                                right: 20.0,
-                                                                bottom: 290.0,
-                                                                child:
-                                                                    Container(
-                                                                  width: 38.0,
-                                                                  height: 38.0,
-                                                                  child:
-                                                                      FloatingActionButton(
-                                                                    onPressed:
-                                                                        () {
-                                                                      showRouteCurrentToCar();
-                                                                    },
-                                                                    child:
-                                                                        Container(
-                                                                      width:
-                                                                          38.0,
-                                                                      height:
-                                                                          38.0,
-                                                                      child: Image
-                                                                          .asset(
-                                                                        'assets/images/go.png',
-                                                                        color: Colors
-                                                                            .white,
-                                                                      ),
-                                                                    ),
-                                                                    elevation:
-                                                                        0.0,
-                                                                    backgroundColor:
-                                                                        Colors
-                                                                            .blueAccent,
-                                                                    heroTag:
-                                                                        'GO1',
-                                                                  ),
-                                                                ),
-                                                              )
-                                                            : Container(),
-                                                        showAllItemsOnMap
-                                                            ? Positioned(
-                                                                right: 20.0,
-                                                                bottom: 190.0,
-                                                                child:
-                                                                    Container(
-                                                                  width: 38.0,
-                                                                  height: 38.0,
-                                                                  child:
-                                                                      FloatingActionButton(
-                                                                    onPressed:
-                                                                        () {
-                                                                      showCarRoute();
-                                                                    },
-                                                                    child:
-                                                                        Container(
-                                                                      width:
-                                                                          38.0,
-                                                                      height:
-                                                                          38.0,
-                                                                      child: Image
-                                                                          .asset(
-                                                                        'assets/images/routecar.png',
-                                                                        color: Colors
-                                                                            .white,
-                                                                      ),
-                                                                    ),
-                                                                    elevation:
-                                                                        1.0,
-                                                                    backgroundColor:
-                                                                        Colors
-                                                                            .blueAccent,
-                                                                    heroTag:
-                                                                        'ROUTECAR',
-                                                                  ),
-                                                                ),
-                                                              )
-                                                            : Container(),
-                                                        /* showAllItemsOnMap
-                                                                          ? Positioned(
-                                                                        left: 60.0,
-                                                                        top: 60.0,
-                                                                        child:
-                                                                        Container(
-                                                                          width: 38.0,
-                                                                          height: 38.0,
-                                                                          child:
-                                                                          FloatingActionButton(
-                                                                            onPressed: () {
-
-                                                                            },
-                                                                            child: Container(
-                                                                              width: 38.0,
-                                                                              height: 38.0,
-                                                                              child: isGPRSOn
-                                                                                  ? ImageNeonGlow(
-                                                                                imageUrl: 'assets/images/gprs.png',
-                                                                                counter: 0,
-                                                                                color: Colors
-                                                                                    .indigoAccent,)
-                                                                                  :
-                                                                              Image
-                                                                                  .asset(
-                                                                                'assets/images/gprs.png',
-                                                                                color: Colors
-                                                                                    .white,),),
-                                                                            elevation: 1.0,
-                                                                            backgroundColor: Colors
-                                                                                .transparent,
-                                                                            heroTag: 'GPRS1',
-                                                                          ),
-                                                                        ),
-                                                                      )
-                                                                          : Container(),*/
-                                                      ],
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            );
-                                          },
-                                        );
-                                      },
-                                    );
-                                  },
-                                );
-                              },
-                            );
-                          } else {
-                            double lat = currentLocation != null
-                                ? currentLocation.latitude
-                                : 35.6917856;
-                            double long = currentLocation != null
-                                ? currentLocation.longitude
-                                : 51.4204603;
-                            return StreamBuilder<Message>(
-                              stream: reportNoty.noty,
-                              builder: (context, snapshot) {
-                                if (snapshot.hasData && snapshot.data != null) {
-                                  Message msg = snapshot.data;
-                                  if (msg.type == 'ANIM_ROUTE') {
-                                    if (forAnim) {
-                                      animateRoutecarPolyLines();
+                              }
+                              return StreamBuilder<Message>(
+                                stream: animateNoty.noty,
+                                builder: (context, snapshot) {
+                                  if (snapshot.hasData &&
+                                      snapshot.data != null) {
+                                    if (_fpoint != null) if (!kIsWeb) {
+                                      liveMapController.mapController
+                                          .move(_fpoint, 15);
+                                    } else {
+                                      mapController.move(_fpoint, 15);
                                     }
                                   }
-                                  if (msg.type == 'CLEAR_MAP') {
-                                    if (_timerLine != null &&
-                                        _timerLine.isActive) {
-                                      _timerLine.cancel();
-                                    }
-                                    if (_timerupdate != null &&
-                                        _timerupdate.isActive) {
-                                      _timerupdate.cancel();
-                                    }
-                                    if (_polyLineAnim != null) {
-                                      forAnim = false;
-                                      _polyLineAnim.points.clear();
-                                      _polyLineAnim = null;
-                                      degress.clear();
-                                    }
-
-                                    if (lines != null && lines.length > 0) {
-                                      lines.clear();
-                                    }
-                                    if (carInMarkerMap != null &&
-                                        carInMarkerMap.length > 0)
-                                      carInMarkerMap.clear();
-                                    if (carMarkersMap != null &&
-                                        carMarkersMap.length > 0)
-                                      carMarkersMap.clear();
-                                    if (carIndexMarkerMap != null &&
-                                        carIndexMarkerMap.length > 0)
-                                      carIndexMarkerMap.clear();
-                                    if (markers != null && markers.length > 0) {
-                                      markers.clear();
-                                    }
-                                    if (lines2 != null) {
-                                      lines2 = null;
-                                    }
-                                  }
-                                }
-                                return StreamBuilder<Message>(
-                                  stream: animateNoty.noty,
-                                  builder: (context, snapshot) {
-                                    if (snapshot.hasData &&
-                                        snapshot.data != null) {
-                                      if (_fpoint != null)
-                                       if(!kIsWeb) { liveMapController.mapController
-                                            .move(_fpoint, 15); }
-                                            else {
-                                              mapController
-                                            .move(_fpoint, 15);
-                                            }
-                                    }
-                                    return StreamBuilder<Message>(
-                                      stream: statusNoty.noty,
-                                      builder: (context, snapshot) {
-                                        if (snapshot.hasData &&
-                                            snapshot.data != null) {
-                                          if (snapshot.data.type ==
-                                              'GPS_GPRS_UPDATE') {}
-                                          if (snapshot.data.type ==
-                                              'CURRENT_LOCATION_UPDATED') {
-                                            showWaiting = false;
-                                          }
-                                          if (snapshot.data.type ==
-                                              'SEARCH_LOCATION') {
-                                            showWaiting = true;
-                                          }
-                                        }
-                                        return StreamBuilder<Message>(
-                                          stream: showAllItemsdNoty.noty,
-                                          builder: (context, snapshot) {
-                                            if (snapshot.hasData &&
-                                                snapshot.data != null) {}
-                                            return Column(
+                                  return StreamBuilder<Message>(
+                                    stream: statusNoty.noty,
+                                    builder: (context, snapshot) {
+                                      if (snapshot.hasData &&
+                                          snapshot.data != null) {
+                                        if (snapshot.data.type ==
+                                            'GPS_GPRS_UPDATE') {}
+                                      }
+                                      return StreamBuilder<Message>(
+                                        stream: showAllItemsdNoty.noty,
+                                        builder: (context, snapshot) {
+                                          if (snapshot.hasData &&
+                                              snapshot.data != null) {}
+                                          return Padding(
+                                            padding: EdgeInsets.all(0.0),
+                                            child: Column(
                                               children: [
+                                                Padding(
+                                                  padding: EdgeInsets.only(
+                                                      top: 0.0, bottom: 0.0),
+                                                  child: Text(''),
+                                                ),
                                                 Flexible(
                                                   child: Stack(
                                                     children: <Widget>[
                                                       FlutterMap(
+                                                        mapController: !kIsWeb
+                                                            ? liveMapController
+                                                                .mapController
+                                                            : mapController,
                                                         options: MapOptions(
-                                                          center:
-                                                              LatLng(lat, long),
-                                                          zoom: 16.0,
+                                                          center: firstPoint !=
+                                                                  null
+                                                              ? firstPoint
+                                                              : currentLocation !=
+                                                                      null
+                                                                  ? LatLng(
+                                                                      currentLocation
+                                                                          .latitude,
+                                                                      currentLocation
+                                                                          .longitude)
+                                                                  : LatLng(
+                                                                      35.6917856,
+                                                                      51.4204603),
+                                                          zoom: 15.0,
                                                           /*plugins: [
-                                                                    UserLocationPlugin()
-                                                                  ],*/
+                                                                      UserLocationPlugin()
+                                                                    ],*/
                                                         ),
                                                         layers: [
                                                           showSattelite
@@ -5269,6 +4812,13 @@ if(!kIsWeb) {
                                                                   ],
                                                                   //additionalOptions: {'key':'2UnTxClTTOQ2d3xsUL5T'},
                                                                 ),
+
+                                                          MarkerLayerOptions(
+                                                              markers: markers),
+                                                          MarkerLayerOptions(
+                                                              markers: [
+                                                                currentMarker
+                                                              ]),
                                                           (forAnim &&
                                                                   _polyLineAnim !=
                                                                       null)
@@ -5280,21 +4830,8 @@ if(!kIsWeb) {
                                                               : PolylineLayerOptions(
                                                                   polylines:
                                                                       lines),
-                                                          /*forAnim ?  MarkerLayerOptions(
-                                                    markers: <Marker>[_marker]) :*/
-                                                          /* MarkerLayerOptions(
-                                                    markers: markers),*/
-                                                          MarkerLayerOptions(
-                                                              markers: markers),
-                                                          MarkerLayerOptions(
-                                                              markers: [
-                                                                currentMarker
-                                                              ]),
-                                                          // userLocationOptions,
+                                                          //userLocationOptions,
                                                         ],
-                                                        mapController:
-                                                          !kIsWeb ?  liveMapController
-                                                                .mapController : mapController,
                                                       ),
                                                       Positioned(
                                                         right: 20.0,
@@ -5323,7 +4860,7 @@ if(!kIsWeb) {
                                                                 Colors
                                                                     .blueAccent,
                                                             heroTag:
-                                                                'CURRENTLOCATION2',
+                                                                'CURRENTLOCATION1',
                                                           ),
                                                         ),
                                                       ),
@@ -5366,7 +4903,7 @@ if(!kIsWeb) {
                                                                       Colors
                                                                           .blueAccent,
                                                                   heroTag:
-                                                                      'SATTELITE2',
+                                                                      'SATTELITE1',
                                                                 ),
                                                               ),
                                                             )
@@ -5382,6 +4919,7 @@ if(!kIsWeb) {
                                                             onPressed: () {
                                                               showAllItemsOnMap =
                                                                   !showAllItemsOnMap;
+
                                                               showAllItemsdNoty
                                                                   .updateValue(
                                                                       new Message(
@@ -5412,14 +4950,14 @@ if(!kIsWeb) {
                                                                 Colors
                                                                     .blueAccent,
                                                             heroTag:
-                                                                'CLEARALL2',
+                                                                'CLEARALL1',
                                                           ),
                                                         ),
                                                       ),
                                                       showAllItemsOnMap
                                                           ? Positioned(
                                                               right: 20.0,
-                                                              bottom: 290.0,
+                                                              bottom: 240.0,
                                                               child: Container(
                                                                 width: 38.0,
                                                                 height: 38.0,
@@ -5427,7 +4965,6 @@ if(!kIsWeb) {
                                                                     FloatingActionButton(
                                                                   onPressed:
                                                                       () {
-                                                                    // liveMapController.removeMarkers();
                                                                     reportNoty.updateValue(
                                                                         new Message(
                                                                             type:
@@ -5451,7 +4988,7 @@ if(!kIsWeb) {
                                                                       Colors
                                                                           .blueAccent,
                                                                   heroTag:
-                                                                      'ClearMap2',
+                                                                      'ClearMap1',
                                                                 ),
                                                               ),
                                                             )
@@ -5459,37 +4996,37 @@ if(!kIsWeb) {
                                                       showAllItemsOnMap
                                                           ? Positioned(
                                                               right: 20.0,
-                                                              bottom: 240.0,
+                                                              bottom: 290.0,
                                                               child: Container(
-                                                                  width: 38.0,
-                                                                  height: 38.0,
+                                                                width: 38.0,
+                                                                height: 38.0,
+                                                                child:
+                                                                    FloatingActionButton(
+                                                                  onPressed:
+                                                                      () {
+                                                                    showRouteCurrentToCar();
+                                                                  },
                                                                   child:
-                                                                      FloatingActionButton(
-                                                                    onPressed:
-                                                                        () {
-                                                                      showRouteCurrentToCar();
-                                                                    },
-                                                                    child:
-                                                                        Container(
-                                                                      width:
-                                                                          38.0,
-                                                                      height:
-                                                                          38.0,
-                                                                      child: Image
-                                                                          .asset(
-                                                                        'assets/images/go.png',
-                                                                        color: Colors
-                                                                            .white,
-                                                                      ),
+                                                                      Container(
+                                                                    width: 38.0,
+                                                                    height:
+                                                                        38.0,
+                                                                    child: Image
+                                                                        .asset(
+                                                                      'assets/images/go.png',
+                                                                      color: Colors
+                                                                          .white,
                                                                     ),
-                                                                    elevation:
-                                                                        0.0,
-                                                                    backgroundColor:
-                                                                        Colors
-                                                                            .blueAccent,
-                                                                    heroTag:
-                                                                        'GO2',
-                                                                  )),
+                                                                  ),
+                                                                  elevation:
+                                                                      0.0,
+                                                                  backgroundColor:
+                                                                      Colors
+                                                                          .blueAccent,
+                                                                  heroTag:
+                                                                      'GO1',
+                                                                ),
+                                                              ),
                                                             )
                                                           : Container(),
                                                       showAllItemsOnMap
@@ -5523,258 +5060,679 @@ if(!kIsWeb) {
                                                                       Colors
                                                                           .blueAccent,
                                                                   heroTag:
-                                                                      'ROUTECAR2',
+                                                                      'ROUTECAR',
                                                                 ),
                                                               ),
                                                             )
                                                           : Container(),
-                                                     
+                                                      /* showAllItemsOnMap
+                                                                          ? Positioned(
+                                                                        left: 60.0,
+                                                                        top: 60.0,
+                                                                        child:
+                                                                        Container(
+                                                                          width: 38.0,
+                                                                          height: 38.0,
+                                                                          child:
+                                                                          FloatingActionButton(
+                                                                            onPressed: () {
+
+                                                                            },
+                                                                            child: Container(
+                                                                              width: 38.0,
+                                                                              height: 38.0,
+                                                                              child: isGPRSOn
+                                                                                  ? ImageNeonGlow(
+                                                                                imageUrl: 'assets/images/gprs.png',
+                                                                                counter: 0,
+                                                                                color: Colors
+                                                                                    .indigoAccent,)
+                                                                                  :
+                                                                              Image
+                                                                                  .asset(
+                                                                                'assets/images/gprs.png',
+                                                                                color: Colors
+                                                                                    .white,),),
+                                                                            elevation: 1.0,
+                                                                            backgroundColor: Colors
+                                                                                .transparent,
+                                                                            heroTag: 'GPRS1',
+                                                                          ),
+                                                                        ),
+                                                                      )
+                                                                          : Container(),*/
                                                     ],
                                                   ),
                                                 ),
                                               ],
-                                            );
-                                          },
-                                        );
-                                      },
-                                    );
-                                  },
-                                );
-                              },
-                            );
-                          }
-                        }
-                        // ),
-                        ),
-
-                    /* elevation: 0,
-                            floatingAppBar: true,
-                            floatAppbar:
-                            Stack(
-                              children: <Widget>[*/
-                     Container(
-                        height: 71.0,
-                        child:  Column(
-                          children: [
-                      Container(
-                        height: 70.0,
-                        child:
-                        AppBar(
-                        
-                          automaticallyImplyLeading: true,
-                          backgroundColor: Colors.white,
-                          elevation: 0.0,
-                          actions: <Widget>[
-                            
-                           Container(
-                        margin: EdgeInsets.only(left: 10, right: 5),
-                        child: IconButton(
-                              icon: Icon(
-                                Icons.refresh,
-                                color: Colors.blueAccent,
-                                size: 35,
-                              ),
-                              onPressed: () {
-                                carInfoss = getCarInfo(true);
-                              },
-                            ),),
-                            Container(
-                              width: 38.0,
-                              height: 38.0,
-                              child: FloatingActionButton(
-                                onPressed: () {},
-                                child: Container(
-                                  margin: EdgeInsets.only(left: 5, right: 5),
-                                  width: 38.0,
-                                  height: 38.0,
-                                  child: isGPSOn
-                                      ? ImageNeonGlow(
-                                          imageUrl: 'assets/images/gps.png',
-                                          counter: 0,
-                                          color: Colors.blueAccent,
-                                        )
-                                      : Image.asset(
-                                          'assets/images/gps.png',
-                                          color: Colors.black38,
-                                        ),
-                                ),
-                                elevation: 1.0,
-                                backgroundColor: Colors.transparent,
-                                heroTag: 'GPS1',
-                              ),
-                            ),
-                            Container(
-                              margin: EdgeInsets.only(left: 5, right: 5),
-                              width: 38.0,
-                              height: 38.0,
-                              child: FloatingActionButton(
-                                onPressed: () {},
-                                child: Container(
-                                  width: 38.0,
-                                  height: 38.0,
-                                  child: isGPRSOn
-                                      ? ImageNeonGlow(
-                                          imageUrl: 'assets/images/gprs.png',
-                                          counter: 0,
-                                          color: Colors.blueAccent,
-                                        )
-                                      : Image.asset(
-                                          'assets/images/gprs.png',
-                                          color: Colors.black38,
-                                        ),
-                                ),
-                                elevation: 1.0,
-                                backgroundColor: Colors.transparent,
-                                heroTag: 'GPRS1',
-                              ),
-                            ),
-                          ],
-                          leading: IconButton(
-                            icon: Icon(
-                              Icons.menu,
-                              color: Colors.indigoAccent,
-                            ),
-                            onPressed: () {
-                              widget.scaffoldKey.currentState.openDrawer();
-                            },
-                          ),
-                        ), ),
-                        showWaiting
-                                ? Container(
-                                
-                                  height: 2.0,
-                                  child:
-                                 LinearProgressIndicator(
-                                  
-                                    backgroundColor: Colors.indigoAccent,) )
-                                : Container(),
-                          ],
-                      ),
-                         // ],
-                    ),
-
-                    StreamBuilder<Message>(
-                      stream: showAllItemsdNoty2.noty,
-                      builder: (context, snapshot) {
-                        bool status = true;
-                        if (snapshot.hasData && snapshot.data != null) {
-                          status = snapshot.data.status;
-                        }
-                        return status
-                            ? Padding(
-                                padding: EdgeInsets.only(top: 65.0),
-                                child: Container(
-                                  color: Colors.transparent,
-                                  width: MediaQuery.of(context).size.width - 10,
-                                  height: 100.0,
-                                  child: PageTransformer(
-                                    pageViewBuilder:
-                                        (context, visibilityResolver) {
-                                      return PageView.builder(
-                                        physics: BouncingScrollPhysics(),
-                                        controller: PageController(
-                                          viewportFraction: 0.5,
-                                        ),
-                                        itemCount: parallaxCardItemsList.length,
-                                        itemBuilder: (context, index) {
-                                          final item =
-                                              parallaxCardItemsList[index];
-                                          final pageVisibility =
-                                              visibilityResolver
-                                                  .resolvePageVisibility(index);
-                                          return GestureDetector(
-                                            onTap: () {
-                                              navigateToCarSelected(index,
-                                                  false, 0, true, false, false);
-                                            },
-                                            child: Container(
-                                              color:
-                                                  Colors.white.withOpacity(0.0),
-                                              width: 200.0,
-                                              height: 100.0,
-                                              child: ParallaxCardsWidget(
-                                                item: item,
-                                                pageVisibility: pageVisibility,
-                                              ),
                                             ),
                                           );
                                         },
                                       );
                                     },
+                                  );
+                                },
+                              );
+                            },
+                          );
+                        } else {
+                          double lat = currentLocation != null
+                              ? currentLocation.latitude
+                              : 35.6917856;
+                          double long = currentLocation != null
+                              ? currentLocation.longitude
+                              : 51.4204603;
+                          return StreamBuilder<Message>(
+                            stream: reportNoty.noty,
+                            builder: (context, snapshot) {
+                              if (snapshot.hasData && snapshot.data != null) {
+                                Message msg = snapshot.data;
+                                if (msg.type == 'ANIM_ROUTE') {
+                                  if (forAnim) {
+                                    animateRoutecarPolyLines();
+                                  }
+                                }
+                                if (msg.type == 'CLEAR_MAP') {
+                                  if (_timerLine != null &&
+                                      _timerLine.isActive) {
+                                    _timerLine.cancel();
+                                  }
+                                  if (_timerupdate != null &&
+                                      _timerupdate.isActive) {
+                                    _timerupdate.cancel();
+                                  }
+                                  if (_polyLineAnim != null) {
+                                    forAnim = false;
+                                    _polyLineAnim.points.clear();
+                                    _polyLineAnim = null;
+                                    degress.clear();
+                                  }
+
+                                  if (lines != null && lines.length > 0) {
+                                    lines.clear();
+                                  }
+                                  if (carInMarkerMap != null &&
+                                      carInMarkerMap.length > 0)
+                                    carInMarkerMap.clear();
+                                  if (carMarkersMap != null &&
+                                      carMarkersMap.length > 0)
+                                    carMarkersMap.clear();
+                                  if (carIndexMarkerMap != null &&
+                                      carIndexMarkerMap.length > 0)
+                                    carIndexMarkerMap.clear();
+                                  if (markers != null && markers.length > 0) {
+                                    markers.clear();
+                                  }
+                                  if (lines2 != null) {
+                                    lines2 = null;
+                                  }
+                                }
+                              }
+                              return StreamBuilder<Message>(
+                                stream: animateNoty.noty,
+                                builder: (context, snapshot) {
+                                  if (snapshot.hasData &&
+                                      snapshot.data != null) {
+                                    if (_fpoint != null) if (!kIsWeb) {
+                                      liveMapController.mapController
+                                          .move(_fpoint, 15);
+                                    } else {
+                                      mapController.move(_fpoint, 15);
+                                    }
+                                  }
+                                  return StreamBuilder<Message>(
+                                    stream: statusNoty.noty,
+                                    builder: (context, snapshot) {
+                                      if (snapshot.hasData &&
+                                          snapshot.data != null) {
+                                        if (snapshot.data.type ==
+                                            'GPS_GPRS_UPDATE') {}
+                                        if (snapshot.data.type ==
+                                            'CURRENT_LOCATION_UPDATED') {
+                                          showWaiting = false;
+                                        }
+                                        if (snapshot.data.type ==
+                                            'SEARCH_LOCATION') {
+                                          showWaiting = true;
+                                        }
+                                      }
+                                      return StreamBuilder<Message>(
+                                        stream: showAllItemsdNoty.noty,
+                                        builder: (context, snapshot) {
+                                          if (snapshot.hasData &&
+                                              snapshot.data != null) {}
+                                          return Column(
+                                            children: [
+                                              Flexible(
+                                                child: Stack(
+                                                  children: <Widget>[
+                                                    FlutterMap(
+                                                      options: MapOptions(
+                                                        center:
+                                                            LatLng(lat, long),
+                                                        zoom: 16.0,
+                                                        /*plugins: [
+                                                                    UserLocationPlugin()
+                                                                  ],*/
+                                                      ),
+                                                      layers: [
+                                                        showSattelite
+                                                            ? TileLayerOptions(
+                                                                //urlTemplate: 'https://{s}.tiles.mapbox.com/v3/pk.eyJ1IjoicmV6YW5kIiwiYSI6ImNrNWNkdnB2dDAwdGwzZnMwc2lhcTlxd3QifQ.61hONdUooWn7aBJs-Km8OA/{z}/{x}/{y}.png',
+                                                                // urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                                                                //urlTemplate:'https://api.mapbox.com/styles/v1/rezand/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoicmV6YW5kIiwiYSI6ImNrNWNkdHg3djAwdDAzZnMwcTc1N2ZpY2YifQ.fl5LG72G5Uz6CLVfhbazNw',
+
+                                                                urlTemplate:
+                                                                    'https://api.mapbox.com/styles/v1/rezand/ck7d3ul4c0k3w1ir0n2a419pd/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoicmV6YW5kIiwiYSI6ImNrNWNkdHg3djAwdDAzZnMwcTc1N2ZpY2YifQ.fl5LG72G5Uz6CLVfhbazNw',
+                                                                additionalOptions: {
+                                                                  'accessToken':
+                                                                      'pk.eyJ1IjoicmV6YW5kIiwiYSI6ImNrNWNkdHg3djAwdDAzZnMwcTc1N2ZpY2YifQ.fl5LG72G5Uz6CLVfhbazNw',
+                                                                  //'id': 'mapbox.mapbox-streets-v7'
+                                                                },
+                                                                subdomains: [
+                                                                  'a',
+                                                                  'b',
+                                                                  'c',
+                                                                  'd'
+                                                                ],
+                                                              )
+                                                            : TileLayerOptions(
+                                                                //urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                                                                urlTemplate:
+                                                                    'https://api.mapbox.com/styles/v1/rezand/ck7ge41221jke1inrbezkflve/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoicmV6YW5kIiwiYSI6ImNrNWNkdHg3djAwdDAzZnMwcTc1N2ZpY2YifQ.fl5LG72G5Uz6CLVfhbazNw',
+                                                                additionalOptions: {
+                                                                  'accessToken':
+                                                                      'pk.eyJ1IjoicmV6YW5kIiwiYSI6ImNrNWNkdHg3djAwdDAzZnMwcTc1N2ZpY2YifQ.fl5LG72G5Uz6CLVfhbazNw',
+                                                                  'id':
+                                                                      'mapbox.mapbox-streets-v7'
+                                                                },
+                                                                subdomains: [
+                                                                  'a',
+                                                                  'b',
+                                                                  'c'
+                                                                ],
+                                                              ),
+                                                        MarkerLayerOptions(
+                                                            markers: markers),
+                                                        MarkerLayerOptions(
+                                                            markers: [
+                                                              currentMarker
+                                                            ]),
+                                                        (forAnim &&
+                                                                _polyLineAnim !=
+                                                                    null)
+                                                            ? PolylineLayerOptions(
+                                                                polylines: <
+                                                                    Polyline>[
+                                                                    _polyLineAnim
+                                                                  ])
+                                                            : PolylineLayerOptions(
+                                                                polylines:
+                                                                    lines),
+                                                      ],
+                                                      mapController: !kIsWeb
+                                                          ? liveMapController
+                                                              .mapController
+                                                          : mapController,
+                                                    ),
+                                                    Positioned(
+                                                      right: 20.0,
+                                                      bottom: 90.0,
+                                                      child: Container(
+                                                        width: 38.0,
+                                                        height: 38.0,
+                                                        child:
+                                                            FloatingActionButton(
+                                                          onPressed: () async {
+                                                            animateToCurrentLocation();
+                                                          },
+                                                          child: Container(
+                                                            width: 38.0,
+                                                            height: 38.0,
+                                                            child: Image.asset(
+                                                              'assets/images/location.png',
+                                                              color:
+                                                                  Colors.white,
+                                                            ),
+                                                          ),
+                                                          elevation: 0.0,
+                                                          backgroundColor:
+                                                              Colors.blueAccent,
+                                                          heroTag:
+                                                              'CURRENTLOCATION2',
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    showAllItemsOnMap
+                                                        ? Positioned(
+                                                            right: 20.0,
+                                                            bottom: 340.0,
+                                                            child: Container(
+                                                              width: 38.0,
+                                                              height: 38.0,
+                                                              child:
+                                                                  FloatingActionButton(
+                                                                onPressed: () {
+                                                                  showSattelite =
+                                                                      !showSattelite;
+                                                                  showAllItemsdNoty.updateValue(
+                                                                      new Message(
+                                                                          type:
+                                                                              'SATTELITE'));
+                                                                },
+                                                                child:
+                                                                    Container(
+                                                                  width: 38.0,
+                                                                  height: 38.0,
+                                                                  child: Image
+                                                                      .asset(
+                                                                    'assets/images/sattelite.png',
+                                                                    color: !showSattelite
+                                                                        ? Colors
+                                                                            .white
+                                                                        : Colors
+                                                                            .amber,
+                                                                  ),
+                                                                ),
+                                                                elevation: 0.0,
+                                                                backgroundColor:
+                                                                    Colors
+                                                                        .blueAccent,
+                                                                heroTag:
+                                                                    'SATTELITE2',
+                                                              ),
+                                                            ),
+                                                          )
+                                                        : Container(),
+                                                    Positioned(
+                                                      right: 20.0,
+                                                      bottom: 140.0,
+                                                      child: Container(
+                                                        width: 38.0,
+                                                        height: 38.0,
+                                                        child:
+                                                            FloatingActionButton(
+                                                          onPressed: () {
+                                                            showAllItemsOnMap =
+                                                                !showAllItemsOnMap;
+                                                            showAllItemsdNoty
+                                                                .updateValue(
+                                                                    new Message(
+                                                                        type:
+                                                                            'CLEAR_ALL'));
+                                                            showAllItemsdNoty2
+                                                                .updateValue(
+                                                                    new Message(
+                                                                        status:
+                                                                            showAllItemsOnMap,
+                                                                        type:
+                                                                            'CLEAR_ALL'));
+                                                          },
+                                                          child: Container(
+                                                            width: 38.0,
+                                                            height: 38.0,
+                                                            child: Image.asset(
+                                                              'assets/images/clear_all.png',
+                                                              color:
+                                                                  showAllItemsOnMap
+                                                                      ? Colors
+                                                                          .white
+                                                                      : Colors
+                                                                          .amber,
+                                                            ),
+                                                          ),
+                                                          elevation: 0.0,
+                                                          backgroundColor:
+                                                              Colors.blueAccent,
+                                                          heroTag: 'CLEARALL2',
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    showAllItemsOnMap
+                                                        ? Positioned(
+                                                            right: 20.0,
+                                                            bottom: 290.0,
+                                                            child: Container(
+                                                              width: 38.0,
+                                                              height: 38.0,
+                                                              child:
+                                                                  FloatingActionButton(
+                                                                onPressed: () {
+                                                                  // liveMapController.removeMarkers();
+                                                                  reportNoty.updateValue(
+                                                                      new Message(
+                                                                          type:
+                                                                              'CLEAR_MAP'));
+                                                                },
+                                                                child:
+                                                                    Container(
+                                                                  width: 38.0,
+                                                                  height: 38.0,
+                                                                  child: Image
+                                                                      .asset(
+                                                                    'assets/images/clear_map.png',
+                                                                    color: Colors
+                                                                        .white,
+                                                                  ),
+                                                                ),
+                                                                elevation: 3.0,
+                                                                backgroundColor:
+                                                                    Colors
+                                                                        .blueAccent,
+                                                                heroTag:
+                                                                    'ClearMap2',
+                                                              ),
+                                                            ),
+                                                          )
+                                                        : Container(),
+                                                    showAllItemsOnMap
+                                                        ? Positioned(
+                                                            right: 20.0,
+                                                            bottom: 240.0,
+                                                            child: Container(
+                                                                width: 38.0,
+                                                                height: 38.0,
+                                                                child:
+                                                                    FloatingActionButton(
+                                                                  onPressed:
+                                                                      () {
+                                                                    showRouteCurrentToCar();
+                                                                  },
+                                                                  child:
+                                                                      Container(
+                                                                    width: 38.0,
+                                                                    height:
+                                                                        38.0,
+                                                                    child: Image
+                                                                        .asset(
+                                                                      'assets/images/go.png',
+                                                                      color: Colors
+                                                                          .white,
+                                                                    ),
+                                                                  ),
+                                                                  elevation:
+                                                                      0.0,
+                                                                  backgroundColor:
+                                                                      Colors
+                                                                          .blueAccent,
+                                                                  heroTag:
+                                                                      'GO2',
+                                                                )),
+                                                          )
+                                                        : Container(),
+                                                    showAllItemsOnMap
+                                                        ? Positioned(
+                                                            right: 20.0,
+                                                            bottom: 190.0,
+                                                            child: Container(
+                                                              width: 38.0,
+                                                              height: 38.0,
+                                                              child:
+                                                                  FloatingActionButton(
+                                                                onPressed: () {
+                                                                  showCarRoute();
+                                                                },
+                                                                child:
+                                                                    Container(
+                                                                  width: 38.0,
+                                                                  height: 38.0,
+                                                                  child: Image
+                                                                      .asset(
+                                                                    'assets/images/routecar.png',
+                                                                    color: Colors
+                                                                        .white,
+                                                                  ),
+                                                                ),
+                                                                elevation: 1.0,
+                                                                backgroundColor:
+                                                                    Colors
+                                                                        .blueAccent,
+                                                                heroTag:
+                                                                    'ROUTECAR2',
+                                                              ),
+                                                            ),
+                                                          )
+                                                        : Container(),
+                                                  ],
+                                                ),
+                                              ),
+                                            ],
+                                          );
+                                        },
+                                      );
+                                    },
+                                  );
+                                },
+                              );
+                            },
+                          );
+                        }
+                      }
+                      // ),
+                      ),
+
+                  /* elevation: 0,
+                            floatingAppBar: true,
+                            floatAppbar:
+                            Stack(
+                              children: <Widget>[*/
+                  Container(
+                    height: 71.0,
+                    child: Column(
+                      children: [
+                        Container(
+                          height: 70.0,
+                          child: AppBar(
+                            automaticallyImplyLeading: true,
+                            backgroundColor: Colors.white,
+                            elevation: 0.0,
+                            actions: <Widget>[
+                              Container(
+                                margin: EdgeInsets.only(left: 10, right: 5),
+                                child: IconButton(
+                                  icon: Icon(
+                                    Icons.refresh,
+                                    color: Colors.blueAccent,
+                                    size: 35,
                                   ),
+                                  onPressed: () {
+                                    carInfoss = getCarInfo(true);
+                                  },
                                 ),
-                              )
-                            : Container();
-                      },
-                    ),
-                  
-                    Positioned(
-                      bottom: 20,
-                      left: 10,
-                      right: 10,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          Container(
-                            alignment: Alignment.center,
-                            width: MediaQuery.of(context).size.width * 0.80,
-                            height: 50,
-                            margin: EdgeInsets.only(left: 10, right: 10),
-                            child: Card(
-                              margin: EdgeInsets.all(0),
-                              color: Colors.white.withOpacity(0.8),
-                              elevation: 0,
-                              shape: RoundedRectangleBorder(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(5)),
                               ),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: <Widget>[
-                                  FlatButton(
-                                      onPressed: () {
-                                        _showBottomSheetReport(context);
-                                      },
-                                      child: Icon(
-                                        Icons.history,
-                                        size: 24,
-                                        color: Colors.blueAccent,
-                                      )),
-                                  FlatButton(
-                                      key: btnKey2,
-                                      onPressed: () {
-                                        menu.show(widgetKey: btnKey2);
-                                      },
-                                      child: Icon(
-                                        Icons.more_horiz,
-                                        size: 24,
-                                        color: Colors.blueAccent,
-                                      )),
-                                  FlatButton(
-                                      onPressed: () {
-                                        _showBottomSheetJoindCars(
-                                            context, carPairedItemsList);
-                                      },
-                                      child: Icon(
-                                        Icons.directions_car,
-                                        size: 24,
-                                        color: Colors.blueAccent,
-                                      )),
-                                ],
+                              Container(
+                                width: 38.0,
+                                height: 38.0,
+                                child: FloatingActionButton(
+                                  onPressed: () {},
+                                  child: Container(
+                                    margin: EdgeInsets.only(left: 5, right: 5),
+                                    width: 38.0,
+                                    height: 38.0,
+                                    child: isGPSOn
+                                        ? ImageNeonGlow(
+                                            imageUrl: 'assets/images/gps.png',
+                                            counter: 0,
+                                            color: Colors.blueAccent,
+                                          )
+                                        : Image.asset(
+                                            'assets/images/gps.png',
+                                            color: Colors.black38,
+                                          ),
+                                  ),
+                                  elevation: 1.0,
+                                  backgroundColor: Colors.transparent,
+                                  heroTag: 'GPS1',
+                                ),
                               ),
+                              Container(
+                                margin: EdgeInsets.only(left: 5, right: 5),
+                                width: 38.0,
+                                height: 38.0,
+                                child: FloatingActionButton(
+                                  onPressed: () {},
+                                  child: Container(
+                                    width: 38.0,
+                                    height: 38.0,
+                                    child: isGPRSOn
+                                        ? ImageNeonGlow(
+                                            imageUrl: 'assets/images/gprs.png',
+                                            counter: 0,
+                                            color: Colors.blueAccent,
+                                          )
+                                        : Image.asset(
+                                            'assets/images/gprs.png',
+                                            color: Colors.black38,
+                                          ),
+                                  ),
+                                  elevation: 1.0,
+                                  backgroundColor: Colors.transparent,
+                                  heroTag: 'GPRS1',
+                                ),
+                              ),
+                            ],
+                            leading: IconButton(
+                              icon: Icon(
+                                Icons.menu,
+                                color: Colors.indigoAccent,
+                              ),
+                              onPressed: () {
+                                widget.scaffoldKey.currentState.openDrawer();
+                              },
                             ),
                           ),
-                        ],
-                      ),
+                        ),
+                        showWaiting
+                            ? Container(
+                                height: 2.0,
+                                child: LinearProgressIndicator(
+                                  backgroundColor: Colors.indigoAccent,
+                                ))
+                            : Container(),
+                      ],
                     ),
-                  ],
-                ),
-              );
-            },
-            // );
-            // },
-          );
+                    // ],
+                  ),
+                  StreamBuilder<Message>(
+                    stream: showAllItemsdNoty2.noty,
+                    builder: (context, snapshot) {
+                      bool status = true;
+                      if (snapshot.hasData && snapshot.data != null) {
+                        status = snapshot.data.status;
+                      }
+                      return status
+                          ? Padding(
+                              padding: EdgeInsets.only(top: 65.0),
+                              child: Container(
+                                color: Colors.transparent,
+                                width: MediaQuery.of(context).size.width - 10,
+                                height: 100.0,
+                                child: PageTransformer(
+                                  pageViewBuilder:
+                                      (context, visibilityResolver) {
+                                    return PageView.builder(
+                                      physics: BouncingScrollPhysics(),
+                                      controller: PageController(
+                                        viewportFraction: 0.5,
+                                      ),
+                                      itemCount: parallaxCardItemsList.length,
+                                      itemBuilder: (context, index) {
+                                        final item =
+                                            parallaxCardItemsList[index];
+                                        final pageVisibility =
+                                            visibilityResolver
+                                                .resolvePageVisibility(index);
+                                        return GestureDetector(
+                                          onTap: () {
+                                            navigateToCarSelected(index, false,
+                                                0, true, false, false);
+                                          },
+                                          child: Container(
+                                            color:
+                                                Colors.white.withOpacity(0.0),
+                                            width: 200.0,
+                                            height: 100.0,
+                                            child: ParallaxCardsWidget(
+                                              item: item,
+                                              pageVisibility: pageVisibility,
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    );
+                                  },
+                                ),
+                              ),
+                            )
+                          : Container();
+                    },
+                  ),
+                  Positioned(
+                    bottom: 20,
+                    left: 10,
+                    right: 10,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Container(
+                          alignment: Alignment.center,
+                          width: MediaQuery.of(context).size.width * 0.80,
+                          height: 50,
+                          margin: EdgeInsets.only(left: 10, right: 10),
+                          child: Card(
+                            margin: EdgeInsets.all(0),
+                            color: Colors.white.withOpacity(0.8),
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(5)),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: <Widget>[
+                                FlatButton(
+                                    onPressed: () {
+                                      _showBottomSheetReport(context);
+                                    },
+                                    child: Icon(
+                                      Icons.history,
+                                      size: 24,
+                                      color: Colors.blueAccent,
+                                    )),
+                                FlatButton(
+                                    key: btnKey2,
+                                    onPressed: () {
+                                      menu.show(widgetKey: btnKey2);
+                                    },
+                                    child: Icon(
+                                      Icons.more_horiz,
+                                      size: 24,
+                                      color: Colors.blueAccent,
+                                    )),
+                                FlatButton(
+                                    onPressed: () {
+                                      _showBottomSheetJoindCars(
+                                          context, carPairedItemsList);
+                                    },
+                                    child: Icon(
+                                      Icons.directions_car,
+                                      size: 24,
+                                      color: Colors.blueAccent,
+                                    )),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+          // );
+          // },
+        );
         // } else {
         //   return NoDataWidget();
         // }
@@ -5796,12 +5754,10 @@ if(!kIsWeb) {
         builder: (BuildContext context) {
           return Icon(Icons.location_on);
         });
-        if(!kIsWeb) {
-    await liveMapController.addMarker(marker: m, name: "Current position");
-    await liveMapController.fitMarker("Current position");
-        } else {
-    
-        }
+    if (!kIsWeb) {
+      await liveMapController.addMarker(marker: m, name: "Current position");
+      await liveMapController.fitMarker("Current position");
+    } else {}
   }
 
   void addGeoMarkerFromPosition(LatLng pos) async {
@@ -5813,12 +5769,10 @@ if(!kIsWeb) {
         builder: (BuildContext context) {
           return Icon(Icons.location_on);
         });
-        if(!kIsWeb) {
-    await liveMapController.addMarker(marker: m, name: "Current position");
-    await liveMapController.fitMarker("Current position");
-        } else {
-          
-        }
+    if (!kIsWeb) {
+      await liveMapController.addMarker(marker: m, name: "Current position");
+      await liveMapController.fitMarker("Current position");
+    } else {}
   }
 
   @override

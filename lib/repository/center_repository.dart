@@ -70,6 +70,7 @@ import 'package:local_auth/auth_strings.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vibration/vibration.dart';
 import 'package:universal_platform/universal_platform.dart';
+
 enum CarStatus { ONLYDOOROPEN, ONLYTRUNKOPEN, BOTHOPEN, BOTHCLOSED }
 typedef VoidFutureConfirmCallBack = Future<void> Function(int);
 
@@ -117,7 +118,7 @@ class CenterRepository {
   static CarModelDetaillDS carModelDetaillDS;
 
 //مربوط به اپ آدورا میباشد درصورت درست بودن خروجی آدورا میشود
-  static bool APP_TYPE_ADORA = true;
+  static bool APP_TYPE_ADORA = false;
   int carId = 0;
   static int userId;
   static int currentCarId = 0;
