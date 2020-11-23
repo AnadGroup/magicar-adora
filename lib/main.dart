@@ -8,21 +8,22 @@ import 'package:anad_magicar/service/locator.dart';
 import 'package:anad_magicar/utils/check_status_connection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-Future<dynamic> myBackgroundMessageHandler(Map<String, dynamic> message) async{
-   if(message!=null && message.length > 0) {
-     if (message.containsKey('data')) {
-       final dynamic data = message['data'];
 
-       final title = data['title'];
-       final body = data['body'];
-       //  await _showNotificationWithDefaultSound(title, body);
-       return null;
-     }
+Future<dynamic> myBackgroundMessageHandler(Map<String, dynamic> message) async {
+  if (message != null && message.length > 0) {
+    if (message.containsKey('data')) {
+      final dynamic data = message['data'];
 
-     if (message.containsKey('notification')) {
-       final dynamic notification = message['notification'];
-     }
-   }
+      final title = data['title'];
+      final body = data['body'];
+      //  await _showNotificationWithDefaultSound(title, body);
+      return null;
+    }
+
+    if (message.containsKey('notification')) {
+      final dynamic notification = message['notification'];
+    }
+  }
 
   return null;
 }
@@ -76,9 +77,9 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   FireBaseMessageHandler messageHandler;
   setupLocator();
-  ConnectionStatusSingleton connectionStatus =
-      ConnectionStatusSingleton.getInstance();
-  connectionStatus.initialize();
+  // ConnectionStatusSingleton connectionStatus =
+  //     ConnectionStatusSingleton.getInstance();
+  // connectionStatus.initialize();
 
   messageHandler = msgHdlr.MessageHandler(
     sendMessage: (message) {
@@ -92,4 +93,4 @@ Future<void> main() async {
   ]);
 
   Routes();
-} 
+}
