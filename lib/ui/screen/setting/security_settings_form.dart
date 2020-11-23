@@ -300,72 +300,73 @@ class SecuritySettingsFormState extends MainPage<SecuritySettingsForm> {
           if (snapshot.hasData && snapshot.data != null) {
             // loginRequiered=snapshot.data;
 
-            return
-              Stack(
-                alignment: Alignment.topCenter,
-                overflow: Overflow.visible,
-                children: <Widget>[
-              Padding(
-              padding: EdgeInsets.only(top: 80.0),
-          child: Container(
-                    height:20.0,
-                  child:Text('آدرس سرورهای نقشه',style: TextStyle(color: Colors.green,fontSize: 12),),),),
-                  Padding(
-                    padding: EdgeInsets.only(top: 145.0),
-                    child:
-                    Container(
-                      color: Color(0xfffefefe),
-                      height:150.0,
-                      child: Container(
-                        height: 150,
-                        color: Color(0xfffefefe),
-                        child: ListView(
-                          padding:
-                          EdgeInsets.all(8.0),
-                          children: _group
-                              .map((item) =>
-                              Container(
-          color: Color(0xfffefefe),
-          child:
-                              RadioListTile(
-                                activeColor: Colors.green,
-                                groupValue:
-                                _currentIndex,
-                                title: Text(
-                                    "${item.text}"),
-                                value: item
-                                    .index,
-                                onChanged:
-                                    (val) {
-                                  setState(() {
-                                  _currentIndex =
-                                      val;
-                                  showSelectedApiMapIndex =
-                                      _currentIndex;
-                                  /*changedRoutRadioBoxNoty.updateValue(
-                                       Message(
-                                          type:
-                                          'RADIO_VALUE_CHANGED'));*/
-                                   });
-                                },
-                              )))
-                              .toList(),
-                        ),
-                      ),
+          return
+            Stack(
+              alignment: Alignment.topCenter,
+              overflow: Overflow.visible,
+              children: <Widget>[
+                // Padding(
+                //   padding: EdgeInsets.only(top: 80.0),
+                //   child: Container(
+                //     height: 20.0,
+                //     child: Text('آدرس سرورهای نقشه',
+                //       style: TextStyle(color: Colors.green, fontSize: 12),),),),
+                // Padding(
+                //   padding: EdgeInsets.only(top: 145.0),
+                //   child:
+                //   Container(
+                //     color: Color(0xfffefefe),
+                //     height: 150.0,
+                //     child: Container(
+                //       height: 150,
+                //       color: Color(0xfffefefe),
+                //       child: ListView(
+                //         padding:
+                //         EdgeInsets.all(8.0),
+                //         children: _group
+                //             .map((item) =>
+                //             Container(
+                //                 color: Color(0xfffefefe),
+                //                 child:
+                //                 RadioListTile(
+                //                   activeColor: Colors.green,
+                //                   groupValue:
+                //                   _currentIndex,
+                //                   title: Text(
+                //                       "${item.text}"),
+                //                   value: item
+                //                       .index,
+                //                   onChanged:
+                //                       (val) {
+                //                     setState(() {
+                //                       _currentIndex =
+                //                           val;
+                //                       showSelectedApiMapIndex =
+                //                           _currentIndex;
+                //                       /*changedRoutRadioBoxNoty.updateValue(
+                //                        Message(
+                //                           type:
+                //                           'RADIO_VALUE_CHANGED'));*/
+                //                     });
+                //                   },
+                //                 )))
+                //             .toList(),
+                //       ),
+                //     ),
+                //
+                //   ),
+                // ),
+                Padding(
+                  padding: EdgeInsets.only(top: 280.0),
+                  child:
+                  SettingsList(
+                    sections: [
 
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.only(top: 280.0),
-                    child:
-                    SettingsList(
-                      sections: [
-
-                        /* SettingsSection(
+                      /* SettingsSection(
                     title: 'کاربری',
                     tiles: [
-                      *//*SettingsTile(
-                          title: 'شماره همراه', leading: Icon(Icons.phone)),*//*
+                      */ /*SettingsTile(
+                          title: 'شماره همراه', leading: Icon(Icons.phone)),*/ /*
                      // SettingsTile(title: 'ایمیل', leading: Icon(Icons.email)),
                       SettingsTile(title: 'خروج از حساب کاربری',
                         leading: Icon(Icons.exit_to_app),
