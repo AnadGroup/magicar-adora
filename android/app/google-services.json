@@ -1,35 +1,42 @@
 {
   "project_info": {
-    "project_number": "617970284324",
-    "firebase_url": "https://adora-6c29e.firebaseio.com",
-    "project_id": "adora-6c29e",
-    "storage_bucket": "adora-6c29e.appspot.com"
+    "project_number": "611322359852",
+    "firebase_url": "https://anadmagicar.firebaseio.com",
+    "project_id": "anadmagicar",
+    "storage_bucket": "anadmagicar.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:617970284324:android:615bd2afdee2bf7753a5b1",
+        "mobilesdk_app_id": "1:611322359852:android:d069ccf9fea79ad23b6189",
         "android_client_info": {
-          "package_name": "com.adora"
+          "package_name": "com.magicar"
         }
       },
       "oauth_client": [
         {
-          "client_id": "617970284324-ecbk2lfnq2jn9ofedn301s3naosfn7bi.apps.googleusercontent.com",
+          "client_id": "611322359852-fsmhk1vuqqh7g97a419m1v5g5pcsfvfm.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyCYb39gjD-kaKiqoE3dblsArnw8OgqOVk0"
+          "current_key": "AIzaSyBHlbV5UtpUN9QQa9H7KuLnkLvrPuDL-2I"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "617970284324-ecbk2lfnq2jn9ofedn301s3naosfn7bi.apps.googleusercontent.com",
+              "client_id": "611322359852-fsmhk1vuqqh7g97a419m1v5g5pcsfvfm.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "611322359852-8tvf2lv4b4000fna1pom4pihr6v6efip.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.anad.magicar.anadmagicar"
+              }
             }
           ]
         }
