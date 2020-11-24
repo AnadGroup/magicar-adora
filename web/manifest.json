@@ -3,11 +3,11 @@
     "short_name": "Adora",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#FF8F00" ,
+    "background_color": "#FF8F00",
     "theme_color": "#FF8F00",
     "description": "Adora",
     "orientation": "portrait-primary",
-    "prefer_related_applications": true,
+    "prefer_related_applications": false,
     "icons": [
         {
             "src": "icons/adora/Icon-192.png",

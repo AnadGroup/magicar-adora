@@ -167,7 +167,7 @@ class NetworkUtil {
       var oReq1 = await htp.HttpRequest.request(url,
           method: metod == null ? "GET" : metod,
           withCredentials: true,
-          sendData: (metod!=null && metod=='POST') ? bodyy : null,
+          sendData: (metod != null && metod == 'POST') ? bodyy : null,
           onProgress: (_) => null,
           //responseType: content,
           requestHeaders: head);
@@ -177,7 +177,7 @@ class NetworkUtil {
       var headers = await oReq1.responseHeaders;
       var rs = await oReq1.response.toString();
       ResponseUniversal responseUniversal= ResponseUniversal(
-      responseBody: body, statusCode: statusCode, headers: headers);
+       responseBody: body, statusCode: statusCode, headers: headers);
       return responseUniversal;
     } else {
       if (metod == null || metod == 'GET') {
@@ -366,7 +366,7 @@ class NetworkUtil {
     if (fheaders.containsKey("content-type")) fheaders.remove("content-type");
 
     response = await doFetch(
-        null, url, theaders == null ? fheaders : theaders, 'GET', '');
+        null, url, theaders == null ? fheaders : theaders, 'GET', null);
 
     final String resBody = response.responseBody.toString();
     final int statusCode = response.statusCode;

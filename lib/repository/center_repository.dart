@@ -70,6 +70,7 @@ import 'package:local_auth/auth_strings.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vibration/vibration.dart';
 import 'package:universal_platform/universal_platform.dart';
+
 enum CarStatus { ONLYDOOROPEN, ONLYTRUNKOPEN, BOTHOPEN, BOTHCLOSED }
 typedef VoidFutureConfirmCallBack = Future<void> Function(int);
 

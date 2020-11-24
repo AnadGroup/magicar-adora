@@ -31,6 +31,7 @@ import 'package:anad_magicar/widgets/animated_dialog_box.dart';
 import 'package:anad_magicar/widgets/bottom_sheet_custom.dart';
 import 'package:anad_magicar/widgets/flash_bar/flash_helper.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
@@ -98,11 +99,10 @@ class _LoginFormState extends BaseState<LoginForm> //State<LoginForm>
             msg: Translations.current.noFingerPrintSupport(),
             toastLength: Toast.LENGTH_SHORT,
             gravity: ToastGravity.BOTTOM,
-            timeInSecForIosWeb:  1,
+            timeInSecForIosWeb: 1,
             backgroundColor: Colors.red,
             textColor: Colors.white,
-            webBgColor: Colors.red ,
-          
+            webBgColor: Colors.red,
             fontSize: 16.0);
       }
       if (event.type == 'LOGIN_USERNAME') {}
@@ -133,7 +133,9 @@ class _LoginFormState extends BaseState<LoginForm> //State<LoginForm>
   void initState() {
     super.initState();
     registerBus();
-    checkInternet = CheckConnection();
+    if (!kIsWeb) {
+      checkInternet = CheckConnection();
+    }
     isLoginDisabled = false;
     formAnimationController = new AnimationController(
       vsync: this,
@@ -203,12 +205,9 @@ class _LoginFormState extends BaseState<LoginForm> //State<LoginForm>
   _buildFingerPrintLogin() {
     return SlideTransition(
         position: pulseAnimation,
-        child:
-       
-            IconButton(
+        child: IconButton(
           padding: EdgeInsets.all(10.0),
           onPressed: () {
-          
             isLoginDisabled = true;
           },
           icon: Icon(
@@ -217,7 +216,6 @@ class _LoginFormState extends BaseState<LoginForm> //State<LoginForm>
             size: 68.0,
           ),
           alignment: Alignment.center,
-        
         ));
   }
 
@@ -227,7 +225,6 @@ class _LoginFormState extends BaseState<LoginForm> //State<LoginForm>
       child: IconButton(
         padding: EdgeInsets.all(10.0),
         onPressed: () {
-        
           isLoginDisabled = true;
         },
 
@@ -755,102 +752,110 @@ class _LoginFormState extends BaseState<LoginForm> //State<LoginForm>
   }
 
   Future<String> _loginFunc(logData.LoginData data) {
-    if(checkInternet.checkInternet()) {
-    return Future.delayed(new Duration(microseconds: 100)).then((_) {
-      if (data != null &&
-          data.name != null &&
-          data.password != null &&
-          data.name.isNotEmpty &&
-          data.password.isNotEmpty) {
-        if (isOnline) {
-          _loginBloc.add(new LoginButtonPressed(
-              username: data.name /*userName*/,
-              password: data.password /*password*/));
-          isLoginDisabled = true;
-        } else {
-          //showSnackLogin(context, Translations.current.noConnection(), false);
-          _loginBloc.add(new LoginFailed(
-              errorMessage: Translations.current.noConnection()));
-          return Translations.current.noConnection();
-        }
-      } else {
-        return Translations.current.allLoginFieldsRequired();
-      }
-      return '';
-    });
-    } else {
-      
+    bool connection = true;
+    if (!kIsWeb) {
+      connection = checkInternet.checkInternet();
     }
+    if (connection) {
+      return Future.delayed(Duration(microseconds: 100)).then((_) {
+        if (data != null &&
+            data.name != null &&
+            data.password != null &&
+            data.name.isNotEmpty &&
+            data.password.isNotEmpty) {
+          if (isOnline) {
+            _loginBloc.add(LoginButtonPressed(
+                username: data.name /*userName*/,
+                password: data.password /*password*/));
+            isLoginDisabled = true;
+          } else {
+            //showSnackLogin(context, Translations.current.noConnection(), false);
+            _loginBloc.add(
+                LoginFailed(errorMessage: Translations.current.noConnection()));
+            return Translations.current.noConnection();
+          }
+        } else {
+          return Translations.current.allLoginFieldsRequired();
+        }
+        return '';
+      });
+    } else {}
   }
 
   Future<String> _loginFuncForRegForm(regData.LoginData data) {
-
-     if(checkInternet.checkInternet()) {
-    return Future.delayed(new Duration(microseconds: 100)).then((_) {
-      if (data != null &&
-          data.name != null &&
-          data.password != null &&
-          data.name.isNotEmpty &&
-          data.password.isNotEmpty) {
-        if (isOnline) {
-          _loginBloc.add(new LoginButtonPressed(
-              username: data.name /*userName*/,
-              password: data.password /*password*/));
-          isLoginDisabled = true;
+    bool connection = true;
+    if (!kIsWeb) {
+      connection = checkInternet.checkInternet();
+    }
+    if (connection) {
+      return Future.delayed(new Duration(microseconds: 100)).then((_) {
+        if (data != null &&
+            data.name != null &&
+            data.password != null &&
+            data.name.isNotEmpty &&
+            data.password.isNotEmpty) {
+          if (isOnline) {
+            _loginBloc.add(new LoginButtonPressed(
+                username: data.name /*userName*/,
+                password: data.password /*password*/));
+            isLoginDisabled = true;
+          } else {
+            //showSnackLogin(context, Translations.current.noConnection(), false);
+            _loginBloc.add(new LoginFailed(
+                errorMessage: Translations.current.noConnection()));
+            return Translations.current.noConnection();
+          }
         } else {
-          //showSnackLogin(context, Translations.current.noConnection(), false);
-          _loginBloc.add(new LoginFailed(
-              errorMessage: Translations.current.noConnection()));
-          return Translations.current.noConnection();
+          return Translations.current.allLoginFieldsRequired();
         }
-      } else {
-        return Translations.current.allLoginFieldsRequired();
-      }
-      return '';
-    });
-     } else {
-
-     }
+        return '';
+      });
+    } else {}
   }
 
   Future<String> _signUpFunc(logData.LoginData data) {
-     if(checkInternet.checkInternet()) {
-    return Future.delayed(new Duration(microseconds: 100)).then((_) {
-      if (data != null && data.mobile != null && data.mobile.isNotEmpty) {
-        if (isOnline) {
-          this.mobile = data.mobile;
-          _loginBloc.add(new SignUpButtonPressed(mobile: data.mobile));
+    bool connection = true;
+    if (!kIsWeb) {
+      connection = checkInternet.checkInternet();
+    }
+    if (connection) {
+      return Future.delayed(new Duration(microseconds: 100)).then((_) {
+        if (data != null && data.mobile != null && data.mobile.isNotEmpty) {
+          if (isOnline) {
+            this.mobile = data.mobile;
+            _loginBloc.add(new SignUpButtonPressed(mobile: data.mobile));
+          } else {
+            _loginBloc.add(new SignUpFailed(
+                errorMessage: Translations.current.noConnection()));
+            return Translations.current.noConnection();
+          }
+        } else if (!signUpDone) {
+          return Translations.current.hasErrors();
         } else {
-          _loginBloc.add(new SignUpFailed(
-              errorMessage: Translations.current.noConnection()));
-          return Translations.current.noConnection();
+          return Translations.current.allLoginFieldsRequired();
         }
-      } else if (!signUpDone) {
-        return Translations.current.hasErrors();
-      } else {
-        return Translations.current.allLoginFieldsRequired();
-      }
-      return Translations.current.errorinSignUp();
-    });
-     }else {
-
-     }
+        return Translations.current.errorinSignUp();
+      });
+    } else {}
   }
 
   Future<String> _signUpFuncForRegister(regData.LoginData data) {
-     if(checkInternet.checkInternet()) {
-    return Future.delayed(new Duration(microseconds: 100)).then((_) {
-      if (data != null && data.mobile != null && data.mobile.isNotEmpty) {
-        this.mobile = data.mobile;
-        _loginBloc.add(new SignUpButtonPressed(mobile: data.mobile));
-      } else {
-        return Translations.current.allLoginFieldsRequired();
-      }
-      return Translations.current.errorinSignUp();
-    });
-     }else {
-       
-     }
+    bool connection = true;
+    if (!kIsWeb) {
+      connection = checkInternet.checkInternet();
+    }
+
+    if (connection) {
+      return Future.delayed(new Duration(microseconds: 100)).then((_) {
+        if (data != null && data.mobile != null && data.mobile.isNotEmpty) {
+          this.mobile = data.mobile;
+          _loginBloc.add(new SignUpButtonPressed(mobile: data.mobile));
+        } else {
+          return Translations.current.allLoginFieldsRequired();
+        }
+        return Translations.current.errorinSignUp();
+      });
+    } else {}
   }
 
   _fingerFunc() {
@@ -1026,12 +1031,10 @@ class _LoginFormState extends BaseState<LoginForm> //State<LoginForm>
                 navigatorKey: widget.navigatorKey,
               );
             } else if (state is SignUpDone) {
-              
               centerRepository.dismissDialog(context);
               signUpDone = true;
               securityCode = state.code;
               recCode = state.code;
-           
             } else if (state is SignUpFaild) {
               centerRepository.dismissDialog(context);
               signUpDone = false;
@@ -1055,16 +1058,18 @@ class _LoginFormState extends BaseState<LoginForm> //State<LoginForm>
                   child: ClipRRect(
                     borderRadius:
                         BorderRadius.only(bottomLeft: Radius.circular(50.0)),
-                    child:CenterRepository.APP_TYPE_ADORA ? Container(
-                      color: Colors.deepOrange,
-                       width: w,
-                      height: h * 0.29,
-                    ) : Image(
-                      fit: BoxFit.fill,
-                      image: AssetImage('assets/images/login_back.jpg'),
-                      width: w,
-                      height: h * 0.29,
-                    ),
+                    child: CenterRepository.APP_TYPE_ADORA
+                        ? Container(
+                            color: Colors.deepOrange,
+                            width: w,
+                            height: h * 0.29,
+                          )
+                        : Image(
+                            fit: BoxFit.fill,
+                            image: AssetImage('assets/images/login_back.jpg'),
+                            width: w,
+                            height: h * 0.29,
+                          ),
                   ),
                 ),
                 Container(
@@ -1092,9 +1097,10 @@ class _LoginFormState extends BaseState<LoginForm> //State<LoginForm>
                                     MediaQuery.of(context).size.height / 6.5,
                                 child: Align(
                                   alignment: Alignment.center,
-                                  child: CenterRepository.APP_TYPE_ADORA ? Container(color: Colors.deepOrange) : 
-                                  Image.asset(
-                                      'assets/images/i26.png'), //Icon(Icons.person,
+                                  child: CenterRepository.APP_TYPE_ADORA
+                                      ? Container(color: Colors.deepOrange)
+                                      : Image.asset(
+                                          'assets/images/i26.png'), //Icon(Icons.person,
                                 ),
                               ),
                               Spacer(),
