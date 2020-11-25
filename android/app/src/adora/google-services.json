@@ -1,35 +1,42 @@
 {
   "project_info": {
-    "project_number": "617970284324",
-    "firebase_url": "https://adora-6c29e.firebaseio.com",
-    "project_id": "adora-6c29e",
-    "storage_bucket": "adora-6c29e.appspot.com"
+    "project_number": "1057888370968",
+    "firebase_url": "https://adora-9ce02.firebaseio.com",
+    "project_id": "adora-9ce02",
+    "storage_bucket": "adora-9ce02.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:617970284324:android:615bd2afdee2bf7753a5b1",
+        "mobilesdk_app_id": "1:1057888370968:android:901ad79f061ff2571c9e6d",
         "android_client_info": {
           "package_name": "com.adora"
         }
       },
       "oauth_client": [
         {
-          "client_id": "617970284324-ecbk2lfnq2jn9ofedn301s3naosfn7bi.apps.googleusercontent.com",
+          "client_id": "1057888370968-vojfj16fpj60a9bqr8llban4tgmcgbhu.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyCYb39gjD-kaKiqoE3dblsArnw8OgqOVk0"
+          "current_key": "AIzaSyD9O2q6jaiKSrvw0uzbJJ1Zw4n9x-hRdTk"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "617970284324-ecbk2lfnq2jn9ofedn301s3naosfn7bi.apps.googleusercontent.com",
+              "client_id": "1057888370968-vojfj16fpj60a9bqr8llban4tgmcgbhu.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "1057888370968-bgll1o79ta32q9cmj6k8eegskgo02bea.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.adora"
+              }
             }
           ]
         }

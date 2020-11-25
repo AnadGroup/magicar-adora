@@ -32,10 +32,10 @@
               "client_type": 3
             },
             {
-              "client_id": "611322359852-8tvf2lv4b4000fna1pom4pihr6v6efip.apps.googleusercontent.com",
+              "client_id": "611322359852-pna8514626ihjqisu1ktpfr9u5bnuesk.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.anad.magicar.anadmagicar"
+                "bundle_id": "com.magicar"
               }
             }
           ]
