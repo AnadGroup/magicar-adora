@@ -321,6 +321,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "withPassword" : MessageLookupByLibrary.simpleMessage("ورود با رمز عبور"),
     "withPattern" : MessageLookupByLibrary.simpleMessage("ورود با الگو"),
     "yes" : MessageLookupByLibrary.simpleMessage("بله"),
-    "yourLocationNotFound" : MessageLookupByLibrary.simpleMessage("آخرین موقعیت شما یافت نشد")
+    "yourLocationNotFound" : MessageLookupByLibrary.simpleMessage("آخرین موقعیت شما یافت نشد"),
+    "language" : MessageLookupByLibrary.simpleMessage("فارسی"),
+    "local" : MessageLookupByLibrary.simpleMessage("زبان")
   };
 }

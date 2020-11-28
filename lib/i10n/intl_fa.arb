@@ -1805,5 +1805,17 @@
     "description": "MagiCar Co.",
     "type": "text",
     "placeholders": {}
-  }
+  },
+   "language": "فارسی",
+    "@language": {
+      "description": "language",
+      "type": "text",
+      "placeholders": {}
+    },
+    "local": "زبان",
+        "@local": {
+          "description": "local",
+          "type": "text",
+          "placeholders": {}
+        }
 }

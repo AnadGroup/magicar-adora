@@ -318,11 +318,13 @@ class MessageLookup extends MessageLookupByLibrary {
     "userName" : MessageLookupByLibrary.simpleMessage("userName"),
     "userinfo" : MessageLookupByLibrary.simpleMessage("userinfo"),
     "users" : MessageLookupByLibrary.simpleMessage("Users"),
-    "withFinger" : MessageLookupByLibrary.simpleMessage("Enter wtih Finger Print"),
+    "withFinger" : MessageLookupByLibrary.simpleMessage("Enter with Finger Print"),
     "withLogin" : MessageLookupByLibrary.simpleMessage("Enter with Login"),
-    "withPassword" : MessageLookupByLibrary.simpleMessage("Enter wtih Password"),
-    "withPattern" : MessageLookupByLibrary.simpleMessage("Enetr with Pattern"),
+    "withPassword" : MessageLookupByLibrary.simpleMessage("Enter with Password"),
+    "withPattern" : MessageLookupByLibrary.simpleMessage("Enter with Pattern"),
     "yes" : MessageLookupByLibrary.simpleMessage("Yes"),
-    "yourLocationNotFound" : MessageLookupByLibrary.simpleMessage("yourLocationNotFound")
+    "yourLocationNotFound" : MessageLookupByLibrary.simpleMessage("yourLocationNotFound"),
+    "language" : MessageLookupByLibrary.simpleMessage("English"),
+    "local" : MessageLookupByLibrary.simpleMessage("Language")
   };
 }

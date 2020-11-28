@@ -510,19 +510,19 @@
     "type": "text",
     "placeholders": {}
   },
-  "withFinger": "Enter wtih Finger Print",
+  "withFinger": "Enter with Finger Print",
   "@withFinger": {
     "description": "withFinger",
     "type": "text",
     "placeholders": {}
   },
-  "withPassword": "Enter wtih Password",
+  "withPassword": "Enter with Password",
   "@withPassword": {
     "description": "withPassword",
     "type": "text",
     "placeholders": {}
   },
-  "withPattern": "Enetr with Pattern",
+  "withPattern": "Eneter with Pattern",
   "@withPattern": {
     "description": "withPattern",
     "type": "text",
@@ -1817,5 +1817,17 @@
     "description": "MagiCar Co.",
     "type": "text",
     "placeholders": {}
-  }
+  },
+  "language": "English",
+    "@title": {
+      "description": "language",
+      "type": "text",
+      "placeholders": {}
+    },
+     "local": "Language",
+        "@local": {
+          "description": "local",
+          "type": "text",
+          "placeholders": {}
+        }
 }
