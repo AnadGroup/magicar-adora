@@ -1,3 +1,4 @@
+import 'package:intl/intl.dart';
 import 'package:anad_magicar/bloc/theme/change_theme_bloc.dart';
 import 'package:anad_magicar/bloc/values/notify_value.dart';
 import 'package:anad_magicar/common/actions_constants.dart';
@@ -17,13 +18,15 @@ import 'package:anad_magicar/ui/screen/home/index.dart';
 import 'package:anad_magicar/ui/screen/login/fancy_login/src/widgets/animated_text_form_field.dart';
 import 'package:anad_magicar/ui/screen/login/reset/fancy_login/src/models/login_data.dart';
 import 'package:anad_magicar/ui/screen/login/reset/reset_password_form.dart';
+import 'package:anad_magicar/ui/screen/setting/languages_screen.dart';
 import 'package:anad_magicar/ui/theme/app_themes.dart';
 import 'package:anad_magicar/widgets/animated_dialog_box.dart';
 import 'package:anad_magicar/widgets/bottom_sheet_custom.dart';
 import 'package:anad_magicar/widgets/native_settings/src/settings_list.dart';
 import 'package:anad_magicar/widgets/native_settings/src/settings_section.dart';
 import 'package:anad_magicar/widgets/native_settings/src/settings_tile.dart';
-import 'package:anad_magicar/widgets/range_slider/flutter_range_slider.dart' as frs;
+import 'package:anad_magicar/widgets/range_slider/flutter_range_slider.dart'
+    as frs;
 import 'package:flutter/material.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -738,111 +741,114 @@ class SettingsScreenState extends MainPage<SettingsScreen> {
   }
 
   _showDefaultSettingsSheet(BuildContext context, String type) async {
-   await loadDefaultSettings();
+    await loadDefaultSettings();
     showModalBottomSheetCustom(
         context: context,
         mHeight: 0.90,
         builder: (BuildContext context) {
           return SingleChildScrollView(
-            child:
-           Builder(
-            builder: (context) {
-              return Container(
+            child: Builder(
+              builder: (context) {
+                return Container(
                   width: MediaQuery.of(context).size.width - 10,
                   height: 450.0,
                   child: Form(
-                key: _formKey,
-                child: Container(
-                  width: MediaQuery.of(context).size.width - 10,
-                  //height: 450.0,
-                  child: Column(
-                   // mainAxisAlignment: MainAxisAlignment.center,
-                   // crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      type == MINMAX_SPEED_TAG
-                          ? Column(
-                             // crossAxisAlignment: CrossAxisAlignment.start,
-                              //mainAxisAlignment: MainAxisAlignment.center,
-                              children: <Widget>[
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
+                    key: _formKey,
+                    child: Container(
+                      width: MediaQuery.of(context).size.width - 10,
+                      //height: 450.0,
+                      child: Column(
+                        // mainAxisAlignment: MainAxisAlignment.center,
+                        // crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          type == MINMAX_SPEED_TAG
+                              ? Column(
+                                  // crossAxisAlignment: CrossAxisAlignment.start,
+                                  //mainAxisAlignment: MainAxisAlignment.center,
                                   children: <Widget>[
-                                    Container(
-                                      width: 150.0,
-                                      height: 50.0,
-                                      child: _buildMaxTextField(
-                                          Translations.current.maxSpeed(),
-                                          80.0,
-                                          maxSpeed),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: <Widget>[
+                                        Container(
+                                          width: 150.0,
+                                          height: 50.0,
+                                          child: _buildMaxTextField(
+                                              Translations.current.maxSpeed(),
+                                              80.0,
+                                              maxSpeed),
+                                        ),
+                                      ],
                                     ),
-                                  ],
-                                ),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: <Widget>[
-                                    Container(
-                                      width: 150.0,
-                                      height: 50.0,
-                                      child: _buildMinTextField(
-                                          Translations.current.minSpeed(),
-                                          80.0,
-                                          minSpeed),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: <Widget>[
+                                        Container(
+                                          width: 150.0,
+                                          height: 50.0,
+                                          child: _buildMinTextField(
+                                              Translations.current.minSpeed(),
+                                              80.0,
+                                              minSpeed),
+                                        )
+                                      ],
                                     )
                                   ],
                                 )
-                              ],
-                            )
-                          : type == PERIODIC_UPDTAE_TIME_TAG
-                              ? Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: <Widget>[
-                                    Container(
-                                      child: _buildTextField2(
-                                          Translations.current
-                                              .periodicSendTime(),
-                                          150.0,
-                                          resultValue,
-                                          defaultPeriodicvalue.toString()),
+                              : type == PERIODIC_UPDTAE_TIME_TAG
+                                  ? Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: <Widget>[
+                                        Container(
+                                          child: _buildTextField2(
+                                              Translations.current
+                                                  .periodicSendTime(),
+                                              150.0,
+                                              resultValue,
+                                              defaultPeriodicvalue.toString()),
+                                        ),
+                                      ],
+                                    )
+                                  : Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: <Widget>[
+                                        Container(
+                                          child: _buildTextField2(
+                                              Translations.current
+                                                  .periodicAccuracy(),
+                                              150.0,
+                                              resultValue,
+                                              ''),
+                                        ),
+                                      ],
                                     ),
-                                  ],
-                                )
-                              : Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: <Widget>[
-                                    Container(
-                                      child: _buildTextField2(
-                                          Translations.current
-                                              .periodicAccuracy(),
-                                          150.0,
-                                          resultValue,
-                                          ''),
-                                    ),
-                                  ],
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              Container(
+                                  child: FlatButton(
+                                onPressed: () {
+                                  _onConfirmDefaultSettings(type, context);
+                                },
+                                child: Button(
+                                  title: Translations.current.confirm(),
+                                  wid: 120.0,
+                                  color: Colors.white.value,
+                                  clr: Colors.green,
                                 ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          Container(
-                              child: FlatButton(
-                            onPressed: () {
-                              _onConfirmDefaultSettings(type, context);
-                            },
-                            child: Button(
-                              title: Translations.current.confirm(),
-                              wid: 120.0,
-                              color: Colors.white.value,
-                              clr: Colors.green,
-                            ),
-                          ))
+                              ))
+                            ],
+                          ),
                         ],
                       ),
-                    ],
+                    ),
                   ),
-                ),
-                ),
-              );
-            },
-           ),
+                );
+              },
+            ),
           );
         });
   }
@@ -1083,7 +1089,7 @@ class SettingsScreenState extends MainPage<SettingsScreen> {
               ),
             ),
           ),*/
-        new Padding(
+        Padding(
           padding: EdgeInsets.only(top: 80.0),
           child: SettingsList(
             sections: [
@@ -1091,12 +1097,14 @@ class SettingsScreenState extends MainPage<SettingsScreen> {
                 title: 'عمومی',
                 tiles: [
                   SettingsTile(
-                    title: 'زبان',
-                    subtitle: 'فارسی',
+                    title: Translations.current.local(),
+                    // subtitle: Intl.canonicalizedLocale(Intl.getCurrentLocale()),
+                    subtitle: Translations.current.language(),
                     leading: Icon(Icons.language),
                     onTap: () {
-                      /* Navigator.of(context).push(MaterialPageRoute(
-                      builder: (BuildContext context) => LanguagesScreen()));*/
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (BuildContext context) =>
+                              LanguagesScreen()));
                     },
                   ),
                   SettingsTile(
@@ -1282,7 +1290,6 @@ class SettingsScreenState extends MainPage<SettingsScreen> {
     // TODO: implement doBack
     return true;
   }
-
 }
 
 class RangeSliderData {
@@ -1330,6 +1337,7 @@ class RangeSliderData {
   //
   String get lowerValueText =>
       lowerValue.toStringAsFixed(valueIndicatorMaxDecimals);
+
   String get upperValueText =>
       upperValue.toStringAsFixed(valueIndicatorMaxDecimals);
 
