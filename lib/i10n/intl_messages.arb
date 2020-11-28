@@ -750,6 +750,12 @@
     "type": "text",
     "placeholders": {}
   },
+  "emptySecurityCode": "SecurityCode is empty",
+  "@emptySecurityCode": {
+    "description": "emptySecurityCode",
+    "type": "text",
+    "placeholders": {}
+  },
   "plzEnterRecievedSecurityCode": "Enter Recieved SecurityCode",
   "@plzEnterRecievedSecurityCode": {
     "description": "plzEnterRecievedSecurityCode",

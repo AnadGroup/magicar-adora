@@ -379,6 +379,9 @@ class Translations {
   String notValidSecurityCode() => Intl.message('SecurityCode is not Valid',
       name: 'notValidSecurityCode', desc: 'notValidSecurityCode');
 
+  String emptySecurityCode() => Intl.message('SecurityCode is empty',
+      name: 'emptySecurityCode', desc: 'emptySecurityCode');
+
   String plzEnterRecievedSecurityCode() =>
       Intl.message('Enter Recieved SecurityCode',
           name: 'plzEnterRecievedSecurityCode',

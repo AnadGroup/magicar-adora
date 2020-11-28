@@ -320,14 +320,17 @@ class _LoginFormState extends BaseState<LoginForm> //State<LoginForm>
           child: Center(
             child: RaisedButton(
               onPressed: () {
-                if (code != null && code.isNotEmpty) {
-                  if (code == securityCode) {
+                if (_securityCodeTextEditController.text.trim().isNotEmpty) {
+                  if (code != null && code.isNotEmpty && code == securityCode) {
                     Navigator.of(context)
                         .pushNamed('/register', arguments: mobile);
                   } else {
                     centerRepository.showFancyToast(
                         Translations.current.notValidSecurityCode(), false);
                   }
+                } else {
+                  centerRepository.showFancyToast(
+                      Translations.current.emptySecurityCode(), false);
                 }
               },
               elevation: 0,

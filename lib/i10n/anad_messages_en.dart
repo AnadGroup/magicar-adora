@@ -214,6 +214,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "notDone" : MessageLookupByLibrary.simpleMessage("Not Done"),
     "notDoneService" : MessageLookupByLibrary.simpleMessage("notDoneService"),
     "notValidSecurityCode" : MessageLookupByLibrary.simpleMessage("SecurityCode is not Valid"),
+    "emptySecurityCode" : MessageLookupByLibrary.simpleMessage("SecurityCode is empty"),
     "off" : MessageLookupByLibrary.simpleMessage("OFF"),
     "on" : MessageLookupByLibrary.simpleMessage("ON"),
     "password" : MessageLookupByLibrary.simpleMessage("password"),
