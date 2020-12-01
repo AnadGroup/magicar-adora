@@ -371,6 +371,7 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
     this.controller.addListener(_onMapChanged);
     this.controller.onSymbolTapped.add(_onSymbolTapped);
     this.controller.setMapLanguage('name');
+    this.controller.setMapRTL('RTL');
     _extractMapInfo();
 
     this.controller.getTelemetryEnabled().then((isEnabled) => setState(() {
@@ -5814,6 +5815,59 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
     }
   }
 
+  clearMap() async {
+    if (_timerLine != null && _timerLine.isActive) {
+      //_timerLine=null;
+      _timerLine.cancel();
+    }
+    if (_timerupdate != null && _timerupdate.isActive) {
+      _timerupdate.cancel();
+    }
+    if (_polyLineAnim != null && _polyLineAnim.points != null) {
+      forAnim = false;
+      _polyLineAnim.points.clear();
+      _polyLineAnim = null;
+    }
+
+    if (lines != null && lines.length > 0) {
+      lines.clear();
+    }
+    if (latLngPoints != null && latLngPoints.isNotEmpty) {
+      latLngPoints.clear();
+    }
+    if (controller.lines != null && controller.lines.isNotEmpty) {
+      controller.clearLines();
+    }
+    if (controller.symbols != null && controller.symbols.isNotEmpty) {
+      controller.clearSymbols();
+    }
+    if (statefulMapController != null &&
+        statefulMapController.markers != null &&
+        statefulMapController.markers.isNotEmpty)
+      statefulMapController.removeMarkers();
+
+    if (statefulMapController != null &&
+        statefulMapController.lines != null &&
+        statefulMapController.lines.isNotEmpty)
+      statefulMapController.removeLine('POINTS');
+
+    if (carInMarkerMap != null && carInMarkerMap.length > 0)
+      carInMarkerMap.clear();
+    if (carMarkersMap != null && carMarkersMap.length > 0)
+      carMarkersMap.clear();
+    if (carIndexMarkerMap != null && carIndexMarkerMap.length > 0)
+      carIndexMarkerMap.clear();
+    if (markers != null && markers.length > 0) {
+      markers.clear();
+    }
+    if (carAnimMarkers != null && carAnimMarkers.length > 0) {
+      carAnimMarkers.clear();
+    }
+    if (lines2 != null) {
+      lines2 = null;
+    }
+  }
+
   String gmap_url =
       'https://maps.googleapis.com/maps/api/js?key=AIzaSyDYkYRHC3WArW9vjchXNs5HlRxW4Dfm618&libraries=places&q=Infinite+Loop,+Cupertino,+CA+95014';
   //'https://www.google.com/maps/embed/v3/place?key=AIzaSyDYkYRHC3WArW9vjchXNs5HlRxW4Dfm618&q="Infinite Loop, Cupertino, CA 95014".replaceAll(' ', '+')';
@@ -6004,70 +6058,7 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
                                   animateRoutecarPolyLines();
                                   // }
                                 }
-                                if (msg.type == 'CLEAR_MAP') {
-                                  if (_timerLine != null &&
-                                      _timerLine.isActive) {
-                                    //_timerLine=null;
-                                    _timerLine.cancel();
-                                  }
-                                  if (_timerupdate != null &&
-                                      _timerupdate.isActive) {
-                                    _timerupdate.cancel();
-                                  }
-                                  if (_polyLineAnim != null &&
-                                      _polyLineAnim.points != null) {
-                                    forAnim = false;
-                                    _polyLineAnim.points.clear();
-                                    _polyLineAnim = null;
-                                  }
-
-                                  if (lines != null && lines.length > 0) {
-                                    lines.clear();
-                                  }
-                                  if (latLngPoints != null &&
-                                      latLngPoints.isNotEmpty) {
-                                    latLngPoints.clear();
-                                  }
-                                  if (controller.lines != null &&
-                                      controller.lines.isNotEmpty) {
-                                    controller.clearLines();
-                                  }
-                                  if (controller.symbols != null &&
-                                      controller.symbols.isNotEmpty) {
-                                    controller.clearSymbols();
-                                  }
-                                  if (statefulMapController != null &&
-                                      statefulMapController.markers != null &&
-                                      statefulMapController.markers.isNotEmpty)
-                                    statefulMapController.removeMarkers();
-
-                                  if (statefulMapController != null &&
-                                      statefulMapController.lines != null &&
-                                      statefulMapController.lines.isNotEmpty)
-                                    statefulMapController.removeLine('POINTS');
-
-                                  if (carInMarkerMap != null &&
-                                      carInMarkerMap.length > 0)
-                                    carInMarkerMap.clear();
-                                  if (carMarkersMap != null &&
-                                      carMarkersMap.length > 0)
-                                    carMarkersMap.clear();
-                                  if (carIndexMarkerMap != null &&
-                                      carIndexMarkerMap.length > 0)
-                                    carIndexMarkerMap.clear();
-                                  if (markers != null && markers.length > 0) {
-                                    markers.clear();
-                                  }
-                                  if (carAnimMarkers != null &&
-                                      carAnimMarkers.length > 0) {
-                                    carAnimMarkers.clear();
-                                  }
-                                  if (lines2 != null) {
-                                    lines2 = null;
-                                  }
-                                }
                               }
-
                               return StreamBuilder<Message>(
                                 stream: statusNoty.noty,
                                 builder: (context, snapshot) {
@@ -6445,10 +6436,11 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
                                                             child:
                                                                 FloatingActionButton(
                                                               onPressed: () {
-                                                                reportNoty.updateValue(
-                                                                    new Message(
-                                                                        type:
-                                                                            'CLEAR_MAP'));
+                                                                clearMap();
+                                                                // reportNoty.updateValue(
+                                                                //     new Message(
+                                                                //         type:
+                                                                //             'CLEAR_MAP'));
                                                               },
                                                               child: Container(
                                                                 width: 38.0,
@@ -6562,71 +6554,7 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
                                     animateRoutecarPolyLines();
                                   }
                                 }
-                                if (msg.type == 'CLEAR_MAP') {
-                                  if (_timerLine != null &&
-                                      _timerLine.isActive) {
-                                    _timerLine.cancel();
-                                  }
-                                  if (_timerupdate != null &&
-                                      _timerupdate.isActive) {
-                                    _timerupdate.cancel();
-                                  }
-                                  if (_polyLineAnim != null &&
-                                      _polyLineAnim.points != null) {
-                                    forAnim = false;
-                                    _polyLineAnim.points.clear();
-                                    _polyLineAnim = null;
-                                    degress.clear();
-                                  }
-
-                                  if (lines != null && lines.length > 0) {
-                                    lines.clear();
-                                  }
-                                  if (latLngPoints != null &&
-                                      latLngPoints.isNotEmpty) {
-                                    latLngPoints.clear();
-                                  }
-                                  if (controller.lines != null &&
-                                      controller.lines.isNotEmpty) {
-                                    controller.clearLines();
-                                  }
-                                  if (controller.symbols != null &&
-                                      controller.symbols.isNotEmpty) {
-                                    controller.clearSymbols();
-                                  }
-                                  if (statefulMapController != null &&
-                                      statefulMapController.markers != null &&
-                                      statefulMapController.markers.isNotEmpty)
-                                    statefulMapController.removeMarkers();
-
-                                  if (statefulMapController != null &&
-                                      statefulMapController.lines != null &&
-                                      statefulMapController.lines.isNotEmpty)
-                                    statefulMapController.removeLine('POINTS');
-
-                                  if (carInMarkerMap != null &&
-                                      carInMarkerMap.length > 0)
-                                    carInMarkerMap.clear();
-                                  if (carMarkersMap != null &&
-                                      carMarkersMap.length > 0)
-                                    carMarkersMap.clear();
-                                  if (carIndexMarkerMap != null &&
-                                      carIndexMarkerMap.length > 0)
-                                    carIndexMarkerMap.clear();
-                                  if (markers != null && markers.length > 0) {
-                                    markers.clear();
-                                  }
-                                  if (carAnimMarkers != null &&
-                                      carAnimMarkers.length > 0) {
-                                    carAnimMarkers.clear();
-                                  }
-
-                                  if (lines2 != null) {
-                                    lines2 = null;
-                                  }
-                                }
                               }
-
                               return StreamBuilder<Message>(
                                 stream: statusNoty.noty,
                                 builder: (context, snapshot) {
@@ -6978,11 +6906,12 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
                                                           child:
                                                               FloatingActionButton(
                                                             onPressed: () {
+                                                              clearMap();
                                                               // liveMapController.removeMarkers();
-                                                              reportNoty.updateValue(
-                                                                  new Message(
-                                                                      type:
-                                                                          'CLEAR_MAP'));
+                                                              // reportNoty.updateValue(
+                                                              //     new Message(
+                                                              //         type:
+                                                              //             'CLEAR_MAP'));
                                                             },
                                                             child: Container(
                                                               width: 38.0,
