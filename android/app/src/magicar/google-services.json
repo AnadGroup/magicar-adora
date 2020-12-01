@@ -1,41 +1,41 @@
 {
   "project_info": {
-    "project_number": "208245795180",
-    "firebase_url": "https://cardo-71005.firebaseio.com",
-    "project_id": "cardo-71005",
-    "storage_bucket": "cardo-71005.appspot.com"
+    "project_number": "611322359852",
+    "firebase_url": "https://anadmagicar.firebaseio.com",
+    "project_id": "anadmagicar",
+    "storage_bucket": "anadmagicar.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:208245795180:android:b0e4f45acef82deb38ab49",
+        "mobilesdk_app_id": "1:611322359852:android:d069ccf9fea79ad23b6189",
         "android_client_info": {
           "package_name": "com.magicar"
         }
       },
       "oauth_client": [
         {
-          "client_id": "208245795180-mkpv8cbv62tqna4me6frumdkjfac2q56.apps.googleusercontent.com",
+          "client_id": "611322359852-fsmhk1vuqqh7g97a419m1v5g5pcsfvfm.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyDu5uc0mgGt3LRIRKW9gb8C2F5q_nLyIIg"
+          "current_key": "AIzaSyBHlbV5UtpUN9QQa9H7KuLnkLvrPuDL-2I"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "208245795180-mkpv8cbv62tqna4me6frumdkjfac2q56.apps.googleusercontent.com",
+              "client_id": "611322359852-fsmhk1vuqqh7g97a419m1v5g5pcsfvfm.apps.googleusercontent.com",
               "client_type": 3
             },
             {
-              "client_id": "208245795180-kf4p5bu1arhvrp6um82044157feli2ek.apps.googleusercontent.com",
+              "client_id": "611322359852-pna8514626ihjqisu1ktpfr9u5bnuesk.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.anad.magicar.anadMagicar"
+                "bundle_id": "com.magicar"
               }
             }
           ]

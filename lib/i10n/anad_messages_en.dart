@@ -214,6 +214,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "notDone" : MessageLookupByLibrary.simpleMessage("Not Done"),
     "notDoneService" : MessageLookupByLibrary.simpleMessage("notDoneService"),
     "notValidSecurityCode" : MessageLookupByLibrary.simpleMessage("SecurityCode is not Valid"),
+    "emptySecurityCode" : MessageLookupByLibrary.simpleMessage("SecurityCode is empty"),
     "off" : MessageLookupByLibrary.simpleMessage("OFF"),
     "on" : MessageLookupByLibrary.simpleMessage("ON"),
     "password" : MessageLookupByLibrary.simpleMessage("password"),
@@ -318,11 +319,13 @@ class MessageLookup extends MessageLookupByLibrary {
     "userName" : MessageLookupByLibrary.simpleMessage("userName"),
     "userinfo" : MessageLookupByLibrary.simpleMessage("userinfo"),
     "users" : MessageLookupByLibrary.simpleMessage("Users"),
-    "withFinger" : MessageLookupByLibrary.simpleMessage("Enter wtih Finger Print"),
+    "withFinger" : MessageLookupByLibrary.simpleMessage("Enter with Finger Print"),
     "withLogin" : MessageLookupByLibrary.simpleMessage("Enter with Login"),
-    "withPassword" : MessageLookupByLibrary.simpleMessage("Enter wtih Password"),
-    "withPattern" : MessageLookupByLibrary.simpleMessage("Enetr with Pattern"),
+    "withPassword" : MessageLookupByLibrary.simpleMessage("Enter with Password"),
+    "withPattern" : MessageLookupByLibrary.simpleMessage("Enter with Pattern"),
     "yes" : MessageLookupByLibrary.simpleMessage("Yes"),
-    "yourLocationNotFound" : MessageLookupByLibrary.simpleMessage("yourLocationNotFound")
+    "yourLocationNotFound" : MessageLookupByLibrary.simpleMessage("yourLocationNotFound"),
+    "language" : MessageLookupByLibrary.simpleMessage("English"),
+    "local" : MessageLookupByLibrary.simpleMessage("Language")
   };
 }

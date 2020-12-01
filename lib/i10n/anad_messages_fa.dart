@@ -212,7 +212,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "notAuthorized" : MessageLookupByLibrary.simpleMessage("شناسایی نشد"),
     "notDone" : MessageLookupByLibrary.simpleMessage("انجام نشده"),
     "notDoneService" : MessageLookupByLibrary.simpleMessage("عدم انجام"),
-    "notValidSecurityCode" : MessageLookupByLibrary.simpleMessage("کد امنیتی وارد شده صحیحی نیست"),
+    "notValidSecurityCode" : MessageLookupByLibrary.simpleMessage("کد امنیتی وارد شده صحیح نیست"),
+    "emptySecurityCode" : MessageLookupByLibrary.simpleMessage("لطفا کد امنیتی را وارد کنید"),
     "off" : MessageLookupByLibrary.simpleMessage("خاموش"),
     "on" : MessageLookupByLibrary.simpleMessage("روشن"),
     "password" : MessageLookupByLibrary.simpleMessage("رمز عبور"),
@@ -321,6 +322,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "withPassword" : MessageLookupByLibrary.simpleMessage("ورود با رمز عبور"),
     "withPattern" : MessageLookupByLibrary.simpleMessage("ورود با الگو"),
     "yes" : MessageLookupByLibrary.simpleMessage("بله"),
-    "yourLocationNotFound" : MessageLookupByLibrary.simpleMessage("آخرین موقعیت شما یافت نشد")
+    "yourLocationNotFound" : MessageLookupByLibrary.simpleMessage("آخرین موقعیت شما یافت نشد"),
+    "language" : MessageLookupByLibrary.simpleMessage("فارسی"),
+    "local" : MessageLookupByLibrary.simpleMessage("زبان")
   };
 }

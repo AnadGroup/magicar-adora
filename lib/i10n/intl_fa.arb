@@ -744,9 +744,15 @@
     "type": "text",
     "placeholders": {}
   },
-  "notValidSecurityCode": "کد امنیتی وارد شده صحیحی نیست",
+  "notValidSecurityCode": "کد امنیتی وارد شده صحیح نیست",
   "@notValidSecurityCode": {
     "description": "notValidSecurityCode",
+    "type": "text",
+    "placeholders": {}
+  },
+  "emptySecurityCode": "لطفا کد امنیتی را وارد کنید",
+  "@emptySecurityCode": {
+    "description": "emptySecurityCode",
     "type": "text",
     "placeholders": {}
   },
@@ -1805,5 +1811,17 @@
     "description": "MagiCar Co.",
     "type": "text",
     "placeholders": {}
-  }
+  },
+   "language": "فارسی",
+    "@language": {
+      "description": "language",
+      "type": "text",
+      "placeholders": {}
+    },
+    "local": "زبان",
+        "@local": {
+          "description": "local",
+          "type": "text",
+          "placeholders": {}
+        }
 }

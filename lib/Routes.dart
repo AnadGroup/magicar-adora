@@ -174,6 +174,7 @@ class MyAppState extends State<MyApp> with WidgetsBindingObserver {
     }
   }*/
 
+//بدلیل سرعت بخشیدن در وب کامتی شد
   void startListening() {
     /*_screen = Screen();
     try {

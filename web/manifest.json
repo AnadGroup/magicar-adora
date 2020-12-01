@@ -3,9 +3,15 @@
     "short_name": "Magicar",
     "start_url": ".",
     "display": "standalone",
+<<<<<<< HEAD
     "background_color": "#514ABD7A",
     "theme_color": "#514ABD7A",
     "description": "Magicar",
+=======
+    "background_color": "#FF8F00",
+    "theme_color": "#FF8F00",
+    "description": "Adora",
+>>>>>>> 520f8fd83a6b05c368fdff174a44a586aa3598bb
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
