@@ -34,6 +34,7 @@ import 'package:anad_magicar/model/user/role.dart';
 import 'package:anad_magicar/model/user/user.dart';
 import 'package:anad_magicar/utils/check_status_connection.dart';
 import 'package:anad_magicar/utils/network_util.dart';
+import 'package:flutter/services.dart' show rootBundle;
 
 class RestDatasource extends BaseRest {
   NetworkUtil _netUtil = new NetworkUtil();
@@ -496,8 +497,16 @@ class RestDatasource extends BaseRest {
   /*Future<List<Service>> GetCarService(int CarId) {
 
   }*/
+  final JsonDecoder _decoder = new JsonDecoder();
+  Future<String> loadAsset() async {
+    return await rootBundle.loadString('assets/points.txt');
+  }
 
   Future<List<ApiRoute>> getRouteList(ApiRoute route) async {
+    // String res2= await loadAsset();
+
+    // dynamic res3 = _decoder.convert(res2);
+    // return res3.map<ApiRoute>((r) => ApiRoute.fromJsonResult(r)).toList();
     return _netUtil.post(GetROUTE_URL, body: route.toJson()).then((res) {
       if (res != null)
         return res.map<ApiRoute>((r) => ApiRoute.fromJsonResult(r)).toList();
