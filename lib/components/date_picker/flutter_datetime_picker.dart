@@ -201,7 +201,9 @@ class _DatePickerRoute<T> extends PopupRoute<T> {
         pickerModel: pickerModel,
       ),
     );
-    ThemeData inheritTheme = Theme.of(context, shadowThemeOnly: true);
+    ThemeData inheritTheme = Theme.of(
+      context,
+    );
     if (inheritTheme != null) {
       bottomSheet = new Theme(data: inheritTheme, child: bottomSheet);
     }
@@ -257,7 +259,8 @@ class _DatePickerState extends State<_DatePickerComponent> {
       child: AnimatedBuilder(
         animation: widget.route.animation,
         builder: (BuildContext context, Widget child) {
-          final double bottomPadding = MediaQuery.of(context).padding.bottom+50.0;
+          final double bottomPadding =
+              MediaQuery.of(context).padding.bottom + 50.0;
           return ClipRect(
             child: CustomSingleChildLayout(
               delegate: _BottomPickerLayout(widget.route.animation.value, theme,
@@ -284,7 +287,7 @@ class _DatePickerState extends State<_DatePickerComponent> {
 
   Widget _renderPickerView(DatePickerTheme theme) {
     Widget itemView = _renderItemView(theme);
-    if (widget.route.showTitleActions ) {
+    if (widget.route.showTitleActions) {
       return Column(
         children: <Widget>[
           _renderTitleActionsView(theme),
@@ -420,65 +423,127 @@ class _DatePickerState extends State<_DatePickerComponent> {
   Widget _renderTitleActionsView(DatePickerTheme theme) {
     String done = _localeDone();
     String cancel = _localeCancel();
-    String fromDate='';
-    String toDate='';
-    if(widget.route.showFromTitle)
-      {
-        fromDate=Translations.current.fromDate();
-        //toDate=Translations.current.toDate();
-      }
-    if(widget.route.showToTitle)
-    {
+    String fromDate = '';
+    String toDate = '';
+    if (widget.route.showFromTitle) {
+      fromDate = Translations.current.fromDate();
+      //toDate=Translations.current.toDate();
+    }
+    if (widget.route.showToTitle) {
       //fromDate=Translations.current.fromDate();
-      toDate=Translations.current.toDate();
+      toDate = Translations.current.toDate();
     }
 
     return Container(
-      margin: EdgeInsets.only(top:10.0),
-      height: theme.titleHeight+10.0,
+      margin: EdgeInsets.only(top: 10.0),
+      height: theme.titleHeight + 10.0,
       decoration: BoxDecoration(
         color: theme.headerColor ?? theme.backgroundColor ?? Colors.white,
       ),
-      child: (widget.route.showFromTitle ||  widget.route.showToTitle) ?
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+      child: (widget.route.showFromTitle || widget.route.showToTitle)
+          ? Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                Container(
-                  margin: EdgeInsets.only(left: 10.0,right:10.0),
-                  height: theme.titleHeight,
-                  child: MaterialButton(
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                        side: BorderSide(color: Colors.blueAccent,width: 2.0,)
-                    ),
-                    // borderRadius: BorderRadius.all( Radius.circular(30.0)),
-                    //color: Theme.of(context).buttonTheme.colorScheme.background,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Container(
+                      margin: EdgeInsets.only(left: 10.0, right: 10.0),
+                      height: theme.titleHeight,
+                      child: MaterialButton(
+                        shape: RoundedRectangleBorder(
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(10.0)),
+                            side: BorderSide(
+                              color: Colors.blueAccent,
+                              width: 2.0,
+                            )),
+                        // borderRadius: BorderRadius.all( Radius.circular(30.0)),
+                        //color: Theme.of(context).buttonTheme.colorScheme.background,
 
-                    //pressedOpacity: 0.3,
-                    //padding: EdgeInsets.only(left: 20, top: 20,right: 20.0),
-                    child: Text(
-                      '$fromDate $toDate',
-                      style: theme.cancelStyle,
+                        //pressedOpacity: 0.3,
+                        //padding: EdgeInsets.only(left: 20, top: 20,right: 20.0),
+                        child: Text(
+                          '$fromDate $toDate',
+                          style: theme.cancelStyle,
+                        ),
+                        onPressed: () => Navigator.pop(context),
+                      ),
                     ),
-                    onPressed: () => Navigator.pop(context),
-                  ),
+                  ],
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Container(
+                      margin: EdgeInsets.only(left: 10.0, right: 10.0),
+                      height: theme.titleHeight,
+                      child: MaterialButton(
+                        shape: RoundedRectangleBorder(
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(10.0)),
+                            side: BorderSide(
+                              color: Colors.blueAccent,
+                              width: 2.0,
+                            )),
+                        // borderRadius: BorderRadius.all( Radius.circular(30.0)),
+                        //color: Theme.of(context).buttonTheme.colorScheme.background,
+
+                        //pressedOpacity: 0.3,
+                        //padding: EdgeInsets.only(left: 20, top: 20,right: 20.0),
+                        child: Text(
+                          '$cancel',
+                          style: theme.cancelStyle,
+                        ),
+                        onPressed: () => Navigator.pop(context),
+                      ),
+                    ),
+                    Container(
+                      margin: EdgeInsets.only(left: 10.0, right: 10.0),
+                      height: theme.titleHeight,
+                      child: MaterialButton(
+                        //pressedOpacity: 0.3,
+                        shape: RoundedRectangleBorder(
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(10.0)),
+                            side: BorderSide(
+                              color: Colors.blueAccent,
+                              width: 2.0,
+                            )),
+                        // borderRadius: BorderRadius.all(Radius.circular(30.0)),
+                        //color: Theme.of(context).buttonTheme.colorScheme.background,
+                        // padding: EdgeInsets.only(right: 20, top: 20,left: 20),
+                        child: Text(
+                          '$done',
+                          style: theme.doneStyle,
+                        ),
+                        onPressed: () {
+                          Navigator.pop(
+                              context, widget.pickerModel.finalTime());
+                          if (widget.route.onConfirm != null) {
+                            widget.route
+                                .onConfirm(widget.pickerModel.finalTime());
+                          }
+                        },
+                      ),
+                    ),
+                  ],
                 ),
               ],
-            ),
-            Row(
+            )
+          : Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 Container(
-                  margin: EdgeInsets.only(left: 10.0,right:10.0),
+                  margin: EdgeInsets.only(left: 10.0, right: 10.0),
                   height: theme.titleHeight,
                   child: MaterialButton(
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                        side: BorderSide(color: Colors.blueAccent,width: 2.0,)
-                    ),
+                        side: BorderSide(
+                          color: Colors.blueAccent,
+                          width: 2.0,
+                        )),
                     // borderRadius: BorderRadius.all( Radius.circular(30.0)),
                     //color: Theme.of(context).buttonTheme.colorScheme.background,
 
@@ -492,14 +557,16 @@ class _DatePickerState extends State<_DatePickerComponent> {
                   ),
                 ),
                 Container(
-                  margin: EdgeInsets.only(left: 10.0,right:10.0),
+                  margin: EdgeInsets.only(left: 10.0, right: 10.0),
                   height: theme.titleHeight,
                   child: MaterialButton(
                     //pressedOpacity: 0.3,
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                        side: BorderSide(color: Colors.blueAccent,width: 2.0,)
-                    ),
+                        side: BorderSide(
+                          color: Colors.blueAccent,
+                          width: 2.0,
+                        )),
                     // borderRadius: BorderRadius.all(Radius.circular(30.0)),
                     //color: Theme.of(context).buttonTheme.colorScheme.background,
                     // padding: EdgeInsets.only(right: 20, top: 20,left: 20),
@@ -517,57 +584,6 @@ class _DatePickerState extends State<_DatePickerComponent> {
                 ),
               ],
             ),
-          ],
-        )   :
-      Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          Container(
-            margin: EdgeInsets.only(left: 10.0,right:10.0),
-            height: theme.titleHeight,
-            child: MaterialButton(
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                  side: BorderSide(color: Colors.blueAccent,width: 2.0,)
-              ),
-             // borderRadius: BorderRadius.all( Radius.circular(30.0)),
-              //color: Theme.of(context).buttonTheme.colorScheme.background,
-
-              //pressedOpacity: 0.3,
-              //padding: EdgeInsets.only(left: 20, top: 20,right: 20.0),
-              child: Text(
-                '$cancel',
-                style: theme.cancelStyle,
-              ),
-              onPressed: () => Navigator.pop(context),
-            ),
-          ),
-          Container(
-            margin: EdgeInsets.only(left: 10.0,right:10.0),
-            height: theme.titleHeight,
-            child: MaterialButton(
-              //pressedOpacity: 0.3,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                side: BorderSide(color: Colors.blueAccent,width: 2.0,)
-              ),
-             // borderRadius: BorderRadius.all(Radius.circular(30.0)),
-              //color: Theme.of(context).buttonTheme.colorScheme.background,
-             // padding: EdgeInsets.only(right: 20, top: 20,left: 20),
-              child: Text(
-                '$done',
-                style: theme.doneStyle,
-              ),
-              onPressed: () {
-                Navigator.pop(context, widget.pickerModel.finalTime());
-                if (widget.route.onConfirm != null) {
-                  widget.route.onConfirm(widget.pickerModel.finalTime());
-                }
-              },
-            ),
-          ),
-        ],
-      ),
     );
   }
 
