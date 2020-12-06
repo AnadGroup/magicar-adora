@@ -63,8 +63,8 @@ dependencies:
 
 
   flutter_custom_clippers: ^1.0.4
-  sqflite: ^1.1.6+3
-  path_provider: ^1.2.0
+  #sqflite: ^1.1.6+3
+  path_provider: any
 
   #angel_framework: ^2.0.4+1
   #angel_orm: ^2.0.1
@@ -72,16 +72,17 @@ dependencies:
   #angel_migration: ^2.0.0
 
 
-  provider: ^3.0.0+1
+  provider: ^4.0.0
   file: ^5.0.7
 
   #jaguar_orm: ^2.2.6
 
   bottom_navy_bar: ^2.2.0
-  after_layout: ^1.0.7
+  after_layout: ^1.0.7+2
   #catcher: ^0.0.6
 
   dio: any
+  flutter_web_image_picker: ^0.0.2
   image_picker: ^0.6.2+3
   video_player: 0.10.5
   bloc: ^2.0.0
@@ -91,9 +92,9 @@ dependencies:
 
     #f_orm_m8: ^0.8.0+3
 
-  cached_network_image: ^1.1.0
+  cached_network_image: ^2.0.0
   transparent_image: ^1.0.0
-  flutter_advanced_networkimage: ^0.7.0
+  #flutter_advanced_networkimage: any
   package_info: ^0.4.0+13
   device_info: ^0.4.1+4
   floating_search_bar: ^0.2.0
@@ -101,11 +102,12 @@ dependencies:
   build_runner: ^1.0.0
   #jaguar_orm_gen: ^2.2.27
   #jaguar_query_sqflite: ^2.2.10
-  shared_preferences: ^0.5.12+4
+  shared_preferences_web: ^0.1.0
   #flutter_uploader: ^1.2.0
-  fluttertoast: ^3.1.3
+  fluttertoast: ^7.1.4
   progress_dialog: ^1.2.0
-  flutter_map: ^0.7.3
+  flutter_map: any
+  map_controller: any
   #mapbox_gl: ^0.0.5
   local_auth: ^0.6.1
   get_it: ^3.0.3
@@ -137,7 +139,7 @@ dependencies:
   #flushbar: ^1.9.1
   auto_size_text: ^2.1.0
   image: ^2.1.4
-  livemap: ^0.5.0
+  #livemap: ^0.6.0
   speech_bubble: ^0.0.6
   requests: ^3.3.0
   #flutter_datetime_picker: ^1.3.1
@@ -162,10 +164,10 @@ dependencies:
   #flutter_vector_icons: ^0.2.0
   mask_text_input_formatter: ^1.0.6
   flutter_masked_text: ^0.8.0
-  url_launcher: ^5.4.1
+  url_launcher: ^5.7.10
   #android_alarm_manager: ^0.4.5+4
   latlong: ^0.6.1
-  #geolocator: ^5.3.0
+  geolocator: ^5.3.0
   geolocation: ^1.1.2
   #flutter_mapbox_navigation: ^0.0.10
   flutter_money_formatter: ^0.8.3
@@ -177,13 +179,21 @@ dependencies:
   sa_stateless_animation: ^1.0.0
   flutter_keyboard_visibility: ^2.0.0
   #screen_state: ^0.1.1
-  flutter_svg: ^0.19.0
+  #flutter_svg: any
   universal_io: ^1.0.1
   http_client: ^1.4.1
   share: ^0.6.5+4
   screenshot: ^0.2.0
   universal_platform: ^0.1.3
-
+  #build_web_compilers: ^2.15.2
+  #build_daemon: ^2.1.0
+  flutter_webview_plugin: ^0.3.11
+  google_maps: any
+  easy_google_maps: ^1.0.0+2
+  easy_web_view: any
+  map_launcher: any
+  flutter_svg: ^0.19.1
+  worker_manager: ^3.1.6
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -192,28 +202,37 @@ dev_dependencies:
   flutter_launcher_icons: ^0.7.2
   simple_animations: ^1.2.0
 
+  #flutter_web: any  
+  #flutter_web_ui: any  
+  #google_maps: ">=3.0.0 <4.0.0"  
+  #build_runner: ^1.6.2
+  map_launcher: any
 
-
-
-
-
+  mapbox_gl:
+    path: flutter-mapbox-gl
+  
 flutter_icons:
   android: true
   ios: true
 
 dependency_overrides:
-  analyzer: ^0.38.4
+  #analyzer: ^0.38.4
   rxdart: ^0.23.1
   intl: ^0.16.0
   dio: ^3.0.7
-  map_controller: ^0.6.1
-  flutter_map: ^0.8.2
-  flutter_advanced_networkimage: ^0.6.2
-  cached_network_image: ^2.0.0-rc
-  fluttertoast: ^7.1.1
+  map_controller: ^0.8.0
+  flutter_map: ^0.10.1+1
+  #flutter_advanced_networkimage: ^0.7.0
+  #cached_network_image: ^2.0.0-rc
+  #fluttertoast: ^7.1.1
   flutter_keyboard_visibility: ^3.0.0
   location: ^3.0.2
-  flutter_svg: ^0.19.0
+  #flutter_svg: ^0.19.2+1
+  provider: ^3.2.0
+  mapbox_gl_platform_interface: 
+    path: flutter-mapbox-gl/mapbox_gl_platform_interface
+  mapbox_gl_web:
+    path: flutter-mapbox-gl/mapbox_gl_web
   #flushbar: ^1.9.1
   #flutter_local_notifications: ^0.9.1
 # For information on the generic Dart part of this file, see the
@@ -247,6 +266,8 @@ flutter:
     - assets/lock.mp3
     - assets/off.mp3
     - assets/help.pdf
+    - assets/points.txt
+    - assets/style.json
 
 
 

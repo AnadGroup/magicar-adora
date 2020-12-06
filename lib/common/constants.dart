@@ -69,6 +69,13 @@ class Constants {
   static final String CAR_IMAGE_GRAY='assets/images/car_gray.png';
   static final String CAR_IMAGE_WHITE='assets/images/car_white.png';
 
+  static final String MAP_CAR_IMAGE_BLACK='assets/images/map_car_black.png';
+  static final String MAP_CAR_IMAGE_BLUE='assets/images/map_car_blue.png';
+  static final String MAP_CAR_IMAGE_RED='assets/images/map_car_red.png';
+  static final String MAP_CAR_IMAGE_YELLOW='assets/images/map_car_yellow.png';
+  static final String MAP_CAR_IMAGE_GRAY='assets/images/map_car_gray.png';
+  static final String MAP_CAR_IMAGE_WHITE='assets/images/map_car_white.png';
+
   static final String CAR_COMMANDS_TITLE_MAP_KEY='CAR_COMMANDS_TITLE_MAP';
   static final int MAX_CAR_COUNTS=20;
 
@@ -80,6 +87,8 @@ class Constants {
    static HashMap<int,Color>  colorIdToColorsMap=new HashMap();
    static HashMap<RoutingType,String>  routingTypeMap=new HashMap();
    static HashMap<int,String> carImagesInColorMap=new HashMap();
+   static HashMap<int,String> mapCarImagesInColorMap=new HashMap();
+
   static HashMap<String,String> carCommandsInTitlesMap=new HashMap();
 
   static List<Color> colors=[
@@ -115,6 +124,15 @@ class Constants {
     carImagesInColorMap.putIfAbsent(CAR_COLOR_RED_TAG, ()=>CAR_IMAGE_RED);
     carImagesInColorMap.putIfAbsent(CAR_COLOR_WHITE_TAG, ()=>CAR_IMAGE_WHITE);
     carImagesInColorMap.putIfAbsent(CAR_COLOR_YELLOW_TAG, ()=>CAR_IMAGE_YELLOW);
+
+
+ if(mapCarImagesInColorMap==null)
+      mapCarImagesInColorMap=new HashMap();
+    mapCarImagesInColorMap.putIfAbsent(CAR_COLOR_BLACK_TAG, ()=>MAP_CAR_IMAGE_BLUE);
+    mapCarImagesInColorMap.putIfAbsent(CAR_COLOR_GREY_TAG, ()=>MAP_CAR_IMAGE_GRAY);
+    mapCarImagesInColorMap.putIfAbsent(CAR_COLOR_RED_TAG, ()=>MAP_CAR_IMAGE_RED);
+    mapCarImagesInColorMap.putIfAbsent(CAR_COLOR_WHITE_TAG, ()=>MAP_CAR_IMAGE_WHITE);
+    mapCarImagesInColorMap.putIfAbsent(CAR_COLOR_YELLOW_TAG, ()=>MAP_CAR_IMAGE_YELLOW);
 
   }
    static createSoundToActionMap()

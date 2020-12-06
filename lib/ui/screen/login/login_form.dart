@@ -136,6 +136,7 @@ class _LoginFormState extends BaseState<LoginForm> //State<LoginForm>
     if (!kIsWeb) {
       checkInternet = CheckConnection();
     }
+
     isLoginDisabled = false;
     formAnimationController = new AnimationController(
       vsync: this,

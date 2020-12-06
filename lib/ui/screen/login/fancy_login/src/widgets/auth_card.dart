@@ -721,6 +721,7 @@ class _LoginCardState extends State<_LoginCard> with TickerProviderStateMixin {
     final auth = Provider.of<Auth>(context);
 
     return AnimatedPasswordTextFormField(
+      keyboardType: TextInputType.text ,
       enabled: auth.isLogin,
       animatedWidth: width,
       loadingController: _loadingController,

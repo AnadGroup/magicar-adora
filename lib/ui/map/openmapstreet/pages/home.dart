@@ -1,7 +1,9 @@
 import 'dart:async';
+import 'dart:convert';
 //import 'dart:html';
 import 'dart:math' as math;
-
+import 'dart:math';
+import 'dart:typed_data';
 import 'package:anad_magicar/bloc/theme/change_theme_bloc.dart';
 import 'package:anad_magicar/bloc/values/notify_value.dart';
 import 'package:anad_magicar/common/constants.dart';
@@ -30,7 +32,10 @@ import 'package:anad_magicar/repository/pref_repository.dart';
 import 'package:anad_magicar/service/user_location/src/user_location_options.dart';
 import 'package:anad_magicar/translation_strings.dart';
 import 'package:anad_magicar/ui/map/geojson/geojson.dart';
+import 'package:mapbox_gl/mapbox_gl.dart' as mbox;
+import 'package:location/location.dart' as mboxLoc;
 import 'package:anad_magicar/ui/map/openmapstreet/pages/location_data.dart';
+import 'package:anad_magicar/ui/map/openmapstreet/pages/show_marker.dart';
 import 'package:anad_magicar/ui/screen/home/index.dart';
 import 'package:anad_magicar/ui/screen/setting/native_settings_screen.dart';
 import 'package:anad_magicar/ui/theme/app_themes.dart';
@@ -41,6 +46,7 @@ import 'package:anad_magicar/widgets/bottom_sheet_custom.dart';
 import 'package:anad_magicar/widgets/extended_navbar/extended_navbar_scaffold.dart';
 import 'package:anad_magicar/widgets/flash_bar/flash_helper.dart';
 import 'package:anad_magicar/widgets/persian_datepicker/persian_datepicker.dart';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -48,16 +54,36 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter/services.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:geolocation/geolocation.dart' as geo;
-import 'package:geolocator/geolocator.dart' as locator;
+//import 'package:geolocator/geolocator.dart' as locator;
 import 'package:geopoint/geopoint.dart';
-import 'package:geopoint_location/geopoint_location.dart';
+//import 'package:google_maps/google_maps.dart' as gm;
+//import 'package:geopoint_location/geopoint_location.dart';
 import 'package:latlong/latlong.dart';
-import 'package:livemap/livemap.dart';
+//import 'package:livemap/livemap.dart';
 import 'package:location/location.dart' as loc;
+import 'package:map_launcher/map_launcher.dart' as ml;
 import 'package:maps_toolkit/maps_toolkit.dart' as maptoolkit;
 import 'package:pedantic/pedantic.dart';
 import 'package:popup_menu/popup_menu.dart' as popmenu;
-import 'dart:ui' as ui;
+import 'package:map_controller/map_controller.dart';
+// import 'dart:ui' as uii;
+// import 'dart:html';
+// import 'package:flutter_web_ui/ui.dart' as ui;
+// import 'package:google_maps/google_maps.dart' hide Icon;
+import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
+//import 'dart:html';
+//import 'flutter/web_ui';
+//import 'mobileui.dart' if (dart.library.html) 'webui.dart' as multiPlatform;
+import 'package:anad_magicar/ui/map/openmapstreet/pages/data.dart';
+import 'package:flutter/services.dart';
+
+const String ACCESS_TOKEN =
+    "pk.eyJ1IjoicmV6YW5kIiwiYSI6ImNrNWNkdHg3djAwdDAzZnMwcTc1N2ZpY2YifQ.fl5LG72G5Uz6CLVfhbazNw";
+const kAndroidUserAgent =
+    'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.94 Mobile Safari/537.36';
+
+String selectedUrl =
+    'https://www.openstreetmap.org/#map=18/35.69659/51.40972&layers=O';
 
 final List<String> carImgList = [
   "assets/images/car_red.png",
@@ -92,6 +118,20 @@ class GroupModel {
   GroupModel({this.text, this.index});
 }
 
+class Place {
+  Place(this.name, this.point);
+
+  final String name;
+  final LatLng point;
+}
+
+class NonCachingNetworkTileProvider extends TileProvider {
+  @override
+  ImageProvider getImage(Coords<num> coords, TileLayerOptions options) {
+    return NetworkImage(getTileUrl(coords, options));
+  }
+}
+
 class MapPage extends StatefulWidget {
   int carId;
   int carCounts;
@@ -114,6 +154,8 @@ class MapPage extends StatefulWidget {
 
 class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
   static const String route = '/mappage';
+
+  final flutterWebViewPlugin = FlutterWebviewPlugin();
 
   popmenu.PopupMenu menu;
   GlobalKey btnKey = GlobalKey();
@@ -176,11 +218,14 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
   final String markerPark = 'assets/images/park_marker.png';
   final String markerStart = 'assets/images/start_point.png';
   final String markerEnd = 'assets/images/end_point.png';
+  final String map_marker = 'assets/images/m_green.png';
 
   //final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   final GlobalKey<FormState> _formKey = new GlobalKey<FormState>();
   final GlobalKey<FormState> _formKey2 = new GlobalKey<FormState>();
+
+  var carPairedItemsList = <ParallaxCardItem>[];
 
   bool _autoValidate = false;
   bool isDark = false;
@@ -227,10 +272,11 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
   final polygons = <Polygon>[];
   List<Polyline> lines = List(); //<Polyline>[];
   Future<List<Polyline>> lines2;
-
+  List<LatLng> latLngPoints = [];
   MapController mapController;
-  LiveMapController liveMapController;
-
+  //LiveMapController liveMapController;
+  StatefulMapController statefulMapController;
+  StreamSubscription<StatefulMapControllerStateChange> sub;
   Marker _marker;
   Timer _timerupdate;
   int _markerIndex = 0;
@@ -266,35 +312,680 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
   double _myzoom = 15.0;
   double _zoom = 15.0;
 
-  // Widget getMap() {
-  //   String htmlId = "7";
+  String pelak_part1 = '';
+  String pelak_part2 = '';
+  String pelak_part3 = '';
+  String pelak_part4 = '';
 
-  //   // ignore: undefined_prefixed_name
-  //   ui.platformViewRegistry.registerViewFactory(htmlId, (int viewId) {
-  //     final myLatlng = LatLng(1.3521, 103.8198);
+  static final mbox.LatLng center = const mbox.LatLng(35.7169447, 51.3103267);
 
-  //     final mapOptions = MapOptions();
-  //     //mapOptions.zoom = 10.0;
-  //     mapOptions..center = LatLng(1.3521, 103.8198);
+  static final mbox.CameraPosition _kInitialPosition =
+      const mbox.CameraPosition(
+    target: mbox.LatLng(35.7169447, 51.3103267),
+    zoom: 11.0,
+  );
 
-  //     final elem = DivElement()
-  //       ..id = htmlId
-  //       ..style.width = "100%"
-  //       ..style.height = "100%"
-  //       ..style.border = 'none';
+  final mbox.LatLngBounds sydneyBounds = mbox.LatLngBounds(
+    southwest: const mbox.LatLng(35.7169447, 51.3103267),
+    northeast: const mbox.LatLng(35.7169447, 51.3103267),
+  );
 
-  //     final map = GMap(elem, mapOptions);
+  mbox.CameraPosition _position = _kInitialPosition;
+  bool _isMoving = false;
+  bool _compassEnabled = true;
+  mbox.CameraTargetBounds _cameraTargetBounds =
+      mbox.CameraTargetBounds.unbounded;
+  mbox.MinMaxZoomPreference _minMaxZoomPreference =
+      mbox.MinMaxZoomPreference.unbounded;
+  int _styleStringIndex = 0;
+  // Style string can a reference to a local or remote resources.
+  // On Android the raw JSON can also be passed via a styleString, on iOS this is not supported.
+  List<String> _styleStrings = [
+    mbox.MapboxStyles.MAPBOX_STREETS,
+    mbox.MapboxStyles.SATELLITE,
+    "assets/style.json"
+  ];
+  List<String> _styleStringLabels = [
+    "MAPBOX_STREETS",
+    "SATELLITE",
+    "LOCAL_ASSET"
+  ];
+  bool _rotateGesturesEnabled = true;
+  bool _scrollGesturesEnabled = true;
+  bool _tiltGesturesEnabled = true;
+  bool _zoomGesturesEnabled = true;
+  bool _myLocationEnabled = true;
+  bool _telemetryEnabled = true;
+  mbox.MyLocationTrackingMode _myLocationTrackingMode =
+      mbox.MyLocationTrackingMode.None;
+  List<Object> _featureQueryFilter;
+  //mbox.Fill _selectedFill;
+  mbox.MapboxMapController controller;
+  int _lineCount = 0;
+  int _symbolCount = 0;
+  mbox.Symbol _selectedSymbol;
+  mbox.Line _selectedLine;
 
-  //     Marker(MarkerOptions()
-  //       ..position = myLatlng
-  //       ..map = map
-  //       ..title = 'Hello World!');
+  void _onMapCreated(mbox.MapboxMapController controller) {
+    this.controller = controller;
+    this.controller.addListener(_onMapChanged);
+    this.controller.onSymbolTapped.add(_onSymbolTapped);
+    this.controller.setMapLanguage('name');
+    this.controller.setMapRTL('RTL');
+    _extractMapInfo();
 
-  //     return elem;
-  //   });
+    this.controller.getTelemetryEnabled().then((isEnabled) => setState(() {
+          _telemetryEnabled = isEnabled;
+        }));
+  }
 
-  //   return HtmlElementView(viewType: htmlId);
-  // }
+  void _onMapChanged() {
+    setState(() {
+      _extractMapInfo();
+    });
+  }
+
+  void _extractMapInfo() {
+    _position = controller.cameraPosition;
+    _isMoving = controller.isCameraMoving;
+  }
+
+  Widget _myLocationTrackingModeCycler() {
+    final mbox.MyLocationTrackingMode nextType =
+        mbox.MyLocationTrackingMode.values[(_myLocationTrackingMode.index + 1) %
+            mbox.MyLocationTrackingMode.values.length];
+    return FlatButton(
+      child: Text('change to $nextType'),
+      onPressed: () {
+        setState(() {
+          _myLocationTrackingMode = nextType;
+        });
+      },
+    );
+  }
+
+  Widget _queryFilterToggler() {
+    return FlatButton(
+      child: Text(
+          'filter zoo on click ${_featureQueryFilter == null ? 'disabled' : 'enabled'}'),
+      onPressed: () {
+        setState(() {
+          if (_featureQueryFilter == null) {
+            _featureQueryFilter = [
+              "==",
+              ["get", "type"],
+              "zoo"
+            ];
+          } else {
+            _featureQueryFilter = null;
+          }
+        });
+      },
+    );
+  }
+
+  Widget _compassToggler() {
+    return FlatButton(
+      child: Text('${_compassEnabled ? 'disable' : 'enable'} compasss'),
+      onPressed: () {
+        setState(() {
+          _compassEnabled = !_compassEnabled;
+        });
+      },
+    );
+  }
+
+  Widget _latLngBoundsToggler() {
+    return FlatButton(
+      child: Text(
+        _cameraTargetBounds.bounds == null
+            ? 'bound camera target'
+            : 'release camera target',
+      ),
+      onPressed: () {
+        setState(() {
+          _cameraTargetBounds = _cameraTargetBounds.bounds == null
+              ? mbox.CameraTargetBounds(sydneyBounds)
+              : mbox.CameraTargetBounds.unbounded;
+        });
+      },
+    );
+  }
+
+  Widget _zoomBoundsToggler() {
+    return FlatButton(
+      child: Text(_minMaxZoomPreference.minZoom == null
+          ? 'bound zoom'
+          : 'release zoom'),
+      onPressed: () {
+        setState(() {
+          _minMaxZoomPreference = _minMaxZoomPreference.minZoom == null
+              ? const mbox.MinMaxZoomPreference(12.0, 16.0)
+              : mbox.MinMaxZoomPreference.unbounded;
+        });
+      },
+    );
+  }
+
+  _setStyleToSatellite(bool show) {
+    setState(() {
+      if (show) {
+        _styleStringIndex = 1; //
+        // (_styleStringIndex + 1) % _styleStrings.length;
+      } else {
+        _styleStringIndex = 0;
+      }
+    });
+  }
+
+  Widget _rotateToggler() {
+    return FlatButton(
+      child: Text('${_rotateGesturesEnabled ? 'disable' : 'enable'} rotate'),
+      onPressed: () {
+        setState(() {
+          _rotateGesturesEnabled = !_rotateGesturesEnabled;
+        });
+      },
+    );
+  }
+
+  Widget _scrollToggler() {
+    return FlatButton(
+      child: Text('${_scrollGesturesEnabled ? 'disable' : 'enable'} scroll'),
+      onPressed: () {
+        setState(() {
+          _scrollGesturesEnabled = !_scrollGesturesEnabled;
+        });
+      },
+    );
+  }
+
+  Widget _tiltToggler() {
+    return FlatButton(
+      child: Text('${_tiltGesturesEnabled ? 'disable' : 'enable'} tilt'),
+      onPressed: () {
+        setState(() {
+          _tiltGesturesEnabled = !_tiltGesturesEnabled;
+        });
+      },
+    );
+  }
+
+  Widget _zoomToggler() {
+    return FlatButton(
+      child: Text('${_zoomGesturesEnabled ? 'disable' : 'enable'} zoom'),
+      onPressed: () {
+        setState(() {
+          _zoomGesturesEnabled = !_zoomGesturesEnabled;
+        });
+      },
+    );
+  }
+
+  Widget _myLocationToggler() {
+    return FlatButton(
+      child: Text('${_myLocationEnabled ? 'disable' : 'enable'} my location'),
+      onPressed: () {
+        setState(() {
+          _myLocationEnabled = !_myLocationEnabled;
+        });
+      },
+    );
+  }
+
+  Widget _telemetryToggler() {
+    return FlatButton(
+      child: Text('${_telemetryEnabled ? 'disable' : 'enable'} telemetry'),
+      onPressed: () {
+        setState(() {
+          _telemetryEnabled = !_telemetryEnabled;
+        });
+        controller?.setTelemetryEnabled(_telemetryEnabled);
+      },
+    );
+  }
+
+  Widget _visibleRegionGetter() {
+    return FlatButton(
+      child: Text('get currently visible region'),
+      onPressed: () async {
+        var result = await controller.getVisibleRegion();
+        Scaffold.of(context).showSnackBar(SnackBar(
+          content: Text(
+              "SW: ${result.southwest.toString()} NE: ${result.northeast.toString()}"),
+        ));
+      },
+    );
+  }
+
+  void onStyleLoadedCallback() {
+    addImageFromAsset("assetImage", map_marker);
+    String carImage = '';
+    var car = carInfos.where((c) => c.carId == lastCarIdSelected).toList();
+    if (car != null && car.length > 0) {
+      carImage = Constants.mapCarImagesInColorMap[car.first.colorId];
+    }
+
+    if (carImage == null || carImage.isEmpty) {
+      carImage =
+          Constants.mapCarImagesInColorMap[Constants.CAR_COLOR_WHITE_TAG];
+    }
+    addImageFromAsset("assetCarImage", carImage);
+  }
+
+  void _onLineTapped(mbox.Line line) {
+    if (_selectedLine != null) {
+      _updateSelectedLine(
+        const mbox.LineOptions(
+          lineWidth: 28.0,
+        ),
+      );
+    }
+    setState(() {
+      _selectedLine = line;
+    });
+    _updateSelectedLine(
+      mbox.LineOptions(
+          // linecolor: ,
+          ),
+    );
+  }
+
+  void _updateSelectedLine(mbox.LineOptions changes) {
+    controller.updateLine(_selectedLine, changes);
+  }
+
+  void _add(List<mbox.LatLng> geos, double lw) {
+    controller.addLine(
+      mbox.LineOptions(
+          geometry: geos,
+          lineColor: "#ff0000",
+          lineWidth: lw,
+          lineOpacity: 0.5,
+          draggable: true),
+    );
+    // setState(() {
+    //   _lineCount += 1;
+    // });
+  }
+
+  void _remove() {
+    controller.removeLine(_selectedLine);
+    setState(() {
+      _selectedLine = null;
+      _lineCount -= 1;
+    });
+  }
+
+  Future<void> _changeAlpha() async {
+    double current = _selectedLine.options.lineOpacity;
+    if (current == null) {
+      // default value
+      current = 1.0;
+    }
+
+    _updateSelectedLine(
+      mbox.LineOptions(lineOpacity: current < 0.1 ? 1.0 : current * 0.75),
+    );
+  }
+
+  Future<void> _toggleVisible() async {
+    double current = _selectedLine.options.lineOpacity;
+    if (current == null) {
+      // default value
+      current = 1.0;
+    }
+    _updateSelectedLine(
+      mbox.LineOptions(lineOpacity: current == 0.0 ? 1.0 : 0.0),
+    );
+  }
+
+  /// Adds an asset image to the currently displayed style
+  Future<void> addImageFromAsset(String name, String assetName) async {
+    final ByteData bytes = await rootBundle.load(assetName);
+    final Uint8List list = bytes.buffer.asUint8List();
+    return controller.addImage(name, list);
+  }
+
+  void _addSymbol(String iconImage, mbox.LatLng latLng,
+      {bool isAnim = false, int speed = 0}) async {
+    List<int> availableNumbers = Iterable<int>.generate(12).toList();
+    controller.symbols.forEach(
+        (s) => availableNumbers.removeWhere((i) => i == s.data['count']));
+    if (availableNumbers.isNotEmpty) {
+      await controller.addSymbol(
+          _getSymbolOptions(iconImage, availableNumbers.first, latLng), {
+        'count': availableNumbers.first,
+        'speed': speed.toString()
+      }).then((value) {
+        if (isAnim) {
+          _selectedSymbol = controller.symbols.last;
+        }
+        setState(() {
+          _symbolCount += 1;
+        });
+      });
+    }
+  }
+
+  void _onSymbolTapped(mbox.Symbol symbol) {
+    if (_selectedSymbol != null) {
+      _updateSelectedSymbol(
+        const mbox.SymbolOptions(iconSize: 1.0),
+      );
+    }
+
+    setState(() {
+      _selectedSymbol = symbol;
+    });
+    _updateSelectedSymbol(
+      const mbox.SymbolOptions(
+        iconSize: 1.4,
+      ),
+    );
+    int speed = symbol.data['speed'];
+    if (speed == null) speed = 0;
+    showSpeedDialog(speed);
+  }
+
+  Future<void> _changeRotation(double degree) async {
+    double current = _selectedSymbol.options.iconRotate;
+    if (current == null) {
+      // default value
+      current = 0;
+    }
+    _updateSelectedSymbol(
+      mbox.SymbolOptions(iconRotate: current == 330.0 ? 0.0 : current = degree),
+    );
+  }
+
+  mbox.SymbolOptions _getSymbolOptions(
+      String iconImage, int symbolCount, mbox.LatLng latLng) {
+    mbox.LatLng geometry = latLng;
+    return iconImage == 'customFont'
+        ? mbox.SymbolOptions(
+            geometry: geometry,
+            iconImage: 'airport-15',
+            fontNames: ['DIN Offc Pro Bold', 'Arial Unicode MS Regular'],
+            textField: 'Airport',
+            textSize: 12.5,
+            textOffset: Offset(0, 0.8),
+            textAnchor: 'top',
+            textColor: '#000000',
+            textHaloBlur: 1,
+            textHaloColor: '#ffffff',
+            textHaloWidth: 0.8,
+          )
+        : mbox.SymbolOptions(
+            geometry: geometry,
+            iconImage: iconImage,
+          );
+  }
+
+  void _removeSymbol() {
+    controller.removeSymbol(_selectedSymbol);
+    setState(() {
+      _selectedSymbol = null;
+      _symbolCount -= 1;
+    });
+  }
+
+  void _removeAllSymbols() {
+    controller.removeSymbols(controller.symbols);
+    setState(() {
+      _selectedSymbol = null;
+      _symbolCount = 0;
+    });
+  }
+
+  void _updateSelectedSymbol(mbox.SymbolOptions changes) {
+    controller.updateSymbol(_selectedSymbol, changes);
+  }
+
+  void _changePositionSymbol(mbox.LatLng newlatLng) {
+    //final mbox.LatLng current = _selectedSymbol.options.geometry;
+    // final Offset offset = Offset(
+    //   newlatLng.latitude,
+    //   newlatLng.longitude,
+    // );
+    _updateSelectedSymbol(
+      mbox.SymbolOptions(
+        geometry: newlatLng,
+      ),
+    );
+  }
+
+  _updateCameraPosition(mbox.LatLng point) {
+    controller.animateCamera(
+      mbox.CameraUpdate.newCameraPosition(
+        mbox.CameraPosition(
+            bearing: 270.0, target: point, tilt: 30.0, zoom: _myzoom),
+      ),
+    );
+  }
+
+  openMapsSheet(context) async {
+    try {
+      final title = "Shanghai Tower";
+      final description = "Asia's tallest building";
+      final coords = ml.Coords(31.233568, 121.505504);
+      final availableMaps = await ml.MapLauncher.installedMaps;
+
+      showModalBottomSheet(
+        context: context,
+        builder: (BuildContext context) {
+          return SafeArea(
+            child: SingleChildScrollView(
+              child: Container(
+                child: Wrap(
+                  children: <Widget>[
+                    for (var map in availableMaps)
+                      ListTile(
+                        onTap: () => map.showMarker(
+                          coords: coords,
+                          title: title,
+                          description: description,
+                        ),
+                        title: Text(map.mapName),
+                        leading: Image(
+                          image: AssetImage(map.icon),
+                          height: 30.0,
+                          width: 30.0,
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
+      );
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  Widget _buildPelakField(
+    double width,
+  ) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: <Widget>[
+        Container(
+          height: 40.0,
+          width: 50.0,
+          child: TextFormField(
+            initialValue: '',
+            textAlign: TextAlign.center,
+            textDirection: TextDirection.ltr,
+            inputFormatters: [LengthLimitingTextInputFormatter(2)],
+            decoration: InputDecoration(
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(4)),
+                borderSide: BorderSide(width: 1, color: Colors.red),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(4)),
+                borderSide: BorderSide(width: 1, color: Colors.green),
+              ),
+              labelText: "",
+              fillColor: Colors.white,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(2.0),
+                borderSide: BorderSide(width: 1.0, color: Colors.black),
+              ),
+              //fillColor: Colors.green
+            ),
+            validator: (val) {
+              // if (val.length == 0) {
+              //   return "نمیتواند خالی باشد";
+              // }
+              return null;
+            },
+            keyboardType:
+                TextInputType.numberWithOptions(signed: false, decimal: false),
+            style: new TextStyle(
+              fontFamily: "IranSans",
+            ),
+            onFieldSubmitted: (value) {},
+            onChanged: (value) {
+              pelak_part4 = value;
+            },
+            onSaved: (value) {},
+          ),
+        ),
+        Container(
+          width: 20.0,
+          child: Text(
+            Translations.current.iranTitle(),
+            style: TextStyle(fontSize: 8.0),
+          ),
+        ),
+        Container(
+          height: 40.0,
+          width: 50.0,
+          child: new TextFormField(
+            initialValue: '',
+            textAlign: TextAlign.center,
+            textDirection: TextDirection.ltr,
+            inputFormatters: [LengthLimitingTextInputFormatter(3)],
+            decoration: new InputDecoration(
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(4)),
+                borderSide: BorderSide(width: 1, color: Colors.red),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(4)),
+                borderSide: BorderSide(width: 1, color: Colors.green),
+              ),
+              labelText: "",
+              fillColor: Colors.white,
+              border: new OutlineInputBorder(
+                borderRadius: new BorderRadius.circular(2.0),
+                borderSide: new BorderSide(width: 1.0, color: Colors.black),
+              ),
+              //fillColor: Colors.green
+            ),
+            validator: (val) {
+              return null;
+            },
+            onFieldSubmitted: (value) {},
+            onChanged: (value) {
+              pelak_part3 = value;
+            },
+            onSaved: (value) {},
+            keyboardType:
+                TextInputType.numberWithOptions(decimal: false, signed: false),
+            style: new TextStyle(
+              fontFamily: "IranSans",
+            ),
+          ),
+        ),
+        Container(
+          height: 40.0,
+          width: 50.0,
+          child: new TextFormField(
+            initialValue: '',
+            textAlign: TextAlign.center,
+            textDirection: TextDirection.ltr,
+            inputFormatters: [
+              BlacklistingTextInputFormatter('.!@#\\\$%^&*(),;:"\\\'و،'),
+              LengthLimitingTextInputFormatter(1)
+            ],
+            decoration: new InputDecoration(
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(4)),
+                borderSide: BorderSide(width: 1, color: Colors.red),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(4)),
+                borderSide: BorderSide(width: 1, color: Colors.green),
+              ),
+              labelText: "",
+              fillColor: Colors.white,
+              border: new OutlineInputBorder(
+                borderRadius: new BorderRadius.circular(2.0),
+                borderSide: new BorderSide(width: 0.5, color: Colors.black),
+              ),
+              //fillColor: Colors.green
+            ),
+            validator: (val) {
+              return null;
+            },
+            keyboardType: TextInputType.text,
+            style: new TextStyle(
+              fontFamily: "IranSans",
+            ),
+            onFieldSubmitted: (value) {},
+            onChanged: (value) {
+              pelak_part2 = value;
+            },
+            onSaved: (value) {},
+          ),
+        ),
+        Container(
+          height: 40.0,
+          width: 50.0,
+          child: new TextFormField(
+            initialValue: '',
+            textAlign: TextAlign.center,
+            textDirection: TextDirection.ltr,
+            inputFormatters: [LengthLimitingTextInputFormatter(2)],
+            decoration: new InputDecoration(
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(4)),
+                borderSide: BorderSide(width: 1, color: Colors.red),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(4)),
+                borderSide: BorderSide(width: 1, color: Colors.green),
+              ),
+              labelText: "",
+              fillColor: Colors.white,
+              border: new OutlineInputBorder(
+                borderRadius: new BorderRadius.circular(2.0),
+                borderSide: new BorderSide(width: 0.5, color: Colors.black),
+              ),
+              //fillColor: Colors.green
+            ),
+            validator: (val) {
+              return null;
+            },
+            onChanged: (value) {
+              pelak_part1 = value;
+            },
+            onSaved: (value) {},
+            keyboardType:
+                TextInputType.numberWithOptions(decimal: false, signed: false),
+            style: new TextStyle(
+              fontFamily: "IranSans",
+            ),
+            onFieldSubmitted: (value) {},
+          ),
+        ),
+      ],
+    );
+  }
 
   Future<void> _checkService() async {
     final bool serviceEnabledResult = await location.serviceEnabled();
@@ -376,7 +1067,10 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
 
 // دریافت رنگ سرعت ها
   Widget getMarkerOnSpeed(int speed, int diff) {
-    var item = Image.asset(markerRed, key: ObjectKey(Colors.red));
+    var item =
+        Icon(Icons.location_on, color: Colors.red, key: ObjectKey(Colors.red));
+
+    //Image.asset(markerRed, key: ObjectKey(Colors.red));
     if (maxSpeed == null || maxSpeed == 0) maxSpeed = 100;
     if (minSpeed == null || minSpeed == 0) minSpeed = 30;
     if (speed == null) speed = 0;
@@ -384,24 +1078,30 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
     if (speed >= maxSpeed)
       return item;
     else if (speed < 5 && diff >= minDelay)
-      return Image.asset(
-        markerPark,
-        key: ObjectKey(Colors.green),
-      );
+      return Icon(Icons.location_on,
+          color: Colors.blue, key: ObjectKey(Colors.green));
+    // Image.asset(
+    //   markerPark,
+    //   key: ObjectKey(Colors.green),
+    // );
     /*else if(speed >= minSpeed && speed < maxSpeed)
       return*/
     else if (speed <= minSpeed)
-      return Image.asset(
-        markerGreen,
-        color: Colors.amber,
-        key: ObjectKey(Colors.amber),
-      );
+      return Icon(Icons.location_on,
+          color: Colors.amber, key: ObjectKey(Colors.amber));
+    // Image.asset(
+    //   markerGreen,
+    //   color: Colors.amber,
+    //   key: ObjectKey(Colors.amber),
+    // );
     else
-      return Image.asset(
-        markerGreen,
-        color: Colors.transparent,
-        key: ObjectKey(Colors.green),
-      );
+      return Icon(Icons.location_on,
+          color: Colors.green, key: ObjectKey(Colors.green));
+    // Image.asset(
+    //   markerGreen,
+    //   color: Colors.transparent,
+    //   key: ObjectKey(Colors.green),
+    // );
   }
 
   getPeriodicTimePosition() async {
@@ -438,36 +1138,42 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
     });
   }
 
-  Marker currentMarker;
   animateToCurrentLocation() async {
     statusNoty.updateValue(Message(type: 'SEARCH_LOCATION'));
     var result = await getLocationForRoute();
     if (result != null) {
-      var marker = Marker(
-          width: markerSize + 28,
-          height: markerSize + 28,
-          point: LatLng(result.latitude, result.longitude),
-          builder: (ctx) {
-            return GestureDetector(
-              onTap: () {},
-              child: Container(
-                width: markerSize + 28,
-                height: markerSize + 28,
-                child: CircleAvatar(
-                  radius: markerSize + 28,
-                  backgroundColor: Colors.transparent,
-                  child: Image.asset('assets/images/location.png',
-                      color: Colors.indigoAccent, key: ObjectKey(Colors.red)),
-                ),
-              ),
-            );
-          });
-      currentMarker = marker;
+      // Place cPlace = Place(
+      //   'Current',
+      //   LatLng(result.latitude, result.longitude),
+      // );
+      mbox.LatLng point = mbox.LatLng(result.latitude, result.longitude);
+      _addSymbol('assetImage', point);
+      // addMarker(
+      //   context,
+      //   cPlace,
+      //   marker: Container(
+      //     width: markerSize + 28,
+      //     height: markerSize + 28,
+      //     child: CircleAvatar(
+      //         radius: markerSize + 28,
+      //         backgroundColor: Colors.transparent,
+      //         child: Icon(Icons.location_on,
+      //             color: Colors.indigoAccent, key: ObjectKey(Colors.red))
+      //         // Image.asset('assets/images/location.png',
+      //         //     color: Colors.indigoAccent, key: ObjectKey(Colors.red)),
+      //         ),
+      //   ),
+      // );
       if (!kIsWeb) {
-        liveMapController.mapController
-            .move(LatLng(result.latitude, result.longitude), 18);
+        _updateCameraPosition(
+          point,
+        );
+        //mapController.move(LatLng(result.latitude, result.longitude), _myzoom);
       } else {
-        mapController.move(LatLng(result.latitude, result.longitude), 18);
+        _updateCameraPosition(
+          point,
+        );
+        // mapController.move(LatLng(result.latitude, result.longitude), _myzoom);
       }
     }
     statusNoty.updateValue(Message(type: 'CURRENT_LOCATION_UPDATED'));
@@ -486,67 +1192,85 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
 
     int next = 0;
     int index = 0;
-    _timerLine = Timer.periodic(Duration(milliseconds: 350), (_) {
-      _polyLine = lines[_polyLineIndex];
-      _polyLineIndex = (_polyLineIndex + 1) % lines.length;
-      //index=_polyLine.points.length;
-      if (index < _polyLine.points.length - 1) {
-        index++;
-        next = index + 1;
-      }
-      // _fpoint=_polyLine.points[_pointIndex];
-      _pointIndex = (_pointIndex + 1) % _polyLine.points.length;
-      if (index < _polyLine.points.length - 1) {
-        _fpoint = _polyLine.points[index];
-        _spoint = _polyLine.points[next];
-        points..add(_fpoint)..add(_spoint);
-        maptoolkit.LatLng slng =
-            maptoolkit.LatLng(_fpoint.latitude, _fpoint.longitude);
-        maptoolkit.LatLng slng2 =
-            maptoolkit.LatLng(_spoint.latitude, _spoint.longitude);
+    if (latLngPoints != null && latLngPoints.isNotEmpty) {
+      _timerLine = Timer.periodic(Duration(milliseconds: 350), (_) {
+        // _polyLine = lines[_polyLineIndex];
+        // _polyLineIndex = (_polyLineIndex + 1) % lines.length;
 
-        double deg = maptoolkit.SphericalUtil.computeHeading(slng2,
-            slng); //getDirection(_fpoint.latitude, _fpoint.longitude, _spoint.latitude, _spoint.longitude);
-        degress..add(deg - 90);
-      }
-      if ((_pointIndex + 1) >= _polyLine.points.length) {
-        _timerLine.cancel();
-      }
-      _polyLineAnim = Polyline(
-          strokeWidth: (8.0 * _myzoom) / _zoom,
-          color: Colors.blueAccent,
-          points: points);
-
-      if (degress != null && degress.length > 0) {
-        double _size = (markerSize + 28) * _myzoom / _zoom;
-        var marker = Marker(
-            width: _size,
-            height: _size,
-            point: _spoint,
-            builder: (ctx) {
-              return GestureDetector(
-                onTap: () {},
-                child: Container(
-                    width: _size,
-                    height: _size,
-                    child: CircleAvatar(
-                      radius: _size,
-                      backgroundColor: Colors.transparent,
-                      child: Transform.rotate(
-                        angle: (math.pi * (degress[index - 1] - 90)) / 180,
-                        child:
-                            Image.asset(carImage, key: ObjectKey(Colors.red)),
-                      ),
-                    )),
-              );
-            });
-        if (carAnimMarkers != null && carAnimMarkers.isNotEmpty) {
-          carAnimMarkers = [];
+        if (index < latLngPoints.length - 1) {
+          index++;
+          next = index + 1;
         }
-        carAnimMarkers..add(marker);
-      }
-      animateNoty.updateValue(Message(type: 'LINE_ANIM'));
-    });
+
+        _pointIndex = (_pointIndex + 1) % latLngPoints.length;
+        if (index < latLngPoints.length - 1) {
+          _fpoint = latLngPoints[index];
+          _spoint = latLngPoints[next];
+          points..add(_fpoint)..add(_spoint);
+          maptoolkit.LatLng slng =
+              maptoolkit.LatLng(_fpoint.latitude, _fpoint.longitude);
+          maptoolkit.LatLng slng2 =
+              maptoolkit.LatLng(_spoint.latitude, _spoint.longitude);
+
+          double deg = maptoolkit.SphericalUtil.computeHeading(slng2,
+              slng); //getDirection(_fpoint.latitude, _fpoint.longitude, _spoint.latitude, _spoint.longitude);
+          degress..add(deg - 90);
+        }
+        if ((_pointIndex + 1) >= latLngPoints.length) {
+          _timerLine.cancel();
+        }
+        // _polyLineAnim = Polyline(
+        //     strokeWidth: (8.0 * _myzoom) / _zoom,
+        //     color: Colors.blueAccent,
+        //     points: points);
+
+        if (degress != null && degress.length > 0) {
+          double _size = (markerSize + 28) * _myzoom / _zoom;
+          var marker = Marker(
+              width: _size,
+              height: _size,
+              point: _spoint,
+              builder: (ctx) {
+                return GestureDetector(
+                  onTap: () {},
+                  child: Container(
+                      width: _size,
+                      height: _size,
+                      child: CircleAvatar(
+                        radius: _size,
+                        backgroundColor: Colors.transparent,
+                        child: Transform.rotate(
+                          angle: (math.pi * (degress[index - 1] - 90)) / 180,
+                          child:
+                              Image.asset(carImage, key: ObjectKey(Colors.red)),
+                        ),
+                      )),
+                );
+              });
+          // if (carAnimMarkers != null && carAnimMarkers.isNotEmpty) {
+          //   carAnimMarkers = [];
+          // }
+          //carAnimMarkers..add(marker);
+          //Place caraniMarker = Place('CarAnimMarker', _spoint);
+          _changeRotation((degress[index - 1]));
+          _changePositionSymbol(
+              mbox.LatLng(_spoint.latitude, _spoint.longitude));
+          _updateCameraPosition(
+              mbox.LatLng(_spoint.latitude, _spoint.longitude));
+          // addMarker(context, caraniMarker,
+          //     marker: CircleAvatar(
+          //       radius: _size,
+          //       backgroundColor: Colors.transparent,
+          //       child: Transform.rotate(
+          //         angle: (math.pi * (degress[index - 1] - 90)) / 180,
+          //         child: Image.asset(carImage, key: ObjectKey(Colors.red)),
+          //       ),
+          //     ),
+          //     isAnim: true);
+        }
+        // animateNoty.updateValue(Message(type: 'LINE_ANIM'));
+      });
+    }
   }
 
   getUserId() async {
@@ -877,6 +1601,15 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
 
   searchCar() async {
     //_formKey2.currentState.save();
+    pelakForSearch = pelak_part1 +
+        '-' +
+        pelak_part2 +
+        '-' +
+        pelak_part3 +
+        '-' +
+        Translations.current.iranTitle() +
+        '-' +
+        pelak_part4;
     if ((carIdForSearch == '' ||
             carIdForSearch.isEmpty ||
             carIdForSearch == null) &&
@@ -919,7 +1652,7 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
     }
   }
 
-  Future<List<CarInfoVM>> getCarInfo(bool refresh) async {
+  Future<List<CarInfoVM>> getCarInfoAfterUpdate(bool refresh) async {
     carsToUserSelf = centerRepository.getCarsToAdmin();
     if (refresh) {
       if (centerRepository.getCarsToAdmin() != null)
@@ -932,10 +1665,34 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
         fillCarInfo(carsToUserSelf);
       }
     }
+
+    var pcars_temp = await restDatasource.getPairedCars();
+    carsPairedList = pcars_temp;
+
+    fillCarsInGroup();
+    return await carInfos;
+  }
+
+  Future<List<CarInfoVM>> getCarInfo(bool refresh) async {
+    carsToUserSelf = centerRepository.getCarsToAdmin();
+    if (refresh) {
+      if (centerRepository.getCarsToAdmin() != null)
+        _carCounts = centerRepository.getCarsToAdmin().length;
+      await fillCarInfo(carsToUserSelf);
+    } else {
+      if (_carCounts == 0) {
+        if (centerRepository.getCarsToAdmin() != null)
+          _carCounts = centerRepository.getCarsToAdmin().length;
+        await fillCarInfo(carsToUserSelf);
+      }
+    }
     // var cars=await restDatasource.getAllPairedCars();
     // carsPairedList=cars;
     var pcars_temp = await restDatasource.getPairedCars();
     carsPairedList = pcars_temp;
+    if (refresh) {
+      pairedChangedNoty.updateValue(Message(type: 'CAR_PAIRED'));
+    }
     // carsPairedList = carsPairedList.where(test);
     /*carsSlavePairedList=new List();
     for(var c in cars) {
@@ -945,8 +1702,11 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
       carsSlavePairedList..addAll(c.slaves);
     }*/
 
-    fillCarsInGroup();
-    return carInfos;
+    await fillCarsInGroup();
+    if (carInfos != null && carInfos.isNotEmpty) {
+      return carInfos;
+    }
+    return null;
   }
 
   fillCarsInGroup() async {
@@ -1595,7 +2355,7 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
       bool forReport,
       bool anim,
       bool fromGo) async {
-    List<LatLng> geoSeries = new List();
+    List<LatLng> geoSeries = List();
 
     String routType = Constants.routingTypeMap[RoutingType.DRIVING];
     int rout =
@@ -1609,7 +2369,8 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
     String sdate = DateTimeUtils.convertIntoDateTimeWithTime(
         DateTimeUtils.getDateJalaliWithAddDays(0), 23, 59);
 
-    ApiRoute route = new ApiRoute(
+    //lastCarIdSelected = 20179;
+    ApiRoute route = ApiRoute(
         carId: lastCarIdSelected,
         startDate: forReport
             ? DateTimeUtils.convertIntoDate(
@@ -1637,6 +2398,7 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
     var queryBody = '{"coordinates":['; //$lng2,$lat2],[$lng1,$lat1]]}';
     if (!fromCurrent) {
       final pointDatas = await restDatasource.getRouteList(route);
+
       if (pointDatas != null && pointDatas.length > 0) {
         if (markers != null && markers.length > 0) {
           markers.clear();
@@ -1685,7 +2447,26 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
                     )),
               );
             });
-        markers..add(marker);
+        Place place = Place('first', firstPoint);
+        _addSymbol('assetImage${firstPoint.latitude - firstPoint.longitude}',
+            mbox.LatLng(firstPoint.latitude, firstPoint.longitude));
+        // addMarker(context, place,
+        //     marker: GestureDetector(
+        //       onTap: () {
+        //         _showInfoPopUp = true;
+        //         showSpeedDialog(0);
+        //       },
+        //       child: Container(
+        //           width: markerSize + 28,
+        //           height: markerSize + 28,
+        //           child: CircleAvatar(
+        //               radius: markerSize + 28,
+        //               backgroundColor: Colors.transparent,
+        //               child: Icon(Icons.location_on, key: ObjectKey(Colors.red))
+        //               //Image.asset(markerStart, key: ObjectKey(Colors.red)),
+        //               )),
+        //     ));
+        //markers..add(marker);
         //////////////////////////////////
         minStopTime = '';
         minStopTime2 = '';
@@ -1702,6 +2483,10 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
         }
         if (minDelay == null) minDelay = 0;
         geoSeries..add(firstPoint);
+
+        int mod = (pointDatas.length / 10).toInt();
+        int size = 1;
+
         for (var i = 1; i < pointDatas.length - 1; i++) {
           int diff = 0;
           firstIndex = i;
@@ -1797,10 +2582,30 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
 
           if (((speed <= minSpeed && showMinSpeedMarkers) ||
               (speed >= maxSpeed && showMaxSpeedMarkers) ||
-              (diff >= minDelay && showStopSpeedMarkers))) markers.add(marker);
+              (diff >= minDelay && showStopSpeedMarkers))) {
+            Place place2 = Place('speed${lat - lng}', LatLng(lat, lng));
+
+            _addSymbol('assetImage${i}', mbox.LatLng(lat, lng), speed: speed);
+            // addMarker(context, place2,
+            //     marker: GestureDetector(
+            //       onTap: () {
+            //         _showInfoPopUp = true;
+            //         showSpeedDialog(speed);
+            //       },
+            //       child: Container(
+            //           width: markerSize,
+            //           height: markerSize,
+            //           child: CircleAvatar(
+            //             radius: markerSize,
+            //             backgroundColor: Colors.transparent,
+            //             child: getMarkerOnSpeed(speed, diff),
+            //           )),
+            //     ));
+
+          }
 
           if (routType == Constants.routingTypeMap[RoutingType.AIR]) {
-            geoSeries..add(new LatLng(lat, lng));
+            geoSeries..add(LatLng(lat, lng));
           }
         }
 
@@ -1842,7 +2647,29 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
                     )),
               );
             });
-        markers..add(marker);
+        Place place2 = Place('speed${fresultLatLng - sresultLatLng}',
+            LatLng(fresultLatLng, sresultLatLng));
+        _addSymbol('assetImage${fresultLatLng - sresultLatLng}',
+            mbox.LatLng(fresultLatLng, sresultLatLng),
+            speed: speed);
+        // addMarker(context, place2,
+        //     marker: GestureDetector(
+        //       onTap: () {
+        //         _showInfoPopUp = true;
+        //         showSpeedDialog(speed);
+        //       },
+        //       child: Container(
+        //           width: markerSize + 28,
+        //           height: markerSize + 28,
+        //           child: CircleAvatar(
+        //               radius: markerSize + 28,
+        //               backgroundColor: Colors.transparent,
+        //               child: Icon(Icons.location_on, key: ObjectKey(Colors.red))
+        //               //Image.asset(markerEnd, key: ObjectKey(Colors.red)),
+        //               )),
+        //     ));
+
+        // markers..add(marker);
         if (points.endsWith(',')) {
           points = points.substring(0, points.length - 1);
         }
@@ -1907,8 +2734,28 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
                     )),
               );
             });
+        Place place2 = Place('speed${lat1 - lng1}', LatLng(lat1, lng1));
+        _addSymbol('assetImage${lat1 - lng1}', mbox.LatLng(lat1, lng1),
+            speed: int.tryParse(currentCarLocationSpeed.toString()));
 
-        markers.add(marker);
+        // addMarker(context, place2,
+        //     marker: GestureDetector(
+        //       onTap: () {
+        //         _showInfoPopUp = true;
+        //         showSpeedDialog(
+        //             int.tryParse(currentCarLocationSpeed.toString()));
+        //       },
+        //       child: Container(
+        //           width: markerSize,
+        //           height: markerSize,
+        //           child: CircleAvatar(
+        //             radius: markerSize,
+        //             backgroundColor: Colors.transparent,
+        //             child: getMarkerOnSpeed(
+        //                 int.tryParse(currentCarLocationSpeed.toString()), 0),
+        //           )),
+        //     ));
+        // markers.add(marker);
 
         marker = Marker(
             width: markerSize,
@@ -1931,8 +2778,26 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
                     )),
               );
             });
+        place2 = Place('speed${lat2 - lng2}', LatLng(lat2, lng2));
+        _addSymbol('assetImage${lat2 - lng2}', mbox.LatLng(lat2, lng2),
+            speed: int.tryParse(speed.toString()));
 
-        markers.add(marker);
+        // addMarker(context, place2,
+        //     marker: GestureDetector(
+        //       onTap: () {
+        //         _showInfoPopUp = true;
+        //         showSpeedDialog(int.tryParse(speed.toString()));
+        //       },
+        //       child: Container(
+        //           width: markerSize,
+        //           height: markerSize,
+        //           child: CircleAvatar(
+        //             radius: markerSize,
+        //             backgroundColor: Colors.transparent,
+        //             child: getMarkerOnSpeed(int.tryParse(speed.toString()), 0),
+        //           )),
+        //     ));
+        // markers.add(marker);
         queryBody = '{"coordinates":[[$lng2,$lat2],[$lng1,$lat1]]}';
         hasPoint = true;
       } else {
@@ -1948,49 +2813,77 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
 
       if (routType == Constants.routingTypeMap[RoutingType.AIR]) {
         final color = Colors.blueAccent.withOpacity(0.7);
+
         lines.add(Polyline(strokeWidth: 8.0, color: color, points: geoSeries));
+        latLngPoints = geoSeries;
       } else {
         if (fromGo) {
           routType = Constants.routingTypeMap[RoutingType.WALKING];
-        } else {
-          /* int rout= await  prefRepository.getRoutingType(CenterRepository.ROUTING_TYPE_TAG);
-            if(rout==1)
-              routType=Constants.routingTypeMap[RoutingType.AIR];
-            if(rout==2)
-              routType=Constants.routingTypeMap[RoutingType.DRIVING];
-            if(rout==3)
-              routType=Constants.routingTypeMap[RoutingType.WALKING];*/
-
-        }
+        } else {}
         final openRoutegeoJSON = await restDatasource
             .fetchOpenRouteServiceURlJSON(body: queryBody, routeType: routType);
         if (openRoutegeoJSON != null) {
           final geojson = GeoJson();
           geojson.processedLines.listen((GeoJsonLine line) {
             final color = Colors.blueAccent.withOpacity(0.7);
+
             lines.add(Polyline(
                 strokeWidth: 8.0,
                 color: color,
                 points: line.geoSerie.toLatLng()));
+
+            latLngPoints = line.geoSerie.toLatLng();
+            _add(
+                latLngPoints
+                    .map<mbox.LatLng>(
+                        (e) => mbox.LatLng(e.latitude, e.longitude))
+                    .toList(),
+                (8.0 * _myzoom) / _zoom);
+            if (kIsWeb) {
+              // animateNoty.updateValue(Message(text: 'ANIM_ROUTE_DONE'));
+              _updateCameraPosition(
+                  mbox.LatLng(firstPoint.latitude, firstPoint.longitude));
+              // mapController.move(firstPoint, _myzoom);
+              if (anim) {
+                animateRoutecarPolyLines();
+              }
+            }
+            //addLines(context, line.geoSerie.geoPoints);
           });
           geojson.endSignal.listen((_) {
             geojson.dispose();
           });
           // unawaited(geojson.parse(data, verbose: true));
-          await geojson.parse(openRoutegeoJSON, verbose: true);
+          if (!kIsWeb)
+            await geojson.parse(openRoutegeoJSON, verbose: true);
+          else
+            geojson.parseWeb(openRoutegeoJSON, verbose: true);
         }
       }
-      if (lines != null && lines.length > 0) {
-        // moreButtonNoty.updateValue(new Message(type:'CLOSE_MORE_BUTTON'));
-        if (!fromGo) {
-          RxBus.post(new ChangeEvent(type: 'CLOSE_MORE_BUTTON'));
+      // if (lines != null && lines.length > 0) {
+      if (!kIsWeb) {
+        if ((latLngPoints != null && latLngPoints.isNotEmpty) ||
+            (markers != null && markers.isNotEmpty)) {
+          // moreButtonNoty.updateValue(new Message(type:'CLOSE_MORE_BUTTON'));
+          animateNoty.updateValue(Message(text: 'ANIM_ROUTE_DONE'));
+          if (!fromGo) {
+            RxBus.post(ChangeEvent(type: 'CLOSE_MORE_BUTTON'));
+          }
+          if (!kIsWeb) {
+            _updateCameraPosition(
+                mbox.LatLng(firstPoint.latitude, firstPoint.longitude));
+            //mapController.move(firstPoint, _myzoom);
+          } else {
+            _updateCameraPosition(
+                mbox.LatLng(firstPoint.latitude, firstPoint.longitude));
+            // mapController.move(firstPoint, _myzoom);
+          }
+          return lines;
         }
-        if (!kIsWeb) {
-          liveMapController.mapController.move(firstPoint, 15);
-        } else {
-          mapController.move(firstPoint, 15);
+      } else {
+        if ((markers != null && markers.isNotEmpty)) {
+          // animateNoty.updateValue(Message(text: 'ANIM_ROUTE_DONE'));
         }
-        return lines;
       }
     } else {
       centerRepository.showFancyToast('اطلاعاتی یافت نشد', false);
@@ -2165,7 +3058,23 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
                     });
 
                 if (speed <= maxSpeed && speed >= minSpeed) {
-                  markers.add(marker);
+                  Place place = Place('alert', LatLng(lat, lng));
+                  addMarker(context, place,
+                      marker: GestureDetector(
+                        onTap: () {
+                          showSpeedDialog(speed);
+                        },
+                        child: Container(
+                          width: markerSize,
+                          height: markerSize,
+                          child: CircleAvatar(
+                            radius: markerSize,
+                            backgroundColor: Colors.transparent,
+                            child: getMarkerOnSpeed(speed, diff),
+                          ),
+                        ),
+                      ));
+                  // markers.add(marker);
                 }
                 if (speed <= 1) {
                   marker = Marker(
@@ -2189,8 +3098,28 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
                                   ))),
                         );
                       });
-                  //if(showSpeedMarkers)
-                  markers.add(marker);
+                  Place place = Place('alert2', LatLng(lat2, lng2));
+                  addMarker(context, place,
+                      marker: GestureDetector(
+                        onTap: () {
+                          showSpeedDialog(speed);
+                        },
+                        child: Container(
+                            width: markerSize,
+                            height: markerSize,
+                            child: CircleAvatar(
+                                radius: markerSize,
+                                backgroundColor: Colors.transparent,
+                                child: Icon(Icons.location_on,
+                                    key: ObjectKey(Colors.green))
+                                // Image.asset(
+                                //   markerPark,
+                                //   key: ObjectKey(Colors.green),
+                                // )
+
+                                )),
+                      ));
+                  //markers.add(marker);
                 }
                 minStopTime = '';
               }
@@ -2224,11 +3153,16 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
       RxBus.post(new ChangeEvent(type: 'CLOSE_MORE_BUTTON'));
 
       if (!kIsWeb) {
-        liveMapController.mapController.move(firstPoint, 15);
+        //mapController.move(firstPoint, 15);
+        _updateCameraPosition(
+            mbox.LatLng(firstPoint.latitude, firstPoint.longitude));
       } else {
-        mapController.move(firstPoint, 15);
+        _updateCameraPosition(
+            mbox.LatLng(firstPoint.latitude, firstPoint.longitude));
+
+        //mapController.move(firstPoint, 15);
       }
-      reportNoty.updateValue(new Message(type: 'HAS_MARKERS'));
+      // reportNoty.updateValue(new Message(type: 'HAS_MARKERS'));
 
       return markers;
     } else {
@@ -2297,8 +3231,10 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
         'altitude': _locationData.altitude,
         'speedAccuracy': _locationData.speedAccuracy
       });
-      mapController.move(
-          LatLng(_locationData.latitude, _locationData.longitude), 16);
+      // mapController.move(
+      //     LatLng(_locationData.latitude, _locationData.longitude), _myzoom);
+      _updateCameraPosition(
+          mbox.LatLng(_locationData.latitude, _locationData.longitude));
     }
   }
 
@@ -2392,6 +3328,184 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
     _locationSubscription.cancel();
   }
 
+  final _markersOnMap = <Place>[];
+  bool ready = false;
+
+  final List<Place> places = [];
+
+  Future<void> loadData() async {
+    // data is from http://geojson.xyz/
+    print("Loading geojson data");
+    final data = await rootBundle.loadString('assets/airports.geojson');
+    unawaited(statefulMapController.fromGeoJson(data,
+        markerIcon: Icon(Icons.local_airport), verbose: true));
+  }
+
+  void addMarker(BuildContext context, Place place,
+      {Widget marker, bool isAnim = false}) {
+    var filter = _markersOnMap
+      ..where((element) => element.name == place.name).toList();
+    int index =
+        _markersOnMap.indexWhere((element) => element.name == place.name);
+    if (filter == null || filter.isEmpty) {
+      print("Adding marker ${place.name}");
+      // statefulMapController.addMarker(
+      //     name: place.name,
+      //     marker: Marker(
+      //         point: place.point,
+      //         builder: (BuildContext context) {
+      //           return marker != null ? marker : const Icon(Icons.location_on);
+      //         }));
+      _markersOnMap.add(place);
+      Marker mark = Marker(
+          point: place.point,
+          width: 32,
+          height: 32,
+          builder: (context) => marker != null
+              ? marker
+              : const Icon(Icons.location_on, color: Colors.blue));
+      markers.add(mark);
+      return;
+    } else {
+      _markersOnMap.removeWhere((element) => element.name == place.name);
+      // statefulMapController.addMarker(
+      //     name: place.name,
+      //     marker: Marker(
+      //         point: place.point,
+      //         builder: (BuildContext context) {
+      //           return marker != null
+      //               ? marker
+      //               : const Icon(Icons.location_on, color: Colors.blue);
+      //         }));
+      _markersOnMap.add(place);
+      Marker mark = Marker(
+          point: place.point,
+          width: 32,
+          height: 32,
+          builder: (context) => marker != null
+              ? marker
+              : const Icon(Icons.location_on, color: Colors.blue));
+      if (index != null && index >= 1) {
+        markers[index] = Marker(
+            point: place.point,
+            width: 32,
+            height: 32,
+            builder: (context) => marker != null
+                ? marker
+                : const Icon(Icons.location_on, color: Colors.blue));
+      } else {
+        markers
+          ..addAll(_markersOnMap.map<Marker>((m) => Marker(
+              point: m.point,
+              width: 32,
+              height: 32,
+              builder: (context) => marker != null
+                  ? marker
+                  : const Icon(Icons.location_on, color: Colors.blue))));
+      }
+
+      return;
+    }
+  }
+
+  void addStatefulMarker(BuildContext context, Place place,
+      {Widget marker, bool isAnim = false}) {
+    var filter = _markersOnMap
+      ..where((element) => element.name == place.name).toList();
+    var oldmarker = statefulMapController.statefulMarkers[place.name];
+    if (oldmarker != null) {}
+    if (isAnim) {
+      //statefulMapController.removeMarkers(names: null)
+    }
+    if (filter == null || filter.isEmpty) {
+      print("Adding marker ${place.name}");
+      statefulMapController.addStatefulMarker(
+          name: place.name,
+          statefulMarker: StatefulMarker(
+              //anchorAlign: AnchorAlign.bottom,
+              height: 80.0,
+              width: 150.0,
+              state: <String, dynamic>{"showText": false},
+              point: place.point,
+              builder: (BuildContext context, Map<String, dynamic> state) {
+                Widget w;
+                final markerIcon = marker != null
+                    ? marker
+                    : IconButton(
+                        icon: const Icon(Icons.location_on),
+                        onPressed: () => statefulMapController.mutateMarker(
+                            name: place.name,
+                            property: "showText",
+                            value: !(state["showText"] as bool)));
+                if (state["showText"] == true) {
+                  w = Column(children: <Widget>[
+                    markerIcon,
+                    Container(
+                        color: Colors.white,
+                        child: Padding(
+                            padding: const EdgeInsets.all(5.0),
+                            child: Text(place.name, textScaleFactor: 1.3))),
+                  ]);
+                } else {
+                  w = markerIcon;
+                }
+                return w;
+              }));
+
+      _markersOnMap.add(place);
+      return;
+    } else {
+      _markersOnMap.removeWhere((element) => element.name == place.name);
+
+      // statefulMapController.addStatefulMarker(
+      //     name: place.name,
+      //     statefulMarker: StatefulMarker(
+      //         //anchorAlign: AnchorAlign.bottom,
+      //         height: 80.0,
+      //         width: 150.0,
+      //         state: <String, dynamic>{"showText": false},
+      //         point: place.point,
+      //         builder: (BuildContext context, Map<String, dynamic> state) {
+      //           Widget w;
+      //           final markerIcon = marker != null
+      //               ? marker
+      //               : IconButton(
+      //                   icon: const Icon(Icons.location_on),
+      //                   onPressed: () => statefulMapController.mutateMarker(
+      //                       name: place.name,
+      //                       property: "showText",
+      //                       value: !(state["showText"] as bool)));
+      //           if (state["showText"] == true) {
+      //             w = Column(children: <Widget>[
+      //               markerIcon,
+      //               Container(
+      //                   color: Colors.white,
+      //                   child: Padding(
+      //                       padding: const EdgeInsets.all(5.0),
+      //                       child: Text(place.name, textScaleFactor: 1.3))),
+      //             ]);
+      //           } else {
+      //             w = markerIcon;
+      //           }
+      //           return w;
+      //         }));
+      _markersOnMap.add(place);
+      return;
+    }
+  }
+
+  void addLines(BuildContext context, List<GeoPoint> points) {
+    if (points != null && points.isNotEmpty) {
+      statefulMapController.addLineFromGeoPoints(
+          geoPoints: points,
+          width: (8.0 * _myzoom) / _zoom,
+          name: 'POINTS',
+          color: Colors.redAccent);
+    }
+
+    return;
+  }
+
   @override
   void initState() {
     registerRxBus();
@@ -2435,25 +3549,7 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
     if (!kIsWeb) {
       getPeriodicTimePosition();
     }
-    currentMarker = Marker(
-        width: markerSize + 28,
-        height: markerSize + 28,
-        point: LatLng(35.696811, 51.3748819),
-        builder: (ctx) {
-          return GestureDetector(
-            onTap: () {},
-            child: Container(
-              width: markerSize + 28,
-              height: markerSize + 28,
-              child: CircleAvatar(
-                radius: markerSize + 28,
-                backgroundColor: Colors.transparent,
-                child: Image.asset('assets/images/location.png',
-                    color: Colors.indigoAccent, key: ObjectKey(Colors.red)),
-              ),
-            ),
-          );
-        });
+
     mapController = new MapController();
     reportNoty = new NotyBloc<Message>();
     reportDateNoty = new NotyBloc<Message>();
@@ -2468,25 +3564,46 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
     pcarsPairedActivated = List();
     carInfoss = getCarInfo(false);
 
-    if (!kIsWeb) {
-      liveMapController = LiveMapController(
-        autoCenter: true,
-        mapController: mapController,
-        verbose: true,
-        autoRotate: true,
-        positionStreamEnabled: true,
-        updateTimeInterval: 1,
-        updateDistanceFilter: 1,
-      );
-      liveMapController.onReady.then((_) {
-        _myzoom = liveMapController.zoom;
-        _changefeed = liveMapController.changeFeed.listen((change) {
-          if (change.name == "zoom") {
-            print("New zoom value: ${change.value}");
-          }
-        });
-      });
-    } else {}
+    //if (!kIsWeb) {
+
+    // statefulMapController = StatefulMapController(
+    //   mapController: mapController,
+    // );
+    // wait for the controller to be ready before using it
+    // statefulMapController.onReady
+    //     .then((_) => print("The map controller is ready"));
+
+    /// [Important] listen to the changefeed to rebuild the map on changes:
+    /// this will rebuild the map when for example addMarker or any method
+    /// that mutates the map assets is called
+    // sub = statefulMapController.changeFeed.listen((change) {
+    //   if (change.name == "zoom") {
+    //     _myzoom = change.value;
+    //     print("New zoom value: ${change.value}");
+    //   }
+    // });
+
+    // liveMapController = LiveMapController(
+    //   autoCenter: true,
+    //   mapController: mapController,
+    //   verbose: true,
+    //   autoRotate: true,
+    //   positionStreamEnabled: true,
+    //   updateTimeInterval: 1,
+    //   updateDistanceFilter: 1,
+    // );
+
+    // liveMapController.flux.zoom = _myzoom;
+    // liveMapController.onReady.then((_) {
+    //   _myzoom = liveMapController.zoom;
+    //   _changefeed = liveMapController.changeFeed.listen((change) {
+    //     if (change.name == "zoom") {
+    //       _myzoom = change.value;
+    //       print("New zoom value: ${change.value}");
+    //     }
+    //   });
+    // });
+    //} else {}
     _listenLocation();
 
     //gpsStatus = checkGPSStatus();
@@ -2495,23 +3612,23 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
     markerlocationStream.stream.asBroadcastStream().listen((onData) {
       print(onData.latitude);
     });
-    userLocationOptions = UserLocationOptions(
-        context: context,
-        mapController:
-            !kIsWeb ? liveMapController.mapController : mapController,
-        markers: markers,
-        onLocationUpdate: (LatLng pos) {
-          print("onLocationUpdate ${pos.toString()}");
-          // mapController.move(pos, 17.0);
-          // liveMapController.mapController.move(pos, 14);
-        },
-        updateMapLocationOnPositionChange: true,
-        showMoveToCurrentLocationFloatingActionButton: true,
-        zoomToCurrentLocationOnLoad: true,
-        //showHeading: true,
-        fabBottom: 90,
-        fabRight: 20,
-        verbose: true);
+    // userLocationOptions = UserLocationOptions(
+    //     context: context,
+    //     mapController: mapController,
+    //     // !kIsWeb ? liveMapController.mapController : mapController,
+    //     markers: markers,
+    //     onLocationUpdate: (LatLng pos) {
+    //       print("onLocationUpdate ${pos.toString()}");
+    //       // mapController.move(pos, 17.0);
+    //       // liveMapController.mapController.move(pos, 14);
+    //     },
+    //     updateMapLocationOnPositionChange: true,
+    //     showMoveToCurrentLocationFloatingActionButton: true,
+    //     zoomToCurrentLocationOnLoad: true,
+    //     //showHeading: true,
+    //     fabBottom: 90,
+    //     fabRight: 20,
+    //     verbose: true);
 
     super.initState();
 
@@ -2521,7 +3638,7 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
           CenterRepository.isFromMapForGPSCheckForFirstTime = true;
           showGPSAlertDialog(context);
         } else {
-          animateToCurrentLocation();
+          // animateToCurrentLocation();
           CenterRepository.GPS_STATUS = true;
           CenterRepository.GPS_STATUS_CONFIRMED = true;
           if (widget.mapVM != null &&
@@ -2966,7 +4083,8 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
     }
   }
 
-  updateMarkerPosition(int carId, Marker newMarker, LatLng latLng) {
+  updateMarkerPosition(int carId, Marker newMarker, LatLng latLng,
+      {Widget marker}) {
     if (carMarkersMap.containsKey(lastCarIdSelected)) {
       Marker mark = carMarkersMap[carId];
       if (markers != null && markers.length > 0) {
@@ -2975,7 +4093,10 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
           if (latLng != mark.point) markers[markerIndex] = newMarker;
         }
       } else {
-        markers.add(newMarker);
+        Place place = Place('update',
+            LatLng(newMarker.point.latitude, newMarker.point.longitude));
+        addMarker(context, place, marker: marker);
+        // markers.add(newMarker);
       }
 
       carMarkersMap.update(lastCarIdSelected, (value) => newMarker);
@@ -2983,7 +4104,10 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
         statusNoty.updateValue(Message(
             type: 'GPS_GPRS_UPDATE', index: carId, id: carId, status: false));
     } else {
-      markers.add(newMarker);
+      Place place = Place('update',
+          LatLng(newMarker.point.latitude, newMarker.point.longitude));
+      addMarker(context, place, marker: marker);
+      // markers.add(newMarker);
       carMarkersMap.putIfAbsent(lastCarIdSelected, () => newMarker);
       statusNoty.updateValue(Message(
           type: 'GPS_GPRS_UPDATE', index: carId, id: carId, status: false));
@@ -2994,12 +4118,13 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
       carInMarkerMap.putIfAbsent(lastCarIdSelected, () => latLng);
     }
 
-    if (!kIsWeb) {
-      if (liveMapController != null && liveMapController.mapController != null)
-        liveMapController.mapController.move(latLng, 14);
-    } else {
-      mapController.move(latLng, 14);
-    }
+    // if (!kIsWeb) {
+    //   if (liveMapController != null && liveMapController.mapController != null)
+    //     liveMapController.mapController.move(latLng, 14);
+    // } else {
+    //   mapController.move(latLng, 14);
+    // }
+    mapController.move(latLng, 14);
   }
 
   Future<bool> getParkAndSpeedStatus(NotyBloc<CarStateVM> notyBloc) async {
@@ -3229,6 +4354,36 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
       );
 
       // markers.add(marker);
+      Place carmarker = Place(
+        'CarMarker',
+        latLng,
+      );
+
+      await _addSymbol(
+          'assetCarImage', mbox.LatLng(latLng.latitude, latLng.longitude),
+          speed: currentCarLocationSpeed, isAnim: false);
+      // addMarker(
+      //   context,
+      //   carmarker,
+      //   marker: Container(
+      //     child: GestureDetector(
+      //       onTap: () {
+      //         _showInfoDialog(lastCarIdSelected);
+      //         _showInfoPopUp = true;
+      //       },
+      //       child: Container(
+      //           width: 38.0,
+      //           height: 38.0,
+      //           child: CircleAvatar(
+      //               radius: 38.0,
+      //               backgroundColor: Colors.transparent,
+      //               child: Image.asset(
+      //                 imgUrl,
+      //                 key: ObjectKey(Colors.green),
+      //               ))),
+      //     ),
+      //   ),
+      // );
       if (carIndexMarkerMap == null) carIndexMarkerMap = new Map();
       if (carInMarkerMap == null) carInMarkerMap = new Map();
       if (carMarkersMap == null) {
@@ -3237,7 +4392,23 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
 
       if (route) {
         if (latLng != null)
-          updateMarkerPosition(lastCarIdSelected, marker, latLng);
+          _changePositionSymbol(mbox.LatLng(latLng.latitude, latLng.longitude));
+        // updateMarkerPosition(lastCarIdSelected, marker, latLng,
+        //     marker: Container(
+        //         width: 38.0,
+        //         height: 38.0,
+        //         child: GestureDetector(
+        //             onTap: () {
+        //               _showInfoDialog(lastCarIdSelected);
+        //               _showInfoPopUp = true;
+        //             },
+        //             child: CircleAvatar(
+        //                 radius: 38.0,
+        //                 backgroundColor: Colors.transparent,
+        //                 child: Image.asset(
+        //                   imgUrl,
+        //                   key: ObjectKey(Colors.green),
+        //                 )))));
       } else {
         if (latLng != null) {
           carMarkersMap.putIfAbsent(lastCarIdSelected, () => marker);
@@ -3248,10 +4419,26 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
       // if(!route) {
 
       if (isCarPaired) {
-        updateMarkerPosition(lastCarIdSelected, marker, latLng);
+        _changePositionSymbol(mbox.LatLng(latLng.latitude, latLng.longitude));
+        // updateMarkerPosition(lastCarIdSelected, marker, latLng,
+        //     marker: Container(
+        //         width: 38.0,
+        //         height: 38.0,
+        //         child: GestureDetector(
+        //             onTap: () {
+        //               _showInfoDialog(lastCarIdSelected);
+        //               _showInfoPopUp = true;
+        //             },
+        //             child: CircleAvatar(
+        //                 radius: 38.0,
+        //                 backgroundColor: Colors.transparent,
+        //                 child: Image.asset(
+        //                   imgUrl,
+        //                   key: ObjectKey(Colors.green),
+        //                 )))));
         //liveMapController.mapController.move(latLng, 14);
       }
-      if (_timerupdate == null || !_timerupdate.isActive)
+      if (_timerupdate == null || !_timerupdate.isActive) if (!kIsWeb)
         _updateLastPositionCarPeriodically(
             index, lastCarIdSelected, isCarPaired);
       // }
@@ -3270,9 +4457,9 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
     if (result != null) {
       centerRepository.showFancyToast(result.Message, true);
       if (result.IsSuccessful) {
+        carInfoss = getCarInfo(true);
+
         centerRepository.showFancyToast(result.Message, true);
-        pairedChangedNoty
-            .updateValue(new Message(type: 'CAR_PAIRED', id: car.SecondCarId));
       } else {
         centerRepository.showFancyToast(result.Message, false);
       }
@@ -3368,19 +4555,20 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
   _showBottomSheetDates(BuildContext cntext) {
     showModalBottomSheetCustom(
         context: cntext,
-        mHeight: 0.98,
+        mHeight: 0.90,
         builder: (BuildContext context) {
           return Column(
             mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
-              Text(
-                Translations.current.fromDate(),
-                style: TextStyle(color: Colors.pinkAccent, fontSize: 12.0),
-                textAlign: TextAlign.center,
-              ),
+              // Text(
+              //   Translations.current.fromDate(),
+              //   style: TextStyle(color: Colors.pinkAccent, fontSize: 12.0),
+              //   textAlign: TextAlign.center,
+              // ),
               Container(
-                height: MediaQuery.of(context).size.height * 0.75,
+                width: MediaQuery.of(context).size.width * 0.75,
+                height: MediaQuery.of(context).size.width * 0.75,
                 child: initDatePicker(textEditingController, 'From'),
               ),
               /*Text(Translations.current.toDate(),
@@ -4006,6 +5194,7 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
                                           bottom: 5.0),
                                       child: FlatButton(
                                         onPressed: () {
+                                          // lastCarIdSelected = 20179;
                                           if (lastCarIdSelected == null ||
                                               lastCarIdSelected == 0) {
                                             centerRepository.showFancyToast(
@@ -4017,10 +5206,16 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
                                             // processLineDataForReportMinTime(fromDate,toDate,minDelay.toString());
                                             processLineData(
                                                     false,
-                                                    currentCarLatLng.latitude
-                                                        .toString(),
-                                                    currentCarLatLng.longitude
-                                                        .toString(),
+                                                    currentCarLatLng != null
+                                                        ? currentCarLatLng
+                                                            .latitude
+                                                            .toString()
+                                                        : '0',
+                                                    currentCarLatLng != null
+                                                        ? currentCarLatLng
+                                                            .longitude
+                                                            .toString()
+                                                        : '0',
                                                     fromDate,
                                                     toDate,
                                                     true,
@@ -4285,7 +5480,7 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
     } else {
       processLineData(false, '', '', '', '', false, false, false).then((data) {
         if (data != null && data.length > 0) {
-          reportNoty.updateValue(new Message(type: 'CAR_ROUTE_REPORT'));
+          reportNoty.updateValue(Message(type: 'CAR_ROUTE_REPORT'));
         }
       });
     }
@@ -4380,25 +5575,28 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
                                     // height: 45,
                                     padding: EdgeInsets.symmetric(
                                         vertical: 2.0, horizontal: 2.0),
-                                    child: FormBuilderTextField(
-                                      initialValue: '',
-                                      attribute: "Pelak",
-                                      inputFormatters: [
-                                        BlacklistingTextInputFormatter(RegExp(
-                                            "[,@#%^&*()+=!.`~\"';:?؟و/\\\\]"))
-                                      ],
-                                      decoration: InputDecoration(
-                                        errorStyle:
-                                            TextStyle(color: Colors.pinkAccent),
-                                        labelText:
-                                            Translations.current.carpelak(),
-                                      ),
-                                      onChanged: (value) =>
-                                          _onPelakChanged(value),
-                                      valueTransformer: (text) => text,
-                                      validators: [],
-                                      // keyboardType: TextInputType.text,
-                                    ),
+                                    child: _buildPelakField(
+                                        MediaQuery.of(context).size.width *
+                                            0.60),
+                                    //  FormBuilderTextField(
+                                    //   initialValue: '',
+                                    //   attribute: "Pelak",
+                                    //   inputFormatters: [
+                                    //     BlacklistingTextInputFormatter(RegExp(
+                                    //         "[,@#%^&*()+=!.`~\"';:?؟و/\\\\]"))
+                                    //   ],
+                                    //   decoration: InputDecoration(
+                                    //     errorStyle:
+                                    //         TextStyle(color: Colors.pinkAccent),
+                                    //     labelText:
+                                    //         Translations.current.carpelak(),
+                                    //   ),
+                                    //   onChanged: (value) =>
+                                    //       _onPelakChanged(value),
+                                    //   valueTransformer: (text) => text,
+                                    //   validators: [],
+                                    //   // keyboardType: TextInputType.text,
+                                    // ),
                                   ),
                                   new GestureDetector(
                                     onTap: () {
@@ -4444,7 +5642,7 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
     _timerupdate?.cancel();
     showAllItemsdNoty?.dispose();
     showAllItemsdNoty2?.dispose();
-    liveMapController?.dispose();
+    //liveMapController?.dispose();
     changedCheckBoxNoty.dispose();
     mapController = null;
     _timerLine?.cancel();
@@ -4528,7 +5726,7 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
       );
     });
     if (location.result.isSuccessful) if (!kIsWeb) {
-      liveMapController.mapController.move(
+      mapController.move(
           LatLng(location.result.locations[0].latitude,
               location.result.locations[0].latitude),
           15);
@@ -4540,10 +5738,193 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
     }
   }
 
+  _updateCarPairsList() async {
+    if (carsPairedList != null && carsPairedList.length > 0) {
+      pcarsPairedActivated =
+          carsPairedList.where((p) => p.IsActive == true).toList();
+      if (pcarsPairedActivated != null && pcarsPairedActivated.length > 0) {
+        pcarsPairedActivated.forEach((pc) {
+          var crs = centerRepository
+              .getCars()
+              .where((c) => c.carId == pc.SecondCar.carId)
+              .toList();
+          if (crs != null && crs.length > 0) {
+            pc.SecondCar.pelaueNumber = crs.first.pelaueNumber;
+          }
+        });
+      }
+      carPairedItemsList = <ParallaxCardItem>[
+        for (var carp in pcarsPairedActivated)
+          ParallaxCardItem(
+            backColor: Colors.blueAccent,
+            title: DartHelper.isNullOrEmptyString(carp.SecondCar.pelaueNumber),
+            body:
+                DartHelper.isNullOrEmptyString(carp.SecondCar.carId.toString()),
+            background: Container(
+              width: 160.0,
+              color: Colors.blueAccent,
+              child: Container(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Text(Translations.current.masterCarId(),
+                            style: TextStyle(fontSize: 10.0)),
+                        Text(
+                            DartHelper.isNullOrEmptyString(
+                                carp.MasterCar.carId.toString()),
+                            style: TextStyle(fontSize: 10.0)),
+                      ],
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: <Widget>[
+                        Text(
+                            DartHelper.isNullOrEmptyString(
+                                carp.SecondCar.carModelTitle),
+                            style: TextStyle(fontSize: 10.0)),
+                        Container(
+                          width: 50.0,
+                          // color:  Colors.lightBlue ,
+                          child: CircleAvatar(
+                            backgroundColor: Colors.transparent,
+                            radius: 30.0,
+                            child: Image.asset(
+                                CenterRepository.getCarImageURlByColorConstId(
+                                    carp.SecondCar.colorTypeConstId)),
+                          ),
+                        )
+                      ],
+                    ),
+                    Row(
+                      children: <Widget>[
+                        Text(
+                            DartHelper.isNullOrEmptyString(
+                                carp.SecondCar.carModelDetailTitle),
+                            style: TextStyle(fontSize: 10.0)),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+      ];
+    }
+  }
+
+  clearMap() async {
+    if (_timerLine != null && _timerLine.isActive) {
+      //_timerLine=null;
+      _timerLine.cancel();
+    }
+    if (_timerupdate != null && _timerupdate.isActive) {
+      _timerupdate.cancel();
+    }
+    if (_polyLineAnim != null && _polyLineAnim.points != null) {
+      forAnim = false;
+      _polyLineAnim.points.clear();
+      _polyLineAnim = null;
+    }
+
+    if (lines != null && lines.length > 0) {
+      lines.clear();
+    }
+    if (latLngPoints != null && latLngPoints.isNotEmpty) {
+      latLngPoints.clear();
+    }
+    if (controller.lines != null && controller.lines.isNotEmpty) {
+      controller.clearLines();
+    }
+    if (controller.symbols != null && controller.symbols.isNotEmpty) {
+      controller.clearSymbols();
+    }
+    if (statefulMapController != null &&
+        statefulMapController.markers != null &&
+        statefulMapController.markers.isNotEmpty)
+      statefulMapController.removeMarkers();
+
+    if (statefulMapController != null &&
+        statefulMapController.lines != null &&
+        statefulMapController.lines.isNotEmpty)
+      statefulMapController.removeLine('POINTS');
+
+    if (carInMarkerMap != null && carInMarkerMap.length > 0)
+      carInMarkerMap.clear();
+    if (carMarkersMap != null && carMarkersMap.length > 0)
+      carMarkersMap.clear();
+    if (carIndexMarkerMap != null && carIndexMarkerMap.length > 0)
+      carIndexMarkerMap.clear();
+    if (markers != null && markers.length > 0) {
+      markers.clear();
+    }
+    if (carAnimMarkers != null && carAnimMarkers.length > 0) {
+      carAnimMarkers.clear();
+    }
+    if (lines2 != null) {
+      lines2 = null;
+    }
+  }
+
+  String gmap_url =
+      'https://maps.googleapis.com/maps/api/js?key=AIzaSyDYkYRHC3WArW9vjchXNs5HlRxW4Dfm618&libraries=places&q=Infinite+Loop,+Cupertino,+CA+95014';
+  //'https://www.google.com/maps/embed/v3/place?key=AIzaSyDYkYRHC3WArW9vjchXNs5HlRxW4Dfm618&q="Infinite Loop, Cupertino, CA 95014".replaceAll(' ', '+')';
+  //'https://www.google.com/maps/embed/dir/?api=1&key=AIzaSyBDw-ldSdso1RT0jqUWSMoJtt2ZWxUm65o&destination=760+West+Genesee+Street+Syracuse+NY+13204';
   @override
   Widget build(BuildContext context) {
     popmenu.PopupMenu.context = context;
+    final mbox.MapboxMap mapboxMap = mbox.MapboxMap(
+      accessToken: ACCESS_TOKEN,
+      onMapCreated: _onMapCreated,
+      initialCameraPosition: _kInitialPosition,
+      trackCameraPosition: true,
+      compassEnabled: _compassEnabled,
+      onStyleLoadedCallback: onStyleLoadedCallback,
+      cameraTargetBounds: _cameraTargetBounds,
+      minMaxZoomPreference: _minMaxZoomPreference,
+      styleString: _styleStrings[_styleStringIndex],
+      rotateGesturesEnabled: _rotateGesturesEnabled,
+      scrollGesturesEnabled: _scrollGesturesEnabled,
+      tiltGesturesEnabled: _tiltGesturesEnabled,
+      zoomGesturesEnabled: _zoomGesturesEnabled,
+      myLocationEnabled: _myLocationEnabled,
+      myLocationTrackingMode: _myLocationTrackingMode,
+      myLocationRenderMode: mbox.MyLocationRenderMode.GPS,
+      onMapClick: (point, latLng) async {
+        print(
+            "Map click: ${point.x},${point.y}   ${latLng.latitude}/${latLng.longitude}");
+        print("Filter $_featureQueryFilter");
+      },
+      onMapLongClick: (point, latLng) async {
+        print(
+            "Map long press: ${point.x},${point.y}   ${latLng.latitude}/${latLng.longitude}");
+        Point convertedPoint = await controller.toScreenLocation(latLng);
+        mbox.LatLng convertedLatLng = await controller.toLatLng(point);
+        print(
+            "Map long press converted: ${convertedPoint.x},${convertedPoint.y}   ${convertedLatLng.latitude}/${convertedLatLng.longitude}");
+        double metersPerPixel =
+            await controller.getMetersPerPixelAtLatitude(latLng.latitude);
 
+        print(
+            "Map long press The distance measured in meters at latitude ${latLng.latitude} is $metersPerPixel m");
+
+        List features = await controller.queryRenderedFeatures(point, [], null);
+        if (features.length > 0) {
+          print(features[0]);
+        }
+      },
+      onCameraTrackingDismissed: () {
+        this.setState(() {
+          _myLocationTrackingMode = mbox.MyLocationTrackingMode.None;
+        });
+      },
+      onUserLocationUpdated: (location) {
+        print(
+            "new location: ${location.position}, alt.: ${location.altitude}, bearing: ${location.bearing}, speed: ${location.speed}, horiz. accuracy: ${location.horizontalAccuracy}, vert. accuracy: ${location.verticalAccuracy}");
+      },
+    );
     return FutureBuilder<List<CarInfoVM>>(
       future: carInfoss,
       builder: (context, snapshot) {
@@ -4585,7 +5966,7 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
                 )),
         ];
 
-        final carPairedItemsList = <ParallaxCardItem>[
+        carPairedItemsList = <ParallaxCardItem>[
           for (var carp in pcarsPairedActivated)
             ParallaxCardItem(
               backColor: Colors.blueAccent,
@@ -4645,18 +6026,18 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
               ),
             ),
         ];
-        if (carInfos != null && carInfos.length > 0)
+        if (carInfos != null && carInfos.length > 0) {
           navigateToCarSelected(
               0, false, carInfos[0].carId, true, false, false);
+        }
         return StreamBuilder<Message>(
-          //initialData: new Message(t),
           stream: pairedChangedNoty.noty,
           builder: (context, snapshot) {
             if (snapshot.hasData && snapshot.data != null) {
-              if (snapshot.data.type == 'CAR_PAIRED')
-                carInfoss = getCarInfo(true);
+              if (snapshot.data.type == 'CAR_PAIRED') {
+                _updateCarPairsList();
+              }
             }
-
             return Scaffold(
               body: Stack(
                 overflow: Overflow.visible,
@@ -4677,47 +6058,7 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
                                   animateRoutecarPolyLines();
                                   // }
                                 }
-                                if (msg.type == 'CLEAR_MAP') {
-                                  if (_timerLine != null &&
-                                      _timerLine.isActive) {
-                                    //_timerLine=null;
-                                    _timerLine.cancel();
-                                  }
-                                  if (_timerupdate != null &&
-                                      _timerupdate.isActive) {
-                                    _timerupdate.cancel();
-                                  }
-                                  if (_polyLineAnim != null) {
-                                    forAnim = false;
-                                    _polyLineAnim.points.clear();
-                                    _polyLineAnim = null;
-                                  }
-
-                                  if (lines != null && lines.length > 0) {
-                                    lines.clear();
-                                  }
-                                  if (carInMarkerMap != null &&
-                                      carInMarkerMap.length > 0)
-                                    carInMarkerMap.clear();
-                                  if (carMarkersMap != null &&
-                                      carMarkersMap.length > 0)
-                                    carMarkersMap.clear();
-                                  if (carIndexMarkerMap != null &&
-                                      carIndexMarkerMap.length > 0)
-                                    carIndexMarkerMap.clear();
-                                  if (markers != null && markers.length > 0) {
-                                    markers.clear();
-                                  }
-                                  if (carAnimMarkers != null &&
-                                      carAnimMarkers.length > 0) {
-                                    carAnimMarkers.clear();
-                                  }
-                                  if (lines2 != null) {
-                                    lines2 = null;
-                                  }
-                                }
                               }
-
                               return StreamBuilder<Message>(
                                 stream: statusNoty.noty,
                                 builder: (context, snapshot) {
@@ -4752,137 +6093,253 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
                                                                 null) {
                                                           if (_fpoint !=
                                                               null) if (!kIsWeb) {
-                                                            liveMapController
-                                                                .mapController
-                                                                .move(_fpoint,
-                                                                    15);
+                                                            mapController.move(
+                                                                _fpoint,
+                                                                _myzoom);
                                                           } else {
                                                             mapController.move(
-                                                                _fpoint, 15);
+                                                                _fpoint,
+                                                                _myzoom);
                                                           }
                                                         }
-                                                        return FlutterMap(
-                                                          mapController: !kIsWeb
-                                                              ? liveMapController
-                                                                  .mapController
-                                                              : mapController,
-                                                          options: MapOptions(
-                                                            center: firstPoint !=
-                                                                    null
-                                                                ? firstPoint
-                                                                : currentLocation !=
-                                                                        null
-                                                                    ? LatLng(
-                                                                        currentLocation
-                                                                            .latitude,
-                                                                        currentLocation
-                                                                            .longitude)
-                                                                    : LatLng(
-                                                                        35.6917856,
-                                                                        51.4204603),
-                                                            zoom: 15.0,
-                                                            /*plugins: [
+                                                        return kIsWeb
+                                                            ? Padding(
+                                                                padding: EdgeInsets
+                                                                    .only(
+                                                                        top:
+                                                                            150.0),
+                                                                child: Container(
+                                                                    width: MediaQuery.of(
+                                                                            context)
+                                                                        .size
+                                                                        .width,
+                                                                    height: MediaQuery.of(context)
+                                                                            .size
+                                                                            .height *
+                                                                        0.80,
+                                                                    child:
+                                                                        mapboxMap))
+                                                            : FlutterMap(
+                                                                mapController: !kIsWeb
+                                                                    ? mapController
+                                                                    : mapController,
+
+                                                                options:
+                                                                    MapOptions(
+                                                                  center: firstPoint !=
+                                                                          null
+                                                                      ? firstPoint
+                                                                      : currentLocation !=
+                                                                              null
+                                                                          ? LatLng(
+                                                                              currentLocation.latitude,
+                                                                              currentLocation.longitude)
+                                                                          : LatLng(
+                                                                              45.13065,
+                                                                              5.58213,
+                                                                            ),
+                                                                  zoom: _myzoom,
+                                                                  /*plugins: [
                                                                       UserLocationPlugin()
                                                                     ],*/
-                                                          ),
-                                                          layers: [
-                                                            showSattelite
-                                                                ? TileLayerOptions(
-                                                                    //urlTemplate: 'https://{s}.tiles.mapbox.com/v3/pk.eyJ1IjoicmV6YW5kIiwiYSI6ImNrNWNkdnB2dDAwdGwzZnMwc2lhcTlxd3QifQ.61hONdUooWn7aBJs-Km8OA/{z}/{x}/{y}.png',
-                                                                    // urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-                                                                    //urlTemplate:'https://api.mapbox.com/styles/v1/rezand/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoicmV6YW5kIiwiYSI6ImNrNWNkdHg3djAwdDAzZnMwcTc1N2ZpY2YifQ.fl5LG72G5Uz6CLVfhbazNw',
+                                                                ),
+                                                                layers: [
+                                                                  // statefulMapController
+                                                                  //     .tileLayer,
 
-                                                                    urlTemplate:
-                                                                        'https://api.mapbox.com/styles/v1/rezand/ck7d3ul4c0k3w1ir0n2a419pd/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoicmV6YW5kIiwiYSI6ImNrNWNkdHg3djAwdDAzZnMwcTc1N2ZpY2YifQ.fl5LG72G5Uz6CLVfhbazNw',
-                                                                    additionalOptions: {
-                                                                      'accessToken':
-                                                                          'pk.eyJ1IjoicmV6YW5kIiwiYSI6ImNrNWNkdHg3djAwdDAzZnMwcTc1N2ZpY2YifQ.fl5LG72G5Uz6CLVfhbazNw',
-                                                                      //'id': 'mapbox.mapbox-streets-v7'
-                                                                    },
-                                                                    subdomains: [
-                                                                      'a',
-                                                                      'b',
-                                                                      'c',
-                                                                      'd'
-                                                                    ],
-                                                                  )
-                                                                : TileLayerOptions(
-                                                                    //urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-                                                                    urlTemplate:
-                                                                        'https://api.mapbox.com/styles/v1/rezand/ck7ge41221jke1inrbezkflve/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoicmV6YW5kIiwiYSI6ImNrNWNkdHg3djAwdDAzZnMwcTc1N2ZpY2YifQ.fl5LG72G5Uz6CLVfhbazNw',
-                                                                    additionalOptions: {
-                                                                      'accessToken':
-                                                                          'pk.eyJ1IjoicmV6YW5kIiwiYSI6ImNrNWNkdHg3djAwdDAzZnMwcTc1N2ZpY2YifQ.fl5LG72G5Uz6CLVfhbazNw',
-                                                                      'id':
-                                                                          'mapbox.mapbox-streets-v7'
-                                                                    },
-                                                                    subdomains: [
-                                                                      'a',
-                                                                      'b',
-                                                                      'c'
-                                                                    ],
-                                                                    //additionalOptions: {'key':'2UnTxClTTOQ2d3xsUL5T'},
+                                                                  showSattelite
+                                                                      ? TileLayerOptions(
+                                                                          tileProvider:
+                                                                              NonCachingNetworkTileProvider(),
+                                                                          urlTemplate:
+                                                                              'https://api.mapbox.com/styles/v1/rezand/ck7d3ul4c0k3w1ir0n2a419pd/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoicmV6YW5kIiwiYSI6ImNrNWNkdHg3djAwdDAzZnMwcTc1N2ZpY2YifQ.fl5LG72G5Uz6CLVfhbazNw',
+                                                                          additionalOptions: {
+                                                                            'accessToken':
+                                                                                'pk.eyJ1IjoicmV6YW5kIiwiYSI6ImNrNWNkdHg3djAwdDAzZnMwcTc1N2ZpY2YifQ.fl5LG72G5Uz6CLVfhbazNw',
+                                                                            //'id': 'mapbox.mapbox-streets-v7'
+                                                                          },
+                                                                          subdomains: [
+                                                                            'a',
+                                                                            'b',
+                                                                            'c',
+                                                                            'd'
+                                                                          ],
+                                                                        )
+                                                                      : TileLayerOptions(
+                                                                          tileProvider:
+                                                                              NonCachingNetworkTileProvider(),
+                                                                          //urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                                                                          urlTemplate:
+                                                                              'https://api.mapbox.com/styles/v1/rezand/ck7ge41221jke1inrbezkflve/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoicmV6YW5kIiwiYSI6ImNrNWNkdHg3djAwdDAzZnMwcTc1N2ZpY2YifQ.fl5LG72G5Uz6CLVfhbazNw',
+                                                                          additionalOptions: {
+                                                                            'accessToken':
+                                                                                'pk.eyJ1IjoicmV6YW5kIiwiYSI6ImNrNWNkdHg3djAwdDAzZnMwcTc1N2ZpY2YifQ.fl5LG72G5Uz6CLVfhbazNw',
+                                                                            'id':
+                                                                                'mapbox.mapbox-streets-v7'
+                                                                          },
+                                                                          subdomains: [
+                                                                            'a',
+                                                                            'b',
+                                                                            'c'
+                                                                          ],
+                                                                          //additionalOptions: {'key':'2UnTxClTTOQ2d3xsUL5T'},
+                                                                        ),
+
+                                                                  // (forAnim &&
+                                                                  //         _polyLineAnim !=
+                                                                  //             null)
+                                                                  //     ? PolylineLayerOptions(
+                                                                  //         polylines: statefulMapController
+                                                                  //             .lines)
+                                                                  //   <Polyline>[
+                                                                  //   _polyLineAnim
+                                                                  // ])
+                                                                  PolylineLayerOptions(
+                                                                      polylines: latLngPoints != null &&
+                                                                              latLngPoints.isNotEmpty
+                                                                          ? [
+                                                                              Polyline(
+                                                                                points: latLngPoints,
+                                                                                color: Colors.red,
+                                                                                strokeWidth: (8.0 * _myzoom / _zoom),
+                                                                              ),
+                                                                            ]
+                                                                          : []),
+                                                                  MarkerLayerOptions(
+                                                                    markers:
+                                                                        markers,
                                                                   ),
 
-                                                            MarkerLayerOptions(
-                                                                markers:
-                                                                    markers),
-                                                            MarkerLayerOptions(
-                                                                markers: [
-                                                                  currentMarker
-                                                                ]),
+                                                                  // MarkerLayerOptions(
+                                                                  //     markers:
+                                                                  //         carAnimMarkers),
 
-                                                            (forAnim &&
-                                                                    _polyLineAnim !=
-                                                                        null)
-                                                                ? PolylineLayerOptions(
-                                                                    polylines: <
-                                                                        Polyline>[
-                                                                        _polyLineAnim
-                                                                      ])
-                                                                : PolylineLayerOptions(
-                                                                    polylines:
-                                                                        lines),
-
-                                                            MarkerLayerOptions(
-                                                                markers:
-                                                                    carAnimMarkers),
-
-                                                            //userLocationOptions,
-                                                          ],
-                                                        );
+                                                                  //userLocationOptions,
+                                                                ],
+                                                                // children: [
+                                                                //   TileLayerWidget(
+                                                                //     options:
+                                                                //         TileLayerOptions(
+                                                                //       tileProvider:
+                                                                //           NonCachingNetworkTileProvider(),
+                                                                //       //urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                                                                //       urlTemplate:
+                                                                //           'https://api.mapbox.com/styles/v1/rezand/ck7ge41221jke1inrbezkflve/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoicmV6YW5kIiwiYSI6ImNrNWNkdHg3djAwdDAzZnMwcTc1N2ZpY2YifQ.fl5LG72G5Uz6CLVfhbazNw',
+                                                                //       additionalOptions: {
+                                                                //         'accessToken':
+                                                                //             'pk.eyJ1IjoicmV6YW5kIiwiYSI6ImNrNWNkdHg3djAwdDAzZnMwcTc1N2ZpY2YifQ.fl5LG72G5Uz6CLVfhbazNw',
+                                                                //         'id':
+                                                                //             'mapbox.mapbox-streets-v7'
+                                                                //       },
+                                                                //       subdomains: [
+                                                                //         'a',
+                                                                //         'b',
+                                                                //         'c'
+                                                                //       ],
+                                                                //       //additionalOptions: {'key':'2UnTxClTTOQ2d3xsUL5T'},
+                                                                //     ),
+                                                                //   ),
+                                                                //   PolylineLayerWidget(
+                                                                //       options:
+                                                                //           PolylineLayerOptions(
+                                                                //               polylines: [
+                                                                //         Polyline(
+                                                                //           points:
+                                                                //               latLngPoints,
+                                                                //           color: Colors
+                                                                //               .red,
+                                                                //           strokeWidth:
+                                                                //               3.0,
+                                                                //         )
+                                                                //       ])),
+                                                                //   MarkerLayerWidget(
+                                                                //     options:
+                                                                //         MarkerLayerOptions(
+                                                                //       markers:
+                                                                //           markers,
+                                                                //     ),
+                                                                //   ),
+                                                                // ],
+                                                              );
                                                       }),
+                                                  // Positioned(
+                                                  //     top: 15.0,
+                                                  //     right: 15.0,
+                                                  //     child: TileLayersBar(
+
+                                                  //         controller:
+                                                  //             statefulMapController)),
                                                   Positioned(
-                                                    right: 20.0,
-                                                    bottom: 90.0,
-                                                    child: Container(
-                                                      width: 38.0,
-                                                      height: 38.0,
-                                                      child:
-                                                          FloatingActionButton(
-                                                        onPressed: () async {
-                                                          animateToCurrentLocation();
-                                                        },
-                                                        child: Container(
-                                                          width: 38.0,
-                                                          height: 38.0,
-                                                          child: Image.asset(
-                                                            'assets/images/location.png',
-                                                            color: Colors.white,
-                                                          ),
-                                                        ),
-                                                        elevation: 0.0,
-                                                        backgroundColor:
-                                                            Colors.blueAccent,
-                                                        heroTag:
-                                                            'CURRENTLOCATION1',
-                                                      ),
-                                                    ),
-                                                  ),
+                                                      bottom: 80.0,
+                                                      left: 25.0,
+                                                      child: GestureDetector(
+                                                          onTap: () {
+                                                            controller
+                                                                .animateCamera(
+                                                              mbox.CameraUpdate
+                                                                  .zoomIn(),
+                                                            );
+                                                          },
+                                                          child: Container(
+                                                              width: 32,
+                                                              height: 32,
+                                                              child:
+                                                                  Image.asset(
+                                                                'assets/images/plus.png',
+                                                                color: Colors
+                                                                    .black38,
+                                                              )))),
+                                                  Positioned(
+                                                      bottom: 130.0,
+                                                      left: 25.0,
+                                                      child: GestureDetector(
+                                                          onTap: () {
+                                                            controller
+                                                                .animateCamera(
+                                                              mbox.CameraUpdate
+                                                                  .zoomOut(),
+                                                            );
+                                                          },
+                                                          child: Container(
+                                                            width: 32,
+                                                            height: 32,
+                                                            child: Image.asset(
+                                                              'assets/images/minus.png',
+                                                              color: Colors
+                                                                  .black38,
+                                                            ),
+                                                          ))),
+                                                  // Positioned(
+                                                  //   right: 20.0,
+                                                  //   bottom: 90.0,
+                                                  //   child: Container(
+                                                  //     width: 38.0,
+                                                  //     height: 38.0,
+                                                  //     child:
+                                                  //         FloatingActionButton(
+                                                  //       onPressed: () async {
+                                                  //         animateToCurrentLocation();
+                                                  //       },
+                                                  //       child: Container(
+                                                  //         width: 38.0,
+                                                  //         height: 38.0,
+                                                  //         child: Image.asset(
+                                                  //           'assets/images/location.png',
+                                                  //           color: Colors.white,
+                                                  //         ),
+                                                  //       ),
+                                                  //       elevation: 0.0,
+                                                  //       backgroundColor:
+                                                  //           Colors.blueAccent,
+                                                  //       heroTag:
+                                                  //           'CURRENTLOCATION1',
+                                                  //     ),
+                                                  //   ),
+                                                  // ),
                                                   showAllItemsOnMap
                                                       ? Positioned(
                                                           right: 20.0,
-                                                          bottom: 340.0,
+                                                          bottom: 320.0,
                                                           child: Container(
                                                             width: 38.0,
                                                             height: 38.0,
@@ -4891,11 +6348,16 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
                                                               onPressed: () {
                                                                 showSattelite =
                                                                     !showSattelite;
-                                                                showAllItemsdNoty
-                                                                    .updateValue(
-                                                                        new Message(
-                                                                            type:
-                                                                                'SATTELITE'));
+                                                                showSattelite
+                                                                    ? _setStyleToSatellite(
+                                                                        true)
+                                                                    : _setStyleToSatellite(
+                                                                        false);
+                                                                // showAllItemsdNoty
+                                                                //     .updateValue(
+                                                                //         new Message(
+                                                                //             type:
+                                                                //                 'SATTELITE'));
                                                               },
                                                               child: Container(
                                                                 width: 38.0,
@@ -4922,7 +6384,7 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
                                                       : Container(),
                                                   Positioned(
                                                     right: 20.0,
-                                                    bottom: 140.0,
+                                                    bottom: 120.0,
                                                     child: Container(
                                                       width: 38.0,
                                                       height: 38.0,
@@ -4967,17 +6429,18 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
                                                   showAllItemsOnMap
                                                       ? Positioned(
                                                           right: 20.0,
-                                                          bottom: 240.0,
+                                                          bottom: 220.0,
                                                           child: Container(
                                                             width: 38.0,
                                                             height: 38.0,
                                                             child:
                                                                 FloatingActionButton(
                                                               onPressed: () {
-                                                                reportNoty.updateValue(
-                                                                    new Message(
-                                                                        type:
-                                                                            'CLEAR_MAP'));
+                                                                clearMap();
+                                                                // reportNoty.updateValue(
+                                                                //     new Message(
+                                                                //         type:
+                                                                //             'CLEAR_MAP'));
                                                               },
                                                               child: Container(
                                                                 width: 38.0,
@@ -5002,7 +6465,7 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
                                                   showAllItemsOnMap
                                                       ? Positioned(
                                                           right: 20.0,
-                                                          bottom: 290.0,
+                                                          bottom: 270.0,
                                                           child: Container(
                                                             width: 38.0,
                                                             height: 38.0,
@@ -5033,7 +6496,7 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
                                                   showAllItemsOnMap
                                                       ? Positioned(
                                                           right: 20.0,
-                                                          bottom: 190.0,
+                                                          bottom: 170.0,
                                                           child: Container(
                                                             width: 38.0,
                                                             height: 38.0,
@@ -5091,48 +6554,7 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
                                     animateRoutecarPolyLines();
                                   }
                                 }
-                                if (msg.type == 'CLEAR_MAP') {
-                                  if (_timerLine != null &&
-                                      _timerLine.isActive) {
-                                    _timerLine.cancel();
-                                  }
-                                  if (_timerupdate != null &&
-                                      _timerupdate.isActive) {
-                                    _timerupdate.cancel();
-                                  }
-                                  if (_polyLineAnim != null) {
-                                    forAnim = false;
-                                    _polyLineAnim.points.clear();
-                                    _polyLineAnim = null;
-                                    degress.clear();
-                                  }
-
-                                  if (lines != null && lines.length > 0) {
-                                    lines.clear();
-                                  }
-                                  if (carInMarkerMap != null &&
-                                      carInMarkerMap.length > 0)
-                                    carInMarkerMap.clear();
-                                  if (carMarkersMap != null &&
-                                      carMarkersMap.length > 0)
-                                    carMarkersMap.clear();
-                                  if (carIndexMarkerMap != null &&
-                                      carIndexMarkerMap.length > 0)
-                                    carIndexMarkerMap.clear();
-                                  if (markers != null && markers.length > 0) {
-                                    markers.clear();
-                                  }
-                                  if (carAnimMarkers != null &&
-                                      carAnimMarkers.length > 0) {
-                                    carAnimMarkers.clear();
-                                  }
-
-                                  if (lines2 != null) {
-                                    lines2 = null;
-                                  }
-                                }
                               }
-
                               return StreamBuilder<Message>(
                                 stream: statusNoty.noty,
                                 builder: (context, snapshot) {
@@ -5166,118 +6588,233 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
                                                         snapshot.data != null) {
                                                       if (_fpoint !=
                                                           null) if (!kIsWeb) {
-                                                        liveMapController
-                                                            .mapController
-                                                            .move(_fpoint, 15);
+                                                        // mapController.move(
+                                                        //     _fpoint, _myzoom);
                                                       } else {
-                                                        mapController.move(
-                                                            _fpoint, 15);
+                                                        // mapController.move(
+                                                        //     _fpoint, _myzoom);
                                                       }
                                                     }
-                                                    return FlutterMap(
-                                                      options: MapOptions(
-                                                        center:
-                                                            LatLng(lat, long),
-                                                        zoom: _zoom,
-                                                        /*plugins: [
+                                                    return kIsWeb
+                                                        ? Padding(
+                                                            padding: EdgeInsets
+                                                                .only(
+                                                                    top: 150.0),
+                                                            child: Container(
+                                                                width: MediaQuery.of(
+                                                                        context)
+                                                                    .size
+                                                                    .width,
+                                                                height: MediaQuery.of(
+                                                                            context)
+                                                                        .size
+                                                                        .height *
+                                                                    0.80,
+                                                                child:
+                                                                    mapboxMap))
+                                                        : FlutterMap(
+                                                            options: MapOptions(
+                                                              center: LatLng(
+                                                                45.13065,
+                                                                5.58213,
+                                                              ),
+                                                              zoom: _myzoom,
+                                                              /*plugins: [
                                                                     UserLocationPlugin()
                                                                   ],*/
-                                                      ),
-                                                      layers: [
-                                                        showSattelite
-                                                            ? TileLayerOptions(
-                                                                //urlTemplate: 'https://{s}.tiles.mapbox.com/v3/pk.eyJ1IjoicmV6YW5kIiwiYSI6ImNrNWNkdnB2dDAwdGwzZnMwc2lhcTlxd3QifQ.61hONdUooWn7aBJs-Km8OA/{z}/{x}/{y}.png',
-                                                                // urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-                                                                //urlTemplate:'https://api.mapbox.com/styles/v1/rezand/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoicmV6YW5kIiwiYSI6ImNrNWNkdHg3djAwdDAzZnMwcTc1N2ZpY2YifQ.fl5LG72G5Uz6CLVfhbazNw',
+                                                            ),
 
-                                                                urlTemplate:
-                                                                    'https://api.mapbox.com/styles/v1/rezand/ck7d3ul4c0k3w1ir0n2a419pd/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoicmV6YW5kIiwiYSI6ImNrNWNkdHg3djAwdDAzZnMwcTc1N2ZpY2YifQ.fl5LG72G5Uz6CLVfhbazNw',
-                                                                additionalOptions: {
-                                                                  'accessToken':
-                                                                      'pk.eyJ1IjoicmV6YW5kIiwiYSI6ImNrNWNkdHg3djAwdDAzZnMwcTc1N2ZpY2YifQ.fl5LG72G5Uz6CLVfhbazNw',
-                                                                  //'id': 'mapbox.mapbox-streets-v7'
-                                                                },
-                                                                subdomains: [
-                                                                  'a',
-                                                                  'b',
-                                                                  'c',
-                                                                  'd'
-                                                                ],
-                                                              )
-                                                            : TileLayerOptions(
-                                                                //urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-                                                                urlTemplate:
-                                                                    'https://api.mapbox.com/styles/v1/rezand/ck7ge41221jke1inrbezkflve/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoicmV6YW5kIiwiYSI6ImNrNWNkdHg3djAwdDAzZnMwcTc1N2ZpY2YifQ.fl5LG72G5Uz6CLVfhbazNw',
-                                                                additionalOptions: {
-                                                                  'accessToken':
-                                                                      'pk.eyJ1IjoicmV6YW5kIiwiYSI6ImNrNWNkdHg3djAwdDAzZnMwcTc1N2ZpY2YifQ.fl5LG72G5Uz6CLVfhbazNw',
-                                                                  'id':
-                                                                      'mapbox.mapbox-streets-v7'
-                                                                },
-                                                                subdomains: [
-                                                                  'a',
-                                                                  'b',
-                                                                  'c'
-                                                                ],
+                                                            layers: [
+                                                              // statefulMapController
+                                                              //     .tileLayer,
+
+                                                              showSattelite
+                                                                  ? TileLayerOptions(
+                                                                      tileProvider:
+                                                                          NonCachingNetworkTileProvider(),
+                                                                      urlTemplate:
+                                                                          'https://api.mapbox.com/styles/v1/rezand/ck7d3ul4c0k3w1ir0n2a419pd/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoicmV6YW5kIiwiYSI6ImNrNWNkdHg3djAwdDAzZnMwcTc1N2ZpY2YifQ.fl5LG72G5Uz6CLVfhbazNw',
+                                                                      additionalOptions: {
+                                                                        'accessToken':
+                                                                            'pk.eyJ1IjoicmV6YW5kIiwiYSI6ImNrNWNkdHg3djAwdDAzZnMwcTc1N2ZpY2YifQ.fl5LG72G5Uz6CLVfhbazNw',
+                                                                        //'id': 'mapbox.mapbox-streets-v7'
+                                                                      },
+                                                                      subdomains: [
+                                                                        'a',
+                                                                        'b',
+                                                                        'c',
+                                                                        'd'
+                                                                      ],
+                                                                    )
+                                                                  : TileLayerOptions(
+                                                                      tileProvider:
+                                                                          NonCachingNetworkTileProvider(),
+                                                                      //urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                                                                      urlTemplate:
+                                                                          'https://api.mapbox.com/styles/v1/rezand/ck7ge41221jke1inrbezkflve/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoicmV6YW5kIiwiYSI6ImNrNWNkdHg3djAwdDAzZnMwcTc1N2ZpY2YifQ.fl5LG72G5Uz6CLVfhbazNw',
+                                                                      additionalOptions: {
+                                                                        'accessToken':
+                                                                            'pk.eyJ1IjoicmV6YW5kIiwiYSI6ImNrNWNkdHg3djAwdDAzZnMwcTc1N2ZpY2YifQ.fl5LG72G5Uz6CLVfhbazNw',
+                                                                        'id':
+                                                                            'mapbox.mapbox-streets-v7'
+                                                                      },
+                                                                      subdomains: [
+                                                                        'a',
+                                                                        'b',
+                                                                        'c'
+                                                                      ],
+                                                                    ),
+
+                                                              // (forAnim &&
+                                                              //         _polyLineAnim !=
+                                                              //             null)
+                                                              //     ?
+                                                              PolylineLayerOptions(
+                                                                  polylines: latLngPoints !=
+                                                                              null &&
+                                                                          latLngPoints
+                                                                              .isNotEmpty
+                                                                      ? [
+                                                                          Polyline(
+                                                                            //           // An optional tag to distinguish polylines in callback
+                                                                            points:
+                                                                                latLngPoints,
+                                                                            color:
+                                                                                Colors.red,
+                                                                            strokeWidth: (8.0 *
+                                                                                _myzoom /
+                                                                                _zoom),
+                                                                          )
+                                                                        ]
+                                                                      : []),
+
+                                                              MarkerLayerOptions(
+                                                                markers:
+                                                                    markers,
                                                               ),
-                                                        MarkerLayerOptions(
-                                                            markers: markers),
-                                                        MarkerLayerOptions(
-                                                            markers: [
-                                                              currentMarker
-                                                            ]),
-                                                        (forAnim &&
-                                                                _polyLineAnim !=
-                                                                    null)
-                                                            ? PolylineLayerOptions(
-                                                                polylines: <
-                                                                    Polyline>[
-                                                                    _polyLineAnim
-                                                                  ])
-                                                            : PolylineLayerOptions(
-                                                                polylines:
-                                                                    lines),
-                                                        MarkerLayerOptions(
-                                                            markers:
-                                                                carAnimMarkers),
-                                                      ],
-                                                      mapController: !kIsWeb
-                                                          ? liveMapController
-                                                              .mapController
-                                                          : mapController,
-                                                    );
+                                                              // MarkerLayerOptions(
+                                                              //     markers:
+                                                              //         carAnimMarkers),
+                                                            ],
+                                                            // children: [
+                                                            //   TileLayerWidget(
+                                                            //     options:
+                                                            //         TileLayerOptions(
+                                                            //       tileProvider:
+                                                            //           NonCachingNetworkTileProvider(),
+                                                            //       //urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                                                            //       urlTemplate:
+                                                            //           'https://api.mapbox.com/styles/v1/rezand/ck7ge41221jke1inrbezkflve/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoicmV6YW5kIiwiYSI6ImNrNWNkdHg3djAwdDAzZnMwcTc1N2ZpY2YifQ.fl5LG72G5Uz6CLVfhbazNw',
+                                                            //       additionalOptions: {
+                                                            //         'accessToken':
+                                                            //             'pk.eyJ1IjoicmV6YW5kIiwiYSI6ImNrNWNkdHg3djAwdDAzZnMwcTc1N2ZpY2YifQ.fl5LG72G5Uz6CLVfhbazNw',
+                                                            //         'id':
+                                                            //             'mapbox.mapbox-streets-v7'
+                                                            //       },
+                                                            //       subdomains: [
+                                                            //         'a',
+                                                            //         'b',
+                                                            //         'c'
+                                                            //       ],
+                                                            //       //additionalOptions: {'key':'2UnTxClTTOQ2d3xsUL5T'},
+                                                            //     ),
+                                                            //   ),
+                                                            //   PolylineLayerWidget(
+                                                            //       options:
+                                                            //           PolylineLayerOptions(
+                                                            //               polylines: [
+                                                            //         Polyline(
+                                                            //           // An optional tag to distinguish polylines in callback
+                                                            //           points:
+                                                            //               latLngPoints,
+                                                            //           color:
+                                                            //               Colors.red,
+                                                            //           strokeWidth:
+                                                            //               3.0,
+                                                            //         ),
+                                                            //       ])),
+                                                            //   MarkerLayerWidget(
+                                                            //     options:
+                                                            //         MarkerLayerOptions(
+                                                            //       markers: markers,
+                                                            //     ),
+                                                            //   ),
+                                                            // ],
+                                                            mapController: !kIsWeb
+                                                                ? mapController
+                                                                : mapController,
+                                                          );
                                                   },
                                                 ),
+                                                // Positioned(
+                                                //     top: 150.0,
+                                                //     left: 15.0,
+                                                //     child: TileLayersBar(
+                                                //         controller:
+                                                //             statefulMapController)),
                                                 Positioned(
-                                                  right: 20.0,
-                                                  bottom: 90.0,
-                                                  child: Container(
-                                                    width: 38.0,
-                                                    height: 38.0,
-                                                    child: FloatingActionButton(
-                                                      onPressed: () async {
-                                                        animateToCurrentLocation();
-                                                      },
-                                                      child: Container(
-                                                        width: 38.0,
-                                                        height: 38.0,
-                                                        child: Image.asset(
-                                                          'assets/images/location.png',
-                                                          color: Colors.white,
-                                                        ),
-                                                      ),
-                                                      elevation: 0.0,
-                                                      backgroundColor:
-                                                          Colors.blueAccent,
-                                                      heroTag:
-                                                          'CURRENTLOCATION2',
-                                                    ),
-                                                  ),
-                                                ),
+                                                    bottom: 80.0,
+                                                    left: 25.0,
+                                                    child: GestureDetector(
+                                                        onTap: () {
+                                                          controller
+                                                              .animateCamera(
+                                                            mbox.CameraUpdate
+                                                                .zoomIn(),
+                                                          );
+                                                        },
+                                                        child: Container(
+                                                            width: 32,
+                                                            height: 32,
+                                                            child: Image.asset(
+                                                                'assets/images/plus.png')))),
+                                                Positioned(
+                                                    bottom: 130.0,
+                                                    left: 25.0,
+                                                    child: GestureDetector(
+                                                        onTap: () {
+                                                          controller
+                                                              .animateCamera(
+                                                            mbox.CameraUpdate
+                                                                .zoomOut(),
+                                                          );
+                                                        },
+                                                        child: Container(
+                                                          width: 32,
+                                                          height: 32,
+                                                          child: Image.asset(
+                                                              'assets/images/minus.png'),
+                                                        ))),
+                                                // Positioned(
+                                                //   right: 20.0,
+                                                //   bottom: 90.0,
+                                                //   child: Container(
+                                                //     width: 38.0,
+                                                //     height: 38.0,
+                                                //     child: FloatingActionButton(
+                                                //       onPressed: () async {
+                                                //         animateToCurrentLocation();
+                                                //       },
+                                                //       child: Container(
+                                                //         width: 38.0,
+                                                //         height: 38.0,
+                                                //         child: Image.asset(
+                                                //           'assets/images/location.png',
+                                                //           color: Colors.white,
+                                                //         ),
+                                                //       ),
+                                                //       elevation: 0.0,
+                                                //       backgroundColor:
+                                                //           Colors.blueAccent,
+                                                //       heroTag:
+                                                //           'CURRENTLOCATION2',
+                                                //     ),
+                                                //   ),
+                                                // ),
                                                 showAllItemsOnMap
                                                     ? Positioned(
                                                         right: 20.0,
-                                                        bottom: 340.0,
+                                                        bottom: 320.0,
                                                         child: Container(
                                                           width: 38.0,
                                                           height: 38.0,
@@ -5286,11 +6823,14 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
                                                             onPressed: () {
                                                               showSattelite =
                                                                   !showSattelite;
-                                                              showAllItemsdNoty
-                                                                  .updateValue(
-                                                                      new Message(
-                                                                          type:
-                                                                              'SATTELITE'));
+
+                                                              _setStyleToSatellite(
+                                                                  showSattelite);
+                                                              // showAllItemsdNoty
+                                                              //     .updateValue(
+                                                              //         new Message(
+                                                              //             type:
+                                                              //                 'SATTELITE'));
                                                             },
                                                             child: Container(
                                                               width: 38.0,
@@ -5317,7 +6857,7 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
                                                     : Container(),
                                                 Positioned(
                                                   right: 20.0,
-                                                  bottom: 140.0,
+                                                  bottom: 120.0,
                                                   child: Container(
                                                     width: 38.0,
                                                     height: 38.0,
@@ -5359,18 +6899,19 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
                                                 showAllItemsOnMap
                                                     ? Positioned(
                                                         right: 20.0,
-                                                        bottom: 290.0,
+                                                        bottom: 270.0,
                                                         child: Container(
                                                           width: 38.0,
                                                           height: 38.0,
                                                           child:
                                                               FloatingActionButton(
                                                             onPressed: () {
+                                                              clearMap();
                                                               // liveMapController.removeMarkers();
-                                                              reportNoty.updateValue(
-                                                                  new Message(
-                                                                      type:
-                                                                          'CLEAR_MAP'));
+                                                              // reportNoty.updateValue(
+                                                              //     new Message(
+                                                              //         type:
+                                                              //             'CLEAR_MAP'));
                                                             },
                                                             child: Container(
                                                               width: 38.0,
@@ -5395,7 +6936,7 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
                                                 showAllItemsOnMap
                                                     ? Positioned(
                                                         right: 20.0,
-                                                        bottom: 240.0,
+                                                        bottom: 220.0,
                                                         child: Container(
                                                             width: 38.0,
                                                             height: 38.0,
@@ -5425,7 +6966,7 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
                                                 showAllItemsOnMap
                                                     ? Positioned(
                                                         right: 20.0,
-                                                        bottom: 190.0,
+                                                        bottom: 170.0,
                                                         child: Container(
                                                           width: 38.0,
                                                           height: 38.0,
@@ -5476,11 +7017,11 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
                             Stack(
                               children: <Widget>[*/
                   Container(
-                    height: 71.0,
+                    height: 73.0,
                     child: Column(
                       children: [
                         Container(
-                          height: 70.0,
+                          height: 71.0,
                           child: AppBar(
                             automaticallyImplyLeading: true,
                             backgroundColor: Colors.white,
@@ -5689,49 +7230,39 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
               ),
             );
           },
-          // );
-          // },
         );
-        // } else {
-        //   return NoDataWidget();
-        // }
-        // );
       },
     );
-    /*  },
-        );*/
-    /*},
-    );*/
   }
 
   void addGeoMarkerFromCurrentPosition() async {
-    GeoPoint gp = await geoPointFromLocation(name: "Current position");
-    Marker m = Marker(
-        width: 180.0,
-        height: 250.0,
-        point: gp.point,
-        builder: (BuildContext context) {
-          return Icon(Icons.location_on);
-        });
+    // GeoPoint gp = await geoPointFromLocation(name: "Current position");
+    // Marker m = Marker(
+    //     width: 180.0,
+    //     height: 250.0,
+    //     point: gp.point,
+    //     builder: (BuildContext context) {
+    //       return Icon(Icons.location_on);
+    //     });
     if (!kIsWeb) {
-      await liveMapController.addMarker(marker: m, name: "Current position");
-      await liveMapController.fitMarker("Current position");
+      //await liveMapController.addMarker(marker: m, name: "Current position");
+      // await liveMapController.fitMarker("Current position");
     } else {}
   }
 
   void addGeoMarkerFromPosition(LatLng pos) async {
-    GeoPoint gp = await geoPointFromLocation(name: "Current position");
-    Marker m = Marker(
-        width: 180.0,
-        height: 250.0,
-        point: gp.point,
-        builder: (BuildContext context) {
-          return Icon(Icons.location_on);
-        });
-    if (!kIsWeb) {
-      await liveMapController.addMarker(marker: m, name: "Current position");
-      await liveMapController.fitMarker("Current position");
-    } else {}
+    // GeoPoint gp = await geoPointFromLocation(name: "Current position");
+    // Marker m = Marker(
+    //     width: 180.0,
+    //     height: 250.0,
+    //     point: gp.point,
+    //     builder: (BuildContext context) {
+    //       return Icon(Icons.location_on);
+    //     });
+    // if (!kIsWeb) {
+    //   await liveMapController.addMarker(marker: m, name: "Current position");
+    //   await liveMapController.fitMarker("Current position");
+    // } else {}
   }
 
   @override

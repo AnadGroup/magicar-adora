@@ -6,10 +6,12 @@ import 'package:geodesy/geodesy.dart';
 import 'package:iso/iso.dart';
 import 'package:meta/meta.dart';
 import 'package:pedantic/pedantic.dart';
+import 'package:worker_manager/worker_manager.dart';
 
 import 'deserializers.dart';
 import 'exceptions.dart';
 import 'models.dart';
+import 'package:flutter/foundation.dart';
 
 /// The main geojson class
 class GeoJson {
@@ -120,6 +122,19 @@ class GeoJson {
   }
 
   /// Parse the data
+  ///
+  ///
+  ///
+  ///
+
+  Future<void> parseWeb(String data,
+      {String nameProperty, bool verbose = false, bool disableStream = false}) {
+    return _parseWeb(data,
+        nameProperty: nameProperty,
+        verbose: verbose,
+        disableStream: disableStream);
+  }
+
   Future<void> parse(String data,
       {String nameProperty,
       bool verbose = false,
@@ -128,6 +143,152 @@ class GeoJson {
         nameProperty: nameProperty,
         verbose: verbose,
         disableStream: disableStream);
+  }
+
+  Future<void> _parseWeb(String data,
+      {String nameProperty,
+      bool verbose,
+      GeoJsonQuery query,
+      bool disableStream}) {
+    final finished = Completer<void>();
+    Iso iso;
+    iso = Iso(_processFeatures, onDataOut: (dynamic data) {
+      if (data is GeoJsonFeature) {
+        switch (data.type) {
+          case GeoJsonFeatureType.point:
+            final item = data.geometry as GeoJsonPoint;
+            points.add(item);
+            if (!disableStream) {
+              _processedPointsController.sink.add(item);
+            }
+            break;
+          case GeoJsonFeatureType.multipoint:
+            final item = data.geometry as GeoJsonMultiPoint;
+            multipoints.add(item);
+            if (!disableStream) {
+              _processedMultipointsController.sink.add(item);
+            }
+            break;
+          case GeoJsonFeatureType.line:
+            final item = data.geometry as GeoJsonLine;
+            lines.add(item);
+            if (!disableStream) {
+              _processedLinesController.sink.add(item);
+            }
+            break;
+          case GeoJsonFeatureType.multiline:
+            final item = data.geometry as GeoJsonMultiLine;
+            multilines.add(item);
+            if (!disableStream) {
+              _processedMultilinesController.sink.add(item);
+            }
+            break;
+          case GeoJsonFeatureType.polygon:
+            final item = data.geometry as GeoJsonPolygon;
+            polygons.add(item);
+            if (!disableStream) {
+              _processedPolygonsController.sink.add(item);
+            }
+            break;
+          case GeoJsonFeatureType.multipolygon:
+            final item = data.geometry as GeoJsonMultiPolygon;
+            multipolygons.add(item);
+            if (!disableStream) {
+              _processedMultipolygonsController.sink.add(item);
+            }
+            break;
+          case GeoJsonFeatureType.geometryCollection:
+        }
+        if (!disableStream) {
+          _processedFeaturesController.sink.add(data);
+        }
+        features.add(data);
+      } else {
+        iso.dispose();
+        finished.complete();
+      }
+    }, onError: (dynamic e) {
+      print("Error: $e");
+      throw ParseErrorException("Can not parse geojson");
+    });
+    final dataToProcess = _DataToProcess(
+        data: data, nameProperty: nameProperty, verbose: verbose, query: query);
+
+    if (!kIsWeb) {
+      unawaited(iso.run(<dynamic>[dataToProcess]));
+       finished.future;
+    _endSignalController.sink.add(true);
+    } else {
+      Executor().warmUp().then((value) {
+        Executor().execute(
+            fun1: _processFeaturesWeb,
+            arg1: <dynamic>[dataToProcess]).then((data) {
+          if (data is List<GeoJsonFeature>) {
+            for (var dt in data) {
+              switch (dt.type) {
+                case GeoJsonFeatureType.point:
+                  final item = dt.geometry as GeoJsonPoint;
+                  points.add(item);
+                  if (!disableStream) {
+                    _processedPointsController.sink.add(item);
+                  }
+                  break;
+                case GeoJsonFeatureType.multipoint:
+                  final item = dt.geometry as GeoJsonMultiPoint;
+                  multipoints.add(item);
+                  if (!disableStream) {
+                    _processedMultipointsController.sink.add(item);
+                  }
+                  break;
+                case GeoJsonFeatureType.line:
+                  final item = dt.geometry as GeoJsonLine;
+                  lines.add(item);
+                  if (!disableStream) {
+                    _processedLinesController.sink.add(item);
+                  }
+                  break;
+                case GeoJsonFeatureType.multiline:
+                  final item = dt.geometry as GeoJsonMultiLine;
+                  multilines.add(item);
+                  if (!disableStream) {
+                    _processedMultilinesController.sink.add(item);
+                  }
+                  break;
+                case GeoJsonFeatureType.polygon:
+                  final item = dt.geometry as GeoJsonPolygon;
+                  polygons.add(item);
+                  if (!disableStream) {
+                    _processedPolygonsController.sink.add(item);
+                  }
+                  break;
+                case GeoJsonFeatureType.multipolygon:
+                  final item = dt.geometry as GeoJsonMultiPolygon;
+                  multipolygons.add(item);
+                  if (!disableStream) {
+                    _processedMultipolygonsController.sink.add(item);
+                  }
+                  break;
+                case GeoJsonFeatureType.geometryCollection:
+              }
+              if (!disableStream) {
+                _processedFeaturesController.sink.add(dt);
+              }
+              features.add(dt);
+            }
+          } else {
+            iso.dispose();
+            finished.complete();
+          }
+
+          finished.future;
+          _endSignalController.sink.add(true);
+        });
+      });
+      // iso.run(<dynamic>[dataToProcess]).then((value) {
+      //   finished.future;
+      //   _endSignalController.sink.add(true);
+      // });
+    }
   }
 
   Future<void> _parse(String data,
@@ -524,6 +685,114 @@ class GeoJson {
       }
     }
     iso.send("end");
+  }
+
+  static List<GeoJsonFeature> _processFeaturesWeb(dynamic iso) {
+    final args = iso;
+    final dataToProcess = args[0] as _DataToProcess;
+    final data = dataToProcess.data;
+    final nameProperty = dataToProcess.nameProperty;
+    final verbose = dataToProcess.verbose;
+    final query = dataToProcess.query;
+    final decoded = json.decode(data) as Map<String, dynamic>;
+    final feats = decoded["features"] as List<dynamic>;
+    List<GeoJsonFeature> features = List();
+    for (final dfeature in feats) {
+      final feat = dfeature as Map<String, dynamic>;
+      var properties = <String, dynamic>{};
+      if (feat.containsKey("properties")) {
+        properties = feat["properties"] as Map<String, dynamic>;
+      }
+      final geometry = feat["geometry"] as Map<String, dynamic>;
+      final geomType = geometry["type"].toString();
+      GeoJsonFeature feature;
+      switch (geomType) {
+        case "GeometryCollection":
+          feature = GeoJsonFeature<GeoJsonGeometryCollection>()
+            ..properties = properties
+            ..type = GeoJsonFeatureType.geometryCollection
+            ..geometry = GeoJsonGeometryCollection();
+          if (nameProperty != null) {
+            feature.geometry.name = properties[nameProperty];
+          }
+          for (final geom in geometry["geometries"]) {
+            feature.geometry.add(_processGeometry(
+                geom as Map<String, dynamic>, properties, nameProperty));
+          }
+          break;
+        case "MultiPolygon":
+          if (query != null) {
+            if (query.geometryType != null) {
+              if (query.geometryType != GeoJsonFeatureType.multipolygon) {
+                continue;
+              }
+            }
+          }
+          feature = _processGeometry(geometry, properties, nameProperty);
+          break;
+        case "Polygon":
+          if (query != null) {
+            if (query.geometryType != null) {
+              if (query.geometryType != GeoJsonFeatureType.polygon) {
+                continue;
+              }
+            }
+          }
+          feature = _processGeometry(geometry, properties, nameProperty);
+          break;
+        case "MultiLineString":
+          if (query != null) {
+            if (query.geometryType != null) {
+              if (query.geometryType != GeoJsonFeatureType.multiline) {
+                continue;
+              }
+            }
+          }
+          feature = _processGeometry(geometry, properties, nameProperty);
+          break;
+        case "LineString":
+          if (query != null) {
+            if (query.geometryType != null) {
+              if (query.geometryType != GeoJsonFeatureType.line) {
+                continue;
+              }
+            }
+          }
+          feature = _processGeometry(geometry, properties, nameProperty);
+          break;
+        case "MultiPoint":
+          if (query != null) {
+            if (query.geometryType != null) {
+              if (query.geometryType != GeoJsonFeatureType.multipoint) {
+                continue;
+              }
+            }
+          }
+          feature = _processGeometry(geometry, properties, nameProperty);
+          break;
+        case "Point":
+          if (query != null) {
+            if (query.geometryType != null) {
+              if (query.geometryType != GeoJsonFeatureType.point) {
+                continue;
+              }
+            }
+          }
+          feature = _processGeometry(geometry, properties, nameProperty);
+          break;
+        default:
+          final e = FeatureNotSupported(geomType);
+          throw e;
+      }
+      if (query != null && properties != null) {
+        if (!_checkProperty(properties, query)) {
+          continue;
+        }
+      }
+
+      features.add(feature);
+    }
+    return features;
   }
 
   static bool _checkProperty(
