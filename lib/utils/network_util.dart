@@ -9,7 +9,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:universal_io/io.dart' as uhttp;
 import 'package:universal_platform/universal_platform.dart';
-import 'dart:html' as htp;
+//برای خروجی غیر وب میبایست حتما کامنت شود
+//import 'dart:html' as htp;
 
 class ResponseUniversal {
   String responseBody;
@@ -163,8 +164,9 @@ class NetworkUtil {
 
     bool isWeb = UniversalPlatform.isWeb;
 
+    //برای خروجی غیر وب میبایست کامنت شود
     if (isWeb != null && isWeb) {
-      var oReq1 = await htp.HttpRequest.request(url,
+      /*var oReq1 = await htp.HttpRequest.request(url,
           method: metod == null ? "GET" : metod,
           withCredentials: true,
           sendData: (metod != null && metod == 'POST') ? bodyy : null,
@@ -175,9 +177,9 @@ class NetworkUtil {
       String body = await oReq1.responseText.toString();
       int statusCode = await oReq1.status;
       var headers = await oReq1.responseHeaders;
-      var rs = await oReq1.response.toString();
-      ResponseUniversal responseUniversal= ResponseUniversal(
-       responseBody: body, statusCode: statusCode, headers: headers);
+      var rs = await oReq1.response.toString();*/
+      ResponseUniversal responseUniversal;//= ResponseUniversal(
+      // responseBody: body, statusCode: statusCode, headers: headers);
       return responseUniversal;
     } else {
       if (metod == null || metod == 'GET') {
