@@ -301,60 +301,68 @@ class SecuritySettingsFormState extends MainPage<SecuritySettingsForm> {
         if (snapshot.hasData && snapshot.data != null) {
           // loginRequiered=snapshot.data;
 
-          return Stack(
-            alignment: Alignment.topCenter,
-            overflow: Overflow.visible,
-            children: <Widget>[
-              // Padding(
-              //   padding: EdgeInsets.only(top: 80.0),
-              //   child: Container(
-              //     height: 20.0,
-              //     child: Text(
-              //       'آدرس سرورهای نقشه',
-              //       style: TextStyle(color: Colors.green, fontSize: 12),
-              //     ),
-              //   ),
-              // ),
-              // Padding(
-              //   padding: EdgeInsets.only(top: 145.0),
-              //   child: Container(
-              //     color: Color(0xfffefefe),
-              //     height: 150.0,
-              //     child: Container(
-              //       height: 150,
-              //       color: Color(0xfffefefe),
-              //       child: ListView(
-              //         padding: EdgeInsets.all(8.0),
-              //         children: _group
-              //             .map((item) => Container(
-              //                 color: Color(0xfffefefe),
-              //                 child: RadioListTile(
-              //                   activeColor: Colors.green,
-              //                   groupValue: _currentIndex,
-              //                   title: Text("${item.text}"),
-              //                   value: item.index,
-              //                   onChanged: (val) {
-              //                     setState(() {
-              //                       _currentIndex = val;
-              //                       showSelectedApiMapIndex = _currentIndex;
-              //                       /*changedRoutRadioBoxNoty.updateValue(
-              //                          Message(
-              //                             type:
-              //                             'RADIO_VALUE_CHANGED'));*/
-              //                     });
-              //                   },
-              //                 )))
-              //             .toList(),
-              //       ),
-              //     ),
-              //   ),
-              // ),
+          return
+              // Stack(
+              //   alignment: Alignment.topCenter,
+              //   overflow: Overflow.visible,
+              //   children: <Widget>[
+              //     Padding(
+              //     padding: EdgeInsets.only(top: 80.0),
+              // child: Container(
+              //           height:20.0,
+              //         child:Text('آدرس سرورهای نقشه',style: TextStyle(color: Colors.green,fontSize: 12),),),),
+              //         Padding(
+              //           padding: EdgeInsets.only(top: 145.0),
+              //           child:
+              //           Container(
+              //             color: Color(0xfffefefe),
+              //             height:150.0,
+              //             child: Container(
+              //               height: 150,
+              //               color: Color(0xfffefefe),
+              //               child: ListView(
+              //                 padding:
+              //                 EdgeInsets.all(8.0),
+              //                 children: _group
+              //                     .map((item) =>
+              //                     Container(
+              // color: Color(0xfffefefe),
+              // child:
+              //                     RadioListTile(
+              //                       activeColor: Colors.green,
+              //                       groupValue:
+              //                       _currentIndex,
+              //                       title: Text(
+              //                           "${item.text}"),
+              //                       value: item
+              //                           .index,
+              //                       onChanged:
+              //                           (val) {
+              //                         setState(() {
+              //                         _currentIndex =
+              //                             val;
+              //                         showSelectedApiMapIndex =
+              //                             _currentIndex;
+              //                         /*changedRoutRadioBoxNoty.updateValue(
+              //                              Message(
+              //                                 type:
+              //                                 'RADIO_VALUE_CHANGED'));*/
+              //                          });
+              //                       },
+              //                     )))
+              //                     .toList(),
+              //               ),
+              //             ),
+              //
+              //           ),
+              //         ),
               Padding(
-                // padding: EdgeInsets.only(top: 280.0),
-                padding: EdgeInsets.only(top: 90.0),
-                child: SettingsList(
-                  sections: [
-                    /* SettingsSection(
+                  padding: EdgeInsets.only(top: 70.0),
+                  child:
+                      // SettingsList(
+                      // sections: [
+
+                      /* SettingsSection(
                     title: 'کاربری',
                     tiles: [
                       */ /*SettingsTile(
@@ -368,77 +376,77 @@ class SecuritySettingsFormState extends MainPage<SecuritySettingsForm> {
                     ],
                   ),*/
 
-                    SettingsSection(
-                      title: 'امنیتی',
-                      tiles: [
-                        SettingsTile.switchTile(
-                          leftPadding: 25.0,
-                          rightPadding: 2.0,
-                          title: Translations.current.useLogin(),
-                          leading: Icon(Icons.phonelink_lock),
-                          switchValue: loginRequiered,
+                      SettingsSection(
+                    title: 'امنیتی',
+                    tiles: [
+                      SettingsTile.switchTile(
+                        leftPadding: 25.0,
+                        rightPadding: 2.0,
+                        title: Translations.current.useLogin(),
+                        leading: Icon(Icons.phonelink_lock),
+                        switchValue: loginRequiered,
+                        onTap: () {
+                          setState(() {
+                            loginRequiered = !loginRequiered;
+                            if (loginRequiered) {
+                              usePattern = !loginRequiered;
+                              usePassword = loginRequiered;
+                              useFinger = !loginRequiered;
+                            } else {
+                              usePattern = loginRequiered;
+                              usePassword = loginRequiered;
+                              useFinger = loginRequiered;
+                            }
+                            //if (loginRequiered)
+                            setAppLogin();
+                          });
+                        },
+                        onToggle: (bool value) {
+                          setState(() {
+                            loginRequiered = value;
+                            if (value) {
+                              usePattern = !value;
+                              usePassword = value;
+                              useFinger = !value;
+                            } else {
+                              usePattern = value;
+                              usePassword = value;
+                              useFinger = value;
+                            }
+                            //if (value)
+                            setAppLogin();
+                          });
+                        },
+                      ),
+                      SettingsTile.switchTile(
+                          leftPadding: 25,
+                          rightPadding: 2,
+                          title: Translations.current.useFingerPrint(),
+                          leading: Icon(Icons.fingerprint),
                           onTap: () {
                             setState(() {
-                              loginRequiered = !loginRequiered;
-                              if (loginRequiered) {
-                                usePattern = !loginRequiered;
-                                usePassword = loginRequiered;
-                                useFinger = !loginRequiered;
-                              } else {
-                                usePattern = loginRequiered;
-                                usePassword = loginRequiered;
-                                useFinger = loginRequiered;
+                              useFinger = !useFinger;
+                              if (useFinger) {
+                                usePattern = !useFinger;
+                                usePassword = !useFinger;
+                                loginType = LoginType.FINGERPRINT;
                               }
-                              //if (loginRequiered)
                               setAppLogin();
                             });
                           },
                           onToggle: (bool value) {
                             setState(() {
-                              loginRequiered = value;
+                              useFinger = value;
                               if (value) {
                                 usePattern = !value;
-                                usePassword = value;
-                                useFinger = !value;
-                              } else {
-                                usePattern = value;
-                                usePassword = value;
-                                useFinger = value;
+                                usePassword = !value;
+                                loginType = LoginType.FINGERPRINT;
                               }
-                              //if (value)
                               setAppLogin();
                             });
                           },
-                        ),
-                        SettingsTile.switchTile(
-                            leftPadding: 25,
-                            rightPadding: 2,
-                            title: Translations.current.useFingerPrint(),
-                            leading: Icon(Icons.fingerprint),
-                            onTap: () {
-                              setState(() {
-                                useFinger = !useFinger;
-                                if (useFinger) {
-                                  usePattern = !useFinger;
-                                  usePassword = !useFinger;
-                                  loginType = LoginType.FINGERPRINT;
-                                }
-                                setAppLogin();
-                              });
-                            },
-                            onToggle: (bool value) {
-                              setState(() {
-                                useFinger = value;
-                                if (value) {
-                                  usePattern = !value;
-                                  usePassword = !value;
-                                  loginType = LoginType.FINGERPRINT;
-                                }
-                                setAppLogin();
-                              });
-                            },
-                            switchValue: useFinger),
-                        /* SettingsTile.switchTile(
+                          switchValue: useFinger),
+                      /* SettingsTile.switchTile(
                           leftPadding: 25,
                           rightPadding: 2,
                           title: Translations.current.usePattern(),
@@ -466,48 +474,48 @@ class SecuritySettingsFormState extends MainPage<SecuritySettingsForm> {
                             });
                           },
                           switchValue: usePattern),*/
-                        SettingsTile.switchTile(
-                            leftPadding: 25,
-                            rightPadding: 2,
-                            title: Translations.current.usePassword(),
-                            leading: Icon(Icons.security),
-                            onTap: () {
-                              setState(() {
-                                usePassword = !usePassword;
-                                if (usePassword) {
-                                  usePattern = !usePassword;
-                                  useFinger = !usePassword;
-                                  loginType = LoginType.PASWWORD;
-                                } else {}
-                                setAppLogin();
-                              });
-                            },
-                            onToggle: (bool value) {
-                              setState(() {
-                                usePassword = value;
-                                if (value) {
-                                  usePattern = !value;
-                                  useFinger = !value;
-                                  loginType = LoginType.PASWWORD;
-                                } else {}
-                                setAppLogin();
-                              });
-                            },
-                            switchValue: usePassword),
-                        SettingsTile(
-                          title: 'تغییر رمز عبور',
-                          leading: Icon(Icons.lock),
+                      SettingsTile.switchTile(
+                          leftPadding: 25,
+                          rightPadding: 2,
+                          title: Translations.current.usePassword(),
+                          leading: Icon(Icons.security),
                           onTap: () {
-                            _showResetPassword();
+                            setState(() {
+                              usePassword = !usePassword;
+                              if (usePassword) {
+                                usePattern = !usePassword;
+                                useFinger = !usePassword;
+                                loginType = LoginType.PASWWORD;
+                              } else {}
+                              setAppLogin();
+                            });
                           },
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          );
+                          onToggle: (bool value) {
+                            setState(() {
+                              usePassword = value;
+                              if (value) {
+                                usePattern = !value;
+                                useFinger = !value;
+                                loginType = LoginType.PASWWORD;
+                              } else {}
+                              setAppLogin();
+                            });
+                          },
+                          switchValue: usePassword),
+                      SettingsTile(
+                        title: 'تغییر رمز عبور',
+                        leading: Icon(Icons.lock),
+                        onTap: () {
+                          _showResetPassword();
+                        },
+                      ),
+                    ],
+                  )
+                  // ],
+                  // ),
+                  // ),
+                  // ],
+                  );
         } else {
           return Container();
         }

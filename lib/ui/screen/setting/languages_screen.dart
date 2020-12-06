@@ -1,8 +1,8 @@
+import 'package:flutter/material.dart';
 import 'package:anad_magicar/bloc/local/change_local_bloc.dart';
 import 'package:anad_magicar/components/animstepper/stepper.dart';
 import 'package:anad_magicar/translation_strings.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
 class LanguagesScreen extends StatefulWidget {
@@ -19,10 +19,10 @@ class _LanguagesScreenState extends State<LanguagesScreen> {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: <Widget>[
           Align(
-            alignment: Alignment.topCenter,
+            alignment: Alignment.bottomLeft,
             child: Padding(
               padding: EdgeInsets.only(
-                  top: 50),
+                  bottom: 32, right: MediaQuery.of(context).size.width * 0.55),
               child: Container(
                 width: 100.0,
                 height: 48.0,
