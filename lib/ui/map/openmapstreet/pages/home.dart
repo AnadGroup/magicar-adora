@@ -191,7 +191,7 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
   bool hasPoint = true;
   int currentCarLocationSpeed = 0;
   static bool forAnim = false;
-  static int lastCarIdSelected = 0;
+  static int lastCarIdSelected = 20180;
   bool _showInfoPopUp = false;
   bool isGPSOn = false;
   bool isGPRSOn = false;
@@ -2369,7 +2369,7 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
     String sdate = DateTimeUtils.convertIntoDateTimeWithTime(
         DateTimeUtils.getDateJalaliWithAddDays(0), 23, 59);
 
-    //lastCarIdSelected = 20179;
+    lastCarIdSelected = 20180;
     ApiRoute route = ApiRoute(
         carId: lastCarIdSelected,
         startDate: forReport
@@ -2508,7 +2508,7 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
               double.tryParse(secondLng1[1]));
 
           double lat = fresultLatLng1;
-          double lng = sresultLatLng1;
+          double lng = -sresultLatLng1;
           int speed = pointDatas[i].speed;
           if (speed == null) speed = 0;
 
@@ -4409,6 +4409,7 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
         //                   imgUrl,
         //                   key: ObjectKey(Colors.green),
         //                 )))));
+        _updateCameraPosition(mbox.LatLng(latLng.latitude, latLng.longitude));
       } else {
         if (latLng != null) {
           carMarkersMap.putIfAbsent(lastCarIdSelected, () => marker);
@@ -4442,6 +4443,9 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
         _updateLastPositionCarPeriodically(
             index, lastCarIdSelected, isCarPaired);
       // }
+      if(latLng!=null){
+        _updateCameraPosition(mbox.LatLng(latLng.latitude, latLng.longitude));
+      }
     } else {
       centerRepository.showFancyToast('اطلاعاتی یافت نشد', false);
     }
