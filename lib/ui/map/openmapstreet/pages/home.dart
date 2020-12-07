@@ -191,7 +191,7 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
   bool hasPoint = true;
   int currentCarLocationSpeed = 0;
   static bool forAnim = false;
-  static int lastCarIdSelected = 20180;
+  static int lastCarIdSelected = 0;
   bool _showInfoPopUp = false;
   bool isGPSOn = false;
   bool isGPRSOn = false;
@@ -2369,7 +2369,7 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
     String sdate = DateTimeUtils.convertIntoDateTimeWithTime(
         DateTimeUtils.getDateJalaliWithAddDays(0), 23, 59);
 
-    lastCarIdSelected = 20180;
+    //lastCarIdSelected = 20180;
     ApiRoute route = ApiRoute(
         carId: lastCarIdSelected,
         startDate: forReport
