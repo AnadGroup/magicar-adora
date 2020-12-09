@@ -1824,8 +1824,14 @@
     "type": "text",
     "placeholders": {}
   },
+  "titleAdora": "Adora",
+  "@titleAdora": {
+    "description": "Adora Co.",
+    "type": "text",
+    "placeholders": {}
+  },
   "language": "English",
-    "@title": {
+    "@language": {
       "description": "language",
       "type": "text",
       "placeholders": {}

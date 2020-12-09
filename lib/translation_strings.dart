@@ -917,6 +917,8 @@ class Translations {
 
   String title() => Intl.message('MagiCar', name: 'title', desc: 'MagiCar Co.');
 
+  String titleAdora() => Intl.message('Adora', name: 'title', desc: 'Adora Co.');
+
   String language() =>
       Intl.message('English', name: 'language', desc: 'language');
 
