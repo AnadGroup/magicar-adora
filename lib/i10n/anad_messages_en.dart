@@ -310,6 +310,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "thisCarPaired" : MessageLookupByLibrary.simpleMessage("thisCarPaired"),
     "thisFormHasErrors" : MessageLookupByLibrary.simpleMessage("thisFormHasErrors"),
     "title" : MessageLookupByLibrary.simpleMessage("MagiCar"),
+    "titleAdora" : MessageLookupByLibrary.simpleMessage("Adora"),
     "toDate" : MessageLookupByLibrary.simpleMessage("To Date"),
     "useFingerPrint" : MessageLookupByLibrary.simpleMessage("Use FingerPrint"),
     "useLogin" : MessageLookupByLibrary.simpleMessage("Use Login"),

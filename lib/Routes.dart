@@ -109,10 +109,12 @@ class MyAppState extends State<MyApp> with WidgetsBindingObserver {
   static var theme;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final GlobalKey<NavigatorState> _navigatorKey = GlobalKey<NavigatorState>();
+
   // Screen _screen;
   //StreamSubscription<ScreenStateEvent> _subscription;
 
   AuthenticationBloc _authenticationBloc;
+
   UserRepository get _userRepository => widget.userRepository;
   ThemeBloc _themeBloc;
   Future<Locale> local;
@@ -380,7 +382,10 @@ class MyAppState extends State<MyApp> with WidgetsBindingObserver {
                                     ],
                                     //supportedLocales: applic.supportedLocales(),
                                     onGenerateTitle: (BuildContext context) =>
-                                        Translations.of(context).title(),
+                                        (CenterRepository.APP_TYPE_ADORA)
+                                            ? Translations.of(context)
+                                                .titleAdora()
+                                            : Translations.of(context).title(),
                                     debugShowCheckedModeBanner: false,
                                     theme: state.themeData,
                                     //ThemeData(fontFamily: 'IranSans'),

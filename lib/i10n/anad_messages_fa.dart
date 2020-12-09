@@ -308,6 +308,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "thisCarPaired" : MessageLookupByLibrary.simpleMessage("خودرو افزوده شد"),
     "thisFormHasErrors" : MessageLookupByLibrary.simpleMessage("خطا رخ داده است!"),
     "title" : MessageLookupByLibrary.simpleMessage("MagiCar"),
+    "titleAdora" : MessageLookupByLibrary.simpleMessage("Adora"),
     "toDate" : MessageLookupByLibrary.simpleMessage("تا تاریخ"),
     "useFingerPrint" : MessageLookupByLibrary.simpleMessage("استفاده از اثرانگشت"),
     "useLogin" : MessageLookupByLibrary.simpleMessage("ورود با لاگین"),
