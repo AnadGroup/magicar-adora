@@ -65,7 +65,9 @@ import 'package:map_launcher/map_launcher.dart' as ml;
 import 'package:maps_toolkit/maps_toolkit.dart' as maptoolkit;
 import 'package:pedantic/pedantic.dart';
 import 'package:popup_menu/popup_menu.dart' as popmenu;
-import 'package:map_controller/map_controller.dart';
+//import 'package:map_controller/map_controller.dart';
+import 'zoombuttons_plugin_option.dart';
+import 'package:flutter_map/plugin_api.dart';
 // import 'dart:ui' as uii;
 // import 'dart:html';
 // import 'package:flutter_web_ui/ui.dart' as ui;
@@ -260,6 +262,7 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
   bool gpsDialogGasShownBefore = false;
   List<Marker> markers = [];
   List<Marker> carAnimMarkers = [];
+  Polyline polyLine;
   Map<int, LatLng> carInMarkerMap = Map();
   Map<int, int> carIndexMarkerMap = Map();
   Map<int, Marker> carMarkersMap = Map();
@@ -275,8 +278,8 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
   List<LatLng> latLngPoints = [];
   MapController mapController;
   //LiveMapController liveMapController;
-  StatefulMapController statefulMapController;
-  StreamSubscription<StatefulMapControllerStateChange> sub;
+  // StatefulMapController statefulMapController;
+  // StreamSubscription<StatefulMapControllerStateChange> sub;
   Marker _marker;
   Timer _timerupdate;
   int _markerIndex = 0;
@@ -352,10 +355,10 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
   ];
   bool _rotateGesturesEnabled = true;
   bool _scrollGesturesEnabled = true;
-  bool _tiltGesturesEnabled = true;
+  bool _tiltGesturesEnabled = false;
   bool _zoomGesturesEnabled = true;
   bool _myLocationEnabled = true;
-  bool _telemetryEnabled = true;
+  bool _telemetryEnabled = false;
   mbox.MyLocationTrackingMode _myLocationTrackingMode =
       mbox.MyLocationTrackingMode.None;
   List<Object> _featureQueryFilter;
@@ -1146,8 +1149,8 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
       //   'Current',
       //   LatLng(result.latitude, result.longitude),
       // );
-      mbox.LatLng point = mbox.LatLng(result.latitude, result.longitude);
-      _addSymbol('assetImage', point);
+      // mbox.LatLng point = mbox.LatLng(result.latitude, result.longitude);
+      // _addSymbol('assetImage', point);
       // addMarker(
       //   context,
       //   cPlace,
@@ -1165,15 +1168,15 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
       //   ),
       // );
       if (!kIsWeb) {
-        _updateCameraPosition(
-          point,
-        );
-        //mapController.move(LatLng(result.latitude, result.longitude), _myzoom);
+        // _updateCameraPosition(
+        //   point,
+        // );
+        mapController.move(LatLng(result.latitude, result.longitude), _myzoom);
       } else {
-        _updateCameraPosition(
-          point,
-        );
-        // mapController.move(LatLng(result.latitude, result.longitude), _myzoom);
+        // _updateCameraPosition(
+        //   point,
+        // );
+        mapController.move(LatLng(result.latitude, result.longitude), _myzoom);
       }
     }
     statusNoty.updateValue(Message(type: 'CURRENT_LOCATION_UPDATED'));
@@ -1225,6 +1228,7 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
         //     points: points);
 
         if (degress != null && degress.length > 0) {
+          _myzoom = mapController.zoom;
           double _size = (markerSize + 28) * _myzoom / _zoom;
           var marker = Marker(
               width: _size,
@@ -1247,16 +1251,16 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
                       )),
                 );
               });
-          // if (carAnimMarkers != null && carAnimMarkers.isNotEmpty) {
-          //   carAnimMarkers = [];
-          // }
-          //carAnimMarkers..add(marker);
+          if (carAnimMarkers != null && carAnimMarkers.isNotEmpty) {
+            carAnimMarkers = [];
+          }
+          carAnimMarkers..add(marker);
           //Place caraniMarker = Place('CarAnimMarker', _spoint);
-          _changeRotation((degress[index - 1]));
-          _changePositionSymbol(
-              mbox.LatLng(_spoint.latitude, _spoint.longitude));
-          _updateCameraPosition(
-              mbox.LatLng(_spoint.latitude, _spoint.longitude));
+          // _changeRotation((degress[index - 1]));
+          // _changePositionSymbol(
+          //     mbox.LatLng(_spoint.latitude, _spoint.longitude));
+          // _updateCameraPosition(
+          //     mbox.LatLng(_spoint.latitude, _spoint.longitude));
           // addMarker(context, caraniMarker,
           //     marker: CircleAvatar(
           //       radius: _size,
@@ -1268,7 +1272,7 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
           //     ),
           //     isAnim: true);
         }
-        // animateNoty.updateValue(Message(type: 'LINE_ANIM'));
+        animateNoty.updateValue(Message(type: 'LINE_ANIM'));
       });
     }
   }
@@ -2346,6 +2350,43 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
     unawaited(geojson.parse(data, nameProperty: nameProperty, verbose: true));
   }
 
+  distance(lat1, lon1, lat2, lon2) {
+    var p = 0.017453292519943295; // Math.PI / 180
+    var c = math.cos;
+    var a = 0.5 -
+        c((lat2 - lat1) * p) / 2 +
+        c(lat1 * p) * c(lat2 * p) * (1 - c((lon2 - lon1) * p)) / 2;
+
+    return 0.7 * math.asin(math.sqrt(a)); // 2 * R; R = 350 m
+  }
+
+  bool isMarkerOutsideCircle(
+      LatLng centerLatLng, LatLng draggedLatLng, double radius) {
+    // var distances ;
+    //  .distanceBetween(centerLatLng.latitude,
+    //         centerLatLng.longitude,
+    //         draggedLatLng.latitude,
+    //         draggedLatLng.longitude, distances);
+    // return radius < distances[0];
+  }
+
+  calcDistance(lat1, lon1, lat2, lon2) {
+    var R = 6371; // Earth's radius in Km
+    return math.acos(math.sin(lat1) * math.sin(lat2) +
+            math.cos(lat1) * math.cos(lat2) * math.cos(lon2 - lon1)) *
+        R;
+  }
+
+  double calculateDistanceBetweenTwoLatLongsInKm(
+      double lat1, double lon1, double lat2, double lon2) {
+    var p = 0.017453292519943295;
+    var c = cos;
+    var a = 0.5 -
+        c((lat2 - lat1) * p) / 2 +
+        c(lat1 * p) * c(lat2 * p) * (1 - c((lon2 - lon1) * p)) / 2;
+    return 0.7 * asin(sqrt(a));
+  }
+
   Future<List<Polyline>> processLineData(
       bool fromCurrent,
       String clat,
@@ -2369,7 +2410,7 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
     String sdate = DateTimeUtils.convertIntoDateTimeWithTime(
         DateTimeUtils.getDateJalaliWithAddDays(0), 23, 59);
 
-    //lastCarIdSelected = 20180;
+    // lastCarIdSelected = 20180;
     ApiRoute route = ApiRoute(
         carId: lastCarIdSelected,
         startDate: forReport
@@ -2405,6 +2446,7 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
         }
         var points = '';
         int index = pointDatas.length - 1;
+        List<List<double>> temp_points = List();
 
         String latStr1 = pointDatas[0].lat;
         String lngStr1 = pointDatas[0].long;
@@ -2425,7 +2467,7 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
 
         firstPoint = LatLng(fresultLatLng, sresultLatLng);
         points += '[$sresultLatLng,$fresultLatLng],';
-
+        temp_points..add([sresultLatLng, fresultLatLng]);
         var marker = Marker(
             width: markerSize + 28,
             height: markerSize + 28,
@@ -2447,9 +2489,9 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
                     )),
               );
             });
-        Place place = Place('first', firstPoint);
-        _addSymbol('assetImage${firstPoint.latitude - firstPoint.longitude}',
-            mbox.LatLng(firstPoint.latitude, firstPoint.longitude));
+        //Place place = Place('first', firstPoint);
+        // _addSymbol('assetImage${firstPoint.latitude - firstPoint.longitude}',
+        //     mbox.LatLng(firstPoint.latitude, firstPoint.longitude));
         // addMarker(context, place,
         //     marker: GestureDetector(
         //       onTap: () {
@@ -2466,7 +2508,7 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
         //               //Image.asset(markerStart, key: ObjectKey(Colors.red)),
         //               )),
         //     ));
-        //markers..add(marker);
+        markers..add(marker);
         //////////////////////////////////
         minStopTime = '';
         minStopTime2 = '';
@@ -2477,15 +2519,15 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
 
         int firstIndex = 0;
         int nextIndex = 0;
-        double div = (index + 1) / 29;
-        if (index < 29) {
+        double div = (index + 1) / 6;
+        if (index < 6) {
           div = 1;
         }
         if (minDelay == null) minDelay = 0;
         geoSeries..add(firstPoint);
 
-        int mod = (pointDatas.length / 10).toInt();
-        int size = 1;
+        // int mod = (pointDatas.length / 10).toInt();
+        // int size = 1;
 
         for (var i = 1; i < pointDatas.length - 1; i++) {
           int diff = 0;
@@ -2508,7 +2550,8 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
               double.tryParse(secondLng1[1]));
 
           double lat = fresultLatLng1;
-          double lng = -sresultLatLng1;
+          double lng = sresultLatLng1;
+
           int speed = pointDatas[i].speed;
           if (speed == null) speed = 0;
 
@@ -2546,14 +2589,64 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
               if (speed > 5) {
                 double x = speed * (diff / 60);
                 if (x > 50) {
-                  points += '[$lng,$lat],';
+                  String latStr22 = pointDatas[nextIndex].lat;
+                  String lngStr22 = pointDatas[nextIndex].long;
+                  var firstLat11 = latStr22.split('*');
+                  var firstLng11 = lngStr22.split('*');
+                  var secondLat11 = firstLat11[1].split("'");
+                  var secondLng11 = firstLng11[1].split("'");
+
+                  double fresultLatLng11 = ConvertDegreeAngleToDouble(
+                      double.tryParse(firstLat11[0]),
+                      double.tryParse(secondLat11[0]),
+                      double.tryParse(secondLat11[1]));
+
+                  double sresultLatLng11 = ConvertDegreeAngleToDouble(
+                      double.tryParse(firstLng11[0]),
+                      double.tryParse(secondLng11[0]),
+                      double.tryParse(secondLng11[1]));
+
+                  double lat2 = fresultLatLng11;
+                  double lng2 = sresultLatLng11;
+                  if (calcDistance(temp_points[temp_points.length - 1][1],
+                          temp_points[temp_points.length - 1][0], lat2, lng2) <
+                      0.35) {
+                    points += '[$lng,$lat],';
+                    temp_points..add([lng, lat]);
+                  }
                 }
               }
             } else {
               if (speed > 5) {
                 // double x=speed*(diff / 60);
                 // if(x>50) {
-                if ((i % div.floor()) == 0) points += '[$lng,$lat],';
+                if ((i % div.floor()) == 0) {
+                  String latStr22 = pointDatas[nextIndex].lat;
+                  String lngStr22 = pointDatas[nextIndex].long;
+                  var firstLat11 = latStr22.split('*');
+                  var firstLng11 = lngStr22.split('*');
+                  var secondLat11 = firstLat11[1].split("'");
+                  var secondLng11 = firstLng11[1].split("'");
+
+                  double fresultLatLng11 = ConvertDegreeAngleToDouble(
+                      double.tryParse(firstLat11[0]),
+                      double.tryParse(secondLat11[0]),
+                      double.tryParse(secondLat11[1]));
+
+                  double sresultLatLng11 = ConvertDegreeAngleToDouble(
+                      double.tryParse(firstLng11[0]),
+                      double.tryParse(secondLng11[0]),
+                      double.tryParse(secondLng11[1]));
+
+                  double lat2 = fresultLatLng11;
+                  double lng2 = sresultLatLng11;
+                  if (calcDistance(temp_points[temp_points.length - 1][1],
+                          temp_points[temp_points.length - 1][0], lat2, lng2) <
+                      0.35) {
+                    points += '[$lng,$lat],';
+                    temp_points..add([lng, lat]);
+                  }
+                }
                 //}
               }
             }
@@ -2583,9 +2676,10 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
           if (((speed <= minSpeed && showMinSpeedMarkers) ||
               (speed >= maxSpeed && showMaxSpeedMarkers) ||
               (diff >= minDelay && showStopSpeedMarkers))) {
-            Place place2 = Place('speed${lat - lng}', LatLng(lat, lng));
+            markers.add(marker);
+            // Place place2 = Place('speed${lat - lng}', LatLng(lat, lng));
 
-            _addSymbol('assetImage${i}', mbox.LatLng(lat, lng), speed: speed);
+            // _addSymbol('assetImage${i}', mbox.LatLng(lat, lng), speed: speed);
             // addMarker(context, place2,
             //     marker: GestureDetector(
             //       onTap: () {
@@ -2601,7 +2695,6 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
             //             child: getMarkerOnSpeed(speed, diff),
             //           )),
             //     ));
-
           }
 
           if (routType == Constants.routingTypeMap[RoutingType.AIR]) {
@@ -2647,11 +2740,11 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
                     )),
               );
             });
-        Place place2 = Place('speed${fresultLatLng - sresultLatLng}',
-            LatLng(fresultLatLng, sresultLatLng));
-        _addSymbol('assetImage${fresultLatLng - sresultLatLng}',
-            mbox.LatLng(fresultLatLng, sresultLatLng),
-            speed: speed);
+        // Place place2 = Place('speed${fresultLatLng - sresultLatLng}',
+        //     LatLng(fresultLatLng, sresultLatLng));
+        // _addSymbol('assetImage${fresultLatLng - sresultLatLng}',
+        //     mbox.LatLng(fresultLatLng, sresultLatLng),
+        //     speed: speed);
         // addMarker(context, place2,
         //     marker: GestureDetector(
         //       onTap: () {
@@ -2669,7 +2762,7 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
         //               )),
         //     ));
 
-        // markers..add(marker);
+        markers..add(marker);
         if (points.endsWith(',')) {
           points = points.substring(0, points.length - 1);
         }
@@ -2734,9 +2827,9 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
                     )),
               );
             });
-        Place place2 = Place('speed${lat1 - lng1}', LatLng(lat1, lng1));
-        _addSymbol('assetImage${lat1 - lng1}', mbox.LatLng(lat1, lng1),
-            speed: int.tryParse(currentCarLocationSpeed.toString()));
+        // Place place2 = Place('speed${lat1 - lng1}', LatLng(lat1, lng1));
+        // _addSymbol('assetImage${lat1 - lng1}', mbox.LatLng(lat1, lng1),
+        //     speed: int.tryParse(currentCarLocationSpeed.toString()));
 
         // addMarker(context, place2,
         //     marker: GestureDetector(
@@ -2755,7 +2848,7 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
         //                 int.tryParse(currentCarLocationSpeed.toString()), 0),
         //           )),
         //     ));
-        // markers.add(marker);
+        markers.add(marker);
 
         marker = Marker(
             width: markerSize,
@@ -2778,9 +2871,9 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
                     )),
               );
             });
-        place2 = Place('speed${lat2 - lng2}', LatLng(lat2, lng2));
-        _addSymbol('assetImage${lat2 - lng2}', mbox.LatLng(lat2, lng2),
-            speed: int.tryParse(speed.toString()));
+        // place2 = Place('speed${lat2 - lng2}', LatLng(lat2, lng2));
+        // _addSymbol('assetImage${lat2 - lng2}', mbox.LatLng(lat2, lng2),
+        //     speed: int.tryParse(speed.toString()));
 
         // addMarker(context, place2,
         //     marker: GestureDetector(
@@ -2797,7 +2890,7 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
         //             child: getMarkerOnSpeed(int.tryParse(speed.toString()), 0),
         //           )),
         //     ));
-        // markers.add(marker);
+        markers.add(marker);
         queryBody = '{"coordinates":[[$lng2,$lat2],[$lng1,$lat1]]}';
         hasPoint = true;
       } else {
@@ -2814,11 +2907,15 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
       if (routType == Constants.routingTypeMap[RoutingType.AIR]) {
         final color = Colors.blueAccent.withOpacity(0.7);
 
-        lines.add(Polyline(strokeWidth: 8.0, color: color, points: geoSeries));
+        //lines.add(Polyline(strokeWidth: 8.0, color: color, points: geoSeries));
+        polyLine = Polyline(
+            strokeWidth: (8.0 * _myzoom) / _zoom,
+            color: color,
+            points: geoSeries);
         latLngPoints = geoSeries;
       } else {
         if (fromGo) {
-          routType = Constants.routingTypeMap[RoutingType.WALKING];
+          routType = Constants.routingTypeMap[RoutingType.DRIVING];
         } else {}
         final openRoutegeoJSON = await restDatasource
             .fetchOpenRouteServiceURlJSON(body: queryBody, routeType: routType);
@@ -2831,19 +2928,22 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
                 strokeWidth: 8.0,
                 color: color,
                 points: line.geoSerie.toLatLng()));
-
+            polyLine = Polyline(
+                strokeWidth: (8.0 * _myzoom) / _zoom,
+                color: color,
+                points: line.geoSerie.toLatLng());
             latLngPoints = line.geoSerie.toLatLng();
-            _add(
-                latLngPoints
-                    .map<mbox.LatLng>(
-                        (e) => mbox.LatLng(e.latitude, e.longitude))
-                    .toList(),
-                (8.0 * _myzoom) / _zoom);
+            // _add(
+            //     latLngPoints
+            //         .map<mbox.LatLng>(
+            //             (e) => mbox.LatLng(e.latitude, e.longitude))
+            //         .toList(),
+            //     (8.0 * _myzoom) / _zoom);
             if (kIsWeb) {
-              // animateNoty.updateValue(Message(text: 'ANIM_ROUTE_DONE'));
-              _updateCameraPosition(
-                  mbox.LatLng(firstPoint.latitude, firstPoint.longitude));
-              // mapController.move(firstPoint, _myzoom);
+              animateNoty.updateValue(Message(text: 'ANIM_ROUTE_DONE'));
+              // _updateCameraPosition(
+              //     mbox.LatLng(firstPoint.latitude, firstPoint.longitude));
+              mapController.move(firstPoint, _myzoom);
               if (anim) {
                 animateRoutecarPolyLines();
               }
@@ -2870,13 +2970,13 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
             RxBus.post(ChangeEvent(type: 'CLOSE_MORE_BUTTON'));
           }
           if (!kIsWeb) {
-            _updateCameraPosition(
-                mbox.LatLng(firstPoint.latitude, firstPoint.longitude));
-            //mapController.move(firstPoint, _myzoom);
+            // _updateCameraPosition(
+            //     mbox.LatLng(firstPoint.latitude, firstPoint.longitude));
+            mapController.move(firstPoint, _myzoom);
           } else {
-            _updateCameraPosition(
-                mbox.LatLng(firstPoint.latitude, firstPoint.longitude));
-            // mapController.move(firstPoint, _myzoom);
+            // _updateCameraPosition(
+            //     mbox.LatLng(firstPoint.latitude, firstPoint.longitude));
+            mapController.move(firstPoint, _myzoom);
           }
           return lines;
         }
@@ -3058,23 +3158,23 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
                     });
 
                 if (speed <= maxSpeed && speed >= minSpeed) {
-                  Place place = Place('alert', LatLng(lat, lng));
-                  addMarker(context, place,
-                      marker: GestureDetector(
-                        onTap: () {
-                          showSpeedDialog(speed);
-                        },
-                        child: Container(
-                          width: markerSize,
-                          height: markerSize,
-                          child: CircleAvatar(
-                            radius: markerSize,
-                            backgroundColor: Colors.transparent,
-                            child: getMarkerOnSpeed(speed, diff),
-                          ),
-                        ),
-                      ));
-                  // markers.add(marker);
+                  // Place place = Place('alert', LatLng(lat, lng));
+                  // addMarker(context, place,
+                  //     marker: GestureDetector(
+                  //       onTap: () {
+                  //         showSpeedDialog(speed);
+                  //       },
+                  //       child: Container(
+                  //         width: markerSize,
+                  //         height: markerSize,
+                  //         child: CircleAvatar(
+                  //           radius: markerSize,
+                  //           backgroundColor: Colors.transparent,
+                  //           child: getMarkerOnSpeed(speed, diff),
+                  //         ),
+                  //       ),
+                  //     ));
+                  markers.add(marker);
                 }
                 if (speed <= 1) {
                   marker = Marker(
@@ -3098,28 +3198,28 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
                                   ))),
                         );
                       });
-                  Place place = Place('alert2', LatLng(lat2, lng2));
-                  addMarker(context, place,
-                      marker: GestureDetector(
-                        onTap: () {
-                          showSpeedDialog(speed);
-                        },
-                        child: Container(
-                            width: markerSize,
-                            height: markerSize,
-                            child: CircleAvatar(
-                                radius: markerSize,
-                                backgroundColor: Colors.transparent,
-                                child: Icon(Icons.location_on,
-                                    key: ObjectKey(Colors.green))
-                                // Image.asset(
-                                //   markerPark,
-                                //   key: ObjectKey(Colors.green),
-                                // )
+                  // Place place = Place('alert2', LatLng(lat2, lng2));
+                  // addMarker(context, place,
+                  //     marker: GestureDetector(
+                  //       onTap: () {
+                  //         showSpeedDialog(speed);
+                  //       },
+                  //       child: Container(
+                  //           width: markerSize,
+                  //           height: markerSize,
+                  //           child: CircleAvatar(
+                  //               radius: markerSize,
+                  //               backgroundColor: Colors.transparent,
+                  //               child: Icon(Icons.location_on,
+                  //                   key: ObjectKey(Colors.green))
+                  //               // Image.asset(
+                  //               //   markerPark,
+                  //               //   key: ObjectKey(Colors.green),
+                  //               // )
 
-                                )),
-                      ));
-                  //markers.add(marker);
+                  //               )),
+                  //     ));
+                  markers.add(marker);
                 }
                 minStopTime = '';
               }
@@ -3153,16 +3253,16 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
       RxBus.post(new ChangeEvent(type: 'CLOSE_MORE_BUTTON'));
 
       if (!kIsWeb) {
-        //mapController.move(firstPoint, 15);
-        _updateCameraPosition(
-            mbox.LatLng(firstPoint.latitude, firstPoint.longitude));
+        mapController.move(firstPoint, 15);
+        // _updateCameraPosition(
+        //     mbox.LatLng(firstPoint.latitude, firstPoint.longitude));
       } else {
-        _updateCameraPosition(
-            mbox.LatLng(firstPoint.latitude, firstPoint.longitude));
+        // _updateCameraPosition(
+        //     mbox.LatLng(firstPoint.latitude, firstPoint.longitude));
 
-        //mapController.move(firstPoint, 15);
+        mapController.move(firstPoint, 15);
       }
-      // reportNoty.updateValue(new Message(type: 'HAS_MARKERS'));
+      reportNoty.updateValue(new Message(type: 'HAS_MARKERS'));
 
       return markers;
     } else {
@@ -3337,8 +3437,8 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
     // data is from http://geojson.xyz/
     print("Loading geojson data");
     final data = await rootBundle.loadString('assets/airports.geojson');
-    unawaited(statefulMapController.fromGeoJson(data,
-        markerIcon: Icon(Icons.local_airport), verbose: true));
+    // unawaited(statefulMapController.fromGeoJson(data,
+    //     markerIcon: Icon(Icons.local_airport), verbose: true));
   }
 
   void addMarker(BuildContext context, Place place,
@@ -3410,97 +3510,97 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
 
   void addStatefulMarker(BuildContext context, Place place,
       {Widget marker, bool isAnim = false}) {
-    var filter = _markersOnMap
-      ..where((element) => element.name == place.name).toList();
-    var oldmarker = statefulMapController.statefulMarkers[place.name];
-    if (oldmarker != null) {}
-    if (isAnim) {
-      //statefulMapController.removeMarkers(names: null)
-    }
-    if (filter == null || filter.isEmpty) {
-      print("Adding marker ${place.name}");
-      statefulMapController.addStatefulMarker(
-          name: place.name,
-          statefulMarker: StatefulMarker(
-              //anchorAlign: AnchorAlign.bottom,
-              height: 80.0,
-              width: 150.0,
-              state: <String, dynamic>{"showText": false},
-              point: place.point,
-              builder: (BuildContext context, Map<String, dynamic> state) {
-                Widget w;
-                final markerIcon = marker != null
-                    ? marker
-                    : IconButton(
-                        icon: const Icon(Icons.location_on),
-                        onPressed: () => statefulMapController.mutateMarker(
-                            name: place.name,
-                            property: "showText",
-                            value: !(state["showText"] as bool)));
-                if (state["showText"] == true) {
-                  w = Column(children: <Widget>[
-                    markerIcon,
-                    Container(
-                        color: Colors.white,
-                        child: Padding(
-                            padding: const EdgeInsets.all(5.0),
-                            child: Text(place.name, textScaleFactor: 1.3))),
-                  ]);
-                } else {
-                  w = markerIcon;
-                }
-                return w;
-              }));
+    // var filter = _markersOnMap
+    //   ..where((element) => element.name == place.name).toList();
+    // var oldmarker = statefulMapController.statefulMarkers[place.name];
+    // if (oldmarker != null) {}
+    // if (isAnim) {
+    //   //statefulMapController.removeMarkers(names: null)
+    // }
+    // if (filter == null || filter.isEmpty) {
+    //   print("Adding marker ${place.name}");
+    //   statefulMapController.addStatefulMarker(
+    //       name: place.name,
+    //       statefulMarker: StatefulMarker(
+    //           //anchorAlign: AnchorAlign.bottom,
+    //           height: 80.0,
+    //           width: 150.0,
+    //           state: <String, dynamic>{"showText": false},
+    //           point: place.point,
+    //           builder: (BuildContext context, Map<String, dynamic> state) {
+    //             Widget w;
+    //             final markerIcon = marker != null
+    //                 ? marker
+    //                 : IconButton(
+    //                     icon: const Icon(Icons.location_on),
+    //                     onPressed: () => statefulMapController.mutateMarker(
+    //                         name: place.name,
+    //                         property: "showText",
+    //                         value: !(state["showText"] as bool)));
+    //             if (state["showText"] == true) {
+    //               w = Column(children: <Widget>[
+    //                 markerIcon,
+    //                 Container(
+    //                     color: Colors.white,
+    //                     child: Padding(
+    //                         padding: const EdgeInsets.all(5.0),
+    //                         child: Text(place.name, textScaleFactor: 1.3))),
+    //               ]);
+    //             } else {
+    //               w = markerIcon;
+    //             }
+    //             return w;
+    //           }));
 
-      _markersOnMap.add(place);
-      return;
-    } else {
-      _markersOnMap.removeWhere((element) => element.name == place.name);
+    //   _markersOnMap.add(place);
+    //   return;
+    // } else {
+    //   _markersOnMap.removeWhere((element) => element.name == place.name);
 
-      // statefulMapController.addStatefulMarker(
-      //     name: place.name,
-      //     statefulMarker: StatefulMarker(
-      //         //anchorAlign: AnchorAlign.bottom,
-      //         height: 80.0,
-      //         width: 150.0,
-      //         state: <String, dynamic>{"showText": false},
-      //         point: place.point,
-      //         builder: (BuildContext context, Map<String, dynamic> state) {
-      //           Widget w;
-      //           final markerIcon = marker != null
-      //               ? marker
-      //               : IconButton(
-      //                   icon: const Icon(Icons.location_on),
-      //                   onPressed: () => statefulMapController.mutateMarker(
-      //                       name: place.name,
-      //                       property: "showText",
-      //                       value: !(state["showText"] as bool)));
-      //           if (state["showText"] == true) {
-      //             w = Column(children: <Widget>[
-      //               markerIcon,
-      //               Container(
-      //                   color: Colors.white,
-      //                   child: Padding(
-      //                       padding: const EdgeInsets.all(5.0),
-      //                       child: Text(place.name, textScaleFactor: 1.3))),
-      //             ]);
-      //           } else {
-      //             w = markerIcon;
-      //           }
-      //           return w;
-      //         }));
-      _markersOnMap.add(place);
-      return;
-    }
+    //   // statefulMapController.addStatefulMarker(
+    //   //     name: place.name,
+    //   //     statefulMarker: StatefulMarker(
+    //   //         //anchorAlign: AnchorAlign.bottom,
+    //   //         height: 80.0,
+    //   //         width: 150.0,
+    //   //         state: <String, dynamic>{"showText": false},
+    //   //         point: place.point,
+    //   //         builder: (BuildContext context, Map<String, dynamic> state) {
+    //   //           Widget w;
+    //   //           final markerIcon = marker != null
+    //   //               ? marker
+    //   //               : IconButton(
+    //   //                   icon: const Icon(Icons.location_on),
+    //   //                   onPressed: () => statefulMapController.mutateMarker(
+    //   //                       name: place.name,
+    //   //                       property: "showText",
+    //   //                       value: !(state["showText"] as bool)));
+    //   //           if (state["showText"] == true) {
+    //   //             w = Column(children: <Widget>[
+    //   //               markerIcon,
+    //   //               Container(
+    //   //                   color: Colors.white,
+    //   //                   child: Padding(
+    //   //                       padding: const EdgeInsets.all(5.0),
+    //   //                       child: Text(place.name, textScaleFactor: 1.3))),
+    //   //             ]);
+    //   //           } else {
+    //   //             w = markerIcon;
+    //   //           }
+    //   //           return w;
+    //   //         }));
+    //   _markersOnMap.add(place);
+    //   return;
+    // }
   }
 
   void addLines(BuildContext context, List<GeoPoint> points) {
     if (points != null && points.isNotEmpty) {
-      statefulMapController.addLineFromGeoPoints(
-          geoPoints: points,
-          width: (8.0 * _myzoom) / _zoom,
-          name: 'POINTS',
-          color: Colors.redAccent);
+      // statefulMapController.addLineFromGeoPoints(
+      //     geoPoints: points,
+      //     width: (8.0 * _myzoom) / _zoom,
+      //     name: 'POINTS',
+      //     color: Colors.redAccent);
     }
 
     return;
@@ -3612,23 +3712,24 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
     markerlocationStream.stream.asBroadcastStream().listen((onData) {
       print(onData.latitude);
     });
-    // userLocationOptions = UserLocationOptions(
-    //     context: context,
-    //     mapController: mapController,
-    //     // !kIsWeb ? liveMapController.mapController : mapController,
-    //     markers: markers,
-    //     onLocationUpdate: (LatLng pos) {
-    //       print("onLocationUpdate ${pos.toString()}");
-    //       // mapController.move(pos, 17.0);
-    //       // liveMapController.mapController.move(pos, 14);
-    //     },
-    //     updateMapLocationOnPositionChange: true,
-    //     showMoveToCurrentLocationFloatingActionButton: true,
-    //     zoomToCurrentLocationOnLoad: true,
-    //     //showHeading: true,
-    //     fabBottom: 90,
-    //     fabRight: 20,
-    //     verbose: true);
+
+    userLocationOptions = UserLocationOptions(
+        context: context,
+        mapController: mapController,
+        // !kIsWeb ? liveMapController.mapController : mapController,
+        markers: markers,
+        onLocationUpdate: (LatLng pos) {
+          print("onLocationUpdate ${pos.toString()}");
+          // mapController.move(pos, 17.0);
+          // liveMapController.mapController.move(pos, 14);
+        },
+        updateMapLocationOnPositionChange: true,
+        showMoveToCurrentLocationFloatingActionButton: true,
+        zoomToCurrentLocationOnLoad: true,
+        //showHeading: true,
+        fabBottom: 90,
+        fabRight: 20,
+        verbose: true);
 
     super.initState();
 
@@ -4093,10 +4194,10 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
           if (latLng != mark.point) markers[markerIndex] = newMarker;
         }
       } else {
-        Place place = Place('update',
-            LatLng(newMarker.point.latitude, newMarker.point.longitude));
-        addMarker(context, place, marker: marker);
-        // markers.add(newMarker);
+        // Place place = Place('update',
+        //     LatLng(newMarker.point.latitude, newMarker.point.longitude));
+        //addMarker(context, place, marker: marker);
+        markers.add(newMarker);
       }
 
       carMarkersMap.update(lastCarIdSelected, (value) => newMarker);
@@ -4104,10 +4205,10 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
         statusNoty.updateValue(Message(
             type: 'GPS_GPRS_UPDATE', index: carId, id: carId, status: false));
     } else {
-      Place place = Place('update',
-          LatLng(newMarker.point.latitude, newMarker.point.longitude));
-      addMarker(context, place, marker: marker);
-      // markers.add(newMarker);
+      // Place place = Place('update',
+      //     LatLng(newMarker.point.latitude, newMarker.point.longitude));
+      // addMarker(context, place, marker: marker);
+      markers.add(newMarker);
       carMarkersMap.putIfAbsent(lastCarIdSelected, () => newMarker);
       statusNoty.updateValue(Message(
           type: 'GPS_GPRS_UPDATE', index: carId, id: carId, status: false));
@@ -4124,7 +4225,7 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
     // } else {
     //   mapController.move(latLng, 14);
     // }
-    mapController.move(latLng, 14);
+    mapController.move(latLng, _myzoom);
   }
 
   Future<bool> getParkAndSpeedStatus(NotyBloc<CarStateVM> notyBloc) async {
@@ -4353,15 +4454,16 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
         ),
       );
 
-      // markers.add(marker);
-      Place carmarker = Place(
-        'CarMarker',
-        latLng,
-      );
+      markers.add(marker);
+      // Place carmarker = Place(
+      //   'CarMarker',
+      //   latLng,
+      // );
 
-      await _addSymbol(
-          'assetCarImage', mbox.LatLng(latLng.latitude, latLng.longitude),
-          speed: currentCarLocationSpeed, isAnim: false);
+      // await _addSymbol(
+      //     'assetCarImage', mbox.LatLng(latLng.latitude, latLng.longitude),
+      //     speed: currentCarLocationSpeed, isAnim: false);
+      //_updateCameraPosition(mbox.LatLng(latLng.latitude, latLng.longitude));
       // addMarker(
       //   context,
       //   carmarker,
@@ -4392,24 +4494,24 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
 
       if (route) {
         if (latLng != null)
-          _changePositionSymbol(mbox.LatLng(latLng.latitude, latLng.longitude));
-        // updateMarkerPosition(lastCarIdSelected, marker, latLng,
-        //     marker: Container(
-        //         width: 38.0,
-        //         height: 38.0,
-        //         child: GestureDetector(
-        //             onTap: () {
-        //               _showInfoDialog(lastCarIdSelected);
-        //               _showInfoPopUp = true;
-        //             },
-        //             child: CircleAvatar(
-        //                 radius: 38.0,
-        //                 backgroundColor: Colors.transparent,
-        //                 child: Image.asset(
-        //                   imgUrl,
-        //                   key: ObjectKey(Colors.green),
-        //                 )))));
-        _updateCameraPosition(mbox.LatLng(latLng.latitude, latLng.longitude));
+          // _changePositionSymbol(mbox.LatLng(latLng.latitude, latLng.longitude));
+          updateMarkerPosition(lastCarIdSelected, marker, latLng,
+              marker: Container(
+                  width: 38.0,
+                  height: 38.0,
+                  child: GestureDetector(
+                      onTap: () {
+                        _showInfoDialog(lastCarIdSelected);
+                        _showInfoPopUp = true;
+                      },
+                      child: CircleAvatar(
+                          radius: 38.0,
+                          backgroundColor: Colors.transparent,
+                          child: Image.asset(
+                            imgUrl,
+                            key: ObjectKey(Colors.green),
+                          )))));
+        //_updateCameraPosition(mbox.LatLng(latLng.latitude, latLng.longitude));
       } else {
         if (latLng != null) {
           carMarkersMap.putIfAbsent(lastCarIdSelected, () => marker);
@@ -4420,31 +4522,32 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
       // if(!route) {
 
       if (isCarPaired) {
-        _changePositionSymbol(mbox.LatLng(latLng.latitude, latLng.longitude));
-        // updateMarkerPosition(lastCarIdSelected, marker, latLng,
-        //     marker: Container(
-        //         width: 38.0,
-        //         height: 38.0,
-        //         child: GestureDetector(
-        //             onTap: () {
-        //               _showInfoDialog(lastCarIdSelected);
-        //               _showInfoPopUp = true;
-        //             },
-        //             child: CircleAvatar(
-        //                 radius: 38.0,
-        //                 backgroundColor: Colors.transparent,
-        //                 child: Image.asset(
-        //                   imgUrl,
-        //                   key: ObjectKey(Colors.green),
-        //                 )))));
-        //liveMapController.mapController.move(latLng, 14);
+        // _changePositionSymbol(mbox.LatLng(latLng.latitude, latLng.longitude));
+        updateMarkerPosition(lastCarIdSelected, marker, latLng,
+            marker: Container(
+                width: 38.0,
+                height: 38.0,
+                child: GestureDetector(
+                    onTap: () {
+                      _showInfoDialog(lastCarIdSelected);
+                      _showInfoPopUp = true;
+                    },
+                    child: CircleAvatar(
+                        radius: 38.0,
+                        backgroundColor: Colors.transparent,
+                        child: Image.asset(
+                          imgUrl,
+                          key: ObjectKey(Colors.green),
+                        )))));
+        mapController.move(latLng, _myzoom);
       }
       if (_timerupdate == null || !_timerupdate.isActive) if (!kIsWeb)
         _updateLastPositionCarPeriodically(
             index, lastCarIdSelected, isCarPaired);
       // }
-      if(latLng!=null){
-        _updateCameraPosition(mbox.LatLng(latLng.latitude, latLng.longitude));
+      if (latLng != null) {
+        // _updateCameraPosition(mbox.LatLng(latLng.latitude, latLng.longitude));
+        mapController.move(latLng, _myzoom);
       }
     } else {
       centerRepository.showFancyToast('اطلاعاتی یافت نشد', false);
@@ -5835,25 +5938,28 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
 
     if (lines != null && lines.length > 0) {
       lines.clear();
+      if (polyLine.points != null && polyLine.points.isNotEmpty) {
+        polyLine.points.clear();
+      }
     }
     if (latLngPoints != null && latLngPoints.isNotEmpty) {
       latLngPoints.clear();
     }
-    if (controller.lines != null && controller.lines.isNotEmpty) {
-      controller.clearLines();
-    }
-    if (controller.symbols != null && controller.symbols.isNotEmpty) {
-      controller.clearSymbols();
-    }
-    if (statefulMapController != null &&
-        statefulMapController.markers != null &&
-        statefulMapController.markers.isNotEmpty)
-      statefulMapController.removeMarkers();
+    // if (controller.lines != null && controller.lines.isNotEmpty) {
+    //   controller.clearLines();
+    // }
+    // if (controller.symbols != null && controller.symbols.isNotEmpty) {
+    //   controller.clearSymbols();
+    // }
+    // if (statefulMapController != null &&
+    //     statefulMapController.markers != null &&
+    //     statefulMapController.markers.isNotEmpty)
+    //   statefulMapController.removeMarkers();
 
-    if (statefulMapController != null &&
-        statefulMapController.lines != null &&
-        statefulMapController.lines.isNotEmpty)
-      statefulMapController.removeLine('POINTS');
+    // if (statefulMapController != null &&
+    //     statefulMapController.lines != null &&
+    //     statefulMapController.lines.isNotEmpty)
+    //   statefulMapController.removeLine('POINTS');
 
     if (carInMarkerMap != null && carInMarkerMap.length > 0)
       carInMarkerMap.clear();
@@ -5870,6 +5976,7 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
     if (lines2 != null) {
       lines2 = null;
     }
+    setState(() {});
   }
 
   String gmap_url =
@@ -5879,56 +5986,57 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
   @override
   Widget build(BuildContext context) {
     popmenu.PopupMenu.context = context;
-    final mbox.MapboxMap mapboxMap = mbox.MapboxMap(
-      accessToken: ACCESS_TOKEN,
-      onMapCreated: _onMapCreated,
-      initialCameraPosition: _kInitialPosition,
-      trackCameraPosition: true,
-      compassEnabled: _compassEnabled,
-      onStyleLoadedCallback: onStyleLoadedCallback,
-      cameraTargetBounds: _cameraTargetBounds,
-      minMaxZoomPreference: _minMaxZoomPreference,
-      styleString: _styleStrings[_styleStringIndex],
-      rotateGesturesEnabled: _rotateGesturesEnabled,
-      scrollGesturesEnabled: _scrollGesturesEnabled,
-      tiltGesturesEnabled: _tiltGesturesEnabled,
-      zoomGesturesEnabled: _zoomGesturesEnabled,
-      myLocationEnabled: _myLocationEnabled,
-      myLocationTrackingMode: _myLocationTrackingMode,
-      myLocationRenderMode: mbox.MyLocationRenderMode.GPS,
-      onMapClick: (point, latLng) async {
-        print(
-            "Map click: ${point.x},${point.y}   ${latLng.latitude}/${latLng.longitude}");
-        print("Filter $_featureQueryFilter");
-      },
-      onMapLongClick: (point, latLng) async {
-        print(
-            "Map long press: ${point.x},${point.y}   ${latLng.latitude}/${latLng.longitude}");
-        Point convertedPoint = await controller.toScreenLocation(latLng);
-        mbox.LatLng convertedLatLng = await controller.toLatLng(point);
-        print(
-            "Map long press converted: ${convertedPoint.x},${convertedPoint.y}   ${convertedLatLng.latitude}/${convertedLatLng.longitude}");
-        double metersPerPixel =
-            await controller.getMetersPerPixelAtLatitude(latLng.latitude);
+    // final mbox.MapboxMap mapboxMap = mbox.MapboxMap(
+    //   accessToken: ACCESS_TOKEN,
+    //   onMapCreated: _onMapCreated,
+    //   initialCameraPosition: _kInitialPosition,
+    //   trackCameraPosition: true,
+    //   compassEnabled: _compassEnabled,
+    //   onStyleLoadedCallback: onStyleLoadedCallback,
+    //   cameraTargetBounds: _cameraTargetBounds,
+    //   minMaxZoomPreference: _minMaxZoomPreference,
+    //   styleString: _styleStrings[_styleStringIndex],
+    //   rotateGesturesEnabled: _rotateGesturesEnabled,
+    //   scrollGesturesEnabled: _scrollGesturesEnabled,
+    //   tiltGesturesEnabled: _tiltGesturesEnabled,
+    //   zoomGesturesEnabled: _zoomGesturesEnabled,
+    //   myLocationEnabled: _myLocationEnabled,
+    //   compassViewPosition: mbox.CompassViewPosition.TopLeft,
+    //   myLocationTrackingMode: _myLocationTrackingMode,
+    //   myLocationRenderMode: mbox.MyLocationRenderMode.NORMAL,
+    //   onMapClick: (point, latLng) async {
+    //     print(
+    //         "Map click: ${point.x},${point.y}   ${latLng.latitude}/${latLng.longitude}");
+    //     print("Filter $_featureQueryFilter");
+    //   },
+    //   onMapLongClick: (point, latLng) async {
+    //     print(
+    //         "Map long press: ${point.x},${point.y}   ${latLng.latitude}/${latLng.longitude}");
+    //     Point convertedPoint = await controller.toScreenLocation(latLng);
+    //     mbox.LatLng convertedLatLng = await controller.toLatLng(point);
+    //     print(
+    //         "Map long press converted: ${convertedPoint.x},${convertedPoint.y}   ${convertedLatLng.latitude}/${convertedLatLng.longitude}");
+    //     double metersPerPixel =
+    //         await controller.getMetersPerPixelAtLatitude(latLng.latitude);
 
-        print(
-            "Map long press The distance measured in meters at latitude ${latLng.latitude} is $metersPerPixel m");
+    //     print(
+    //         "Map long press The distance measured in meters at latitude ${latLng.latitude} is $metersPerPixel m");
 
-        List features = await controller.queryRenderedFeatures(point, [], null);
-        if (features.length > 0) {
-          print(features[0]);
-        }
-      },
-      onCameraTrackingDismissed: () {
-        this.setState(() {
-          _myLocationTrackingMode = mbox.MyLocationTrackingMode.None;
-        });
-      },
-      onUserLocationUpdated: (location) {
-        print(
-            "new location: ${location.position}, alt.: ${location.altitude}, bearing: ${location.bearing}, speed: ${location.speed}, horiz. accuracy: ${location.horizontalAccuracy}, vert. accuracy: ${location.verticalAccuracy}");
-      },
-    );
+    //     List features = await controller.queryRenderedFeatures(point, [], null);
+    //     if (features.length > 0) {
+    //       print(features[0]);
+    //     }
+    //   },
+    //   onCameraTrackingDismissed: () {
+    //     this.setState(() {
+    //       _myLocationTrackingMode = mbox.MyLocationTrackingMode.None;
+    //     });
+    //   },
+    //   onUserLocationUpdated: (location) {
+    //     print(
+    //         "new location: ${location.position}, alt.: ${location.altitude}, bearing: ${location.bearing}, speed: ${location.speed}, horiz. accuracy: ${location.horizontalAccuracy}, vert. accuracy: ${location.verticalAccuracy}");
+    //   },
+    // );
     return FutureBuilder<List<CarInfoVM>>(
       future: carInfoss,
       builder: (context, snapshot) {
@@ -6097,174 +6205,210 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
                                                                 null) {
                                                           if (_fpoint !=
                                                               null) if (!kIsWeb) {
+                                                            // _updateCameraPosition(
+                                                            //     mbox.LatLng(
+                                                            //         _fpoint
+                                                            //             .latitude,
+                                                            //         _fpoint
+                                                            //             .longitude));
                                                             mapController.move(
                                                                 _fpoint,
                                                                 _myzoom);
                                                           } else {
+                                                            // _updateCameraPosition(
+                                                            //     mbox.LatLng(
+                                                            //         _fpoint
+                                                            //             .latitude,
+                                                            //         _fpoint
+                                                            //             .longitude));
                                                             mapController.move(
                                                                 _fpoint,
                                                                 _myzoom);
                                                           }
                                                         }
-                                                        return kIsWeb
-                                                            ? Padding(
-                                                                padding: EdgeInsets
-                                                                    .only(
-                                                                        top:
-                                                                            150.0),
-                                                                child: Container(
-                                                                    width: MediaQuery.of(
-                                                                            context)
-                                                                        .size
-                                                                        .width,
-                                                                    height: MediaQuery.of(context)
-                                                                            .size
-                                                                            .height *
-                                                                        0.80,
-                                                                    child:
-                                                                        mapboxMap))
-                                                            : FlutterMap(
-                                                                mapController: !kIsWeb
-                                                                    ? mapController
-                                                                    : mapController,
+                                                        return
+                                                            //  kIsWeb
+                                                            //     ? Padding(
+                                                            //         padding: EdgeInsets.only(
+                                                            //             top: 150.0),
+                                                            //         child: Container(
+                                                            //             width: MediaQuery.of(context)
+                                                            //                 .size
+                                                            //                 .width,
+                                                            //             height: MediaQuery.of(context)
+                                                            //                     .size
+                                                            //                     .height *
+                                                            //                 0.80,
+                                                            //             child:
+                                                            //                 mapboxMap))
+                                                            //     : Padding(
+                                                            //         padding: EdgeInsets.only(
+                                                            //             top: 150.0),
+                                                            //         child: Container(
+                                                            //             width: MediaQuery.of(
+                                                            //                     context)
+                                                            //                 .size
+                                                            //                 .width,
+                                                            //             height: MediaQuery.of(context)
+                                                            //                     .size
+                                                            //                     .height *
+                                                            //                 0.80,
+                                                            //             child:
+                                                            //                 mapboxMap));
+                                                            FlutterMap(
+                                                          mapController: !kIsWeb
+                                                              ? mapController
+                                                              : mapController,
 
-                                                                options:
-                                                                    MapOptions(
-                                                                  center: firstPoint !=
-                                                                          null
-                                                                      ? firstPoint
-                                                                      : currentLocation !=
-                                                                              null
-                                                                          ? LatLng(
-                                                                              currentLocation.latitude,
-                                                                              currentLocation.longitude)
-                                                                          : LatLng(
-                                                                              45.13065,
-                                                                              5.58213,
-                                                                            ),
-                                                                  zoom: _myzoom,
-                                                                  /*plugins: [
-                                                                      UserLocationPlugin()
-                                                                    ],*/
-                                                                ),
-                                                                layers: [
-                                                                  // statefulMapController
-                                                                  //     .tileLayer,
+                                                          options: MapOptions(
+                                                            center: firstPoint !=
+                                                                    null
+                                                                ? firstPoint
+                                                                : currentLocation !=
+                                                                        null
+                                                                    ? LatLng(
+                                                                        currentLocation
+                                                                            .latitude,
+                                                                        currentLocation
+                                                                            .longitude)
+                                                                    : LatLng(
+                                                                        45.13065,
+                                                                        5.58213,
+                                                                      ),
+                                                            zoom: _myzoom,
+                                                            plugins: [
+                                                              ZoomButtonsPlugin(),
+                                                            ],
+                                                          ),
+                                                          layers: [
+                                                            // statefulMapController
+                                                            //     .tileLayer,
 
-                                                                  showSattelite
-                                                                      ? TileLayerOptions(
-                                                                          tileProvider:
-                                                                              NonCachingNetworkTileProvider(),
-                                                                          urlTemplate:
-                                                                              'https://api.mapbox.com/styles/v1/rezand/ck7d3ul4c0k3w1ir0n2a419pd/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoicmV6YW5kIiwiYSI6ImNrNWNkdHg3djAwdDAzZnMwcTc1N2ZpY2YifQ.fl5LG72G5Uz6CLVfhbazNw',
-                                                                          additionalOptions: {
-                                                                            'accessToken':
-                                                                                'pk.eyJ1IjoicmV6YW5kIiwiYSI6ImNrNWNkdHg3djAwdDAzZnMwcTc1N2ZpY2YifQ.fl5LG72G5Uz6CLVfhbazNw',
-                                                                            //'id': 'mapbox.mapbox-streets-v7'
-                                                                          },
-                                                                          subdomains: [
-                                                                            'a',
-                                                                            'b',
-                                                                            'c',
-                                                                            'd'
-                                                                          ],
-                                                                        )
-                                                                      : TileLayerOptions(
-                                                                          tileProvider:
-                                                                              NonCachingNetworkTileProvider(),
-                                                                          //urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-                                                                          urlTemplate:
-                                                                              'https://api.mapbox.com/styles/v1/rezand/ck7ge41221jke1inrbezkflve/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoicmV6YW5kIiwiYSI6ImNrNWNkdHg3djAwdDAzZnMwcTc1N2ZpY2YifQ.fl5LG72G5Uz6CLVfhbazNw',
-                                                                          additionalOptions: {
-                                                                            'accessToken':
-                                                                                'pk.eyJ1IjoicmV6YW5kIiwiYSI6ImNrNWNkdHg3djAwdDAzZnMwcTc1N2ZpY2YifQ.fl5LG72G5Uz6CLVfhbazNw',
-                                                                            'id':
-                                                                                'mapbox.mapbox-streets-v7'
-                                                                          },
-                                                                          subdomains: [
-                                                                            'a',
-                                                                            'b',
-                                                                            'c'
-                                                                          ],
-                                                                          //additionalOptions: {'key':'2UnTxClTTOQ2d3xsUL5T'},
-                                                                        ),
-
-                                                                  // (forAnim &&
-                                                                  //         _polyLineAnim !=
-                                                                  //             null)
-                                                                  //     ? PolylineLayerOptions(
-                                                                  //         polylines: statefulMapController
-                                                                  //             .lines)
-                                                                  //   <Polyline>[
-                                                                  //   _polyLineAnim
-                                                                  // ])
-                                                                  PolylineLayerOptions(
-                                                                      polylines: latLngPoints != null &&
-                                                                              latLngPoints.isNotEmpty
-                                                                          ? [
-                                                                              Polyline(
-                                                                                points: latLngPoints,
-                                                                                color: Colors.red,
-                                                                                strokeWidth: (8.0 * _myzoom / _zoom),
-                                                                              ),
-                                                                            ]
-                                                                          : []),
-                                                                  MarkerLayerOptions(
-                                                                    markers:
-                                                                        markers,
+                                                            showSattelite
+                                                                ? TileLayerOptions(
+                                                                    tileProvider:
+                                                                        NonCachingNetworkTileProvider(),
+                                                                    urlTemplate:
+                                                                        'https://api.mapbox.com/styles/v1/rezand/ck7d3ul4c0k3w1ir0n2a419pd/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoicmV6YW5kIiwiYSI6ImNrNWNkdHg3djAwdDAzZnMwcTc1N2ZpY2YifQ.fl5LG72G5Uz6CLVfhbazNw',
+                                                                    additionalOptions: {
+                                                                      'accessToken':
+                                                                          'pk.eyJ1IjoicmV6YW5kIiwiYSI6ImNrNWNkdHg3djAwdDAzZnMwcTc1N2ZpY2YifQ.fl5LG72G5Uz6CLVfhbazNw',
+                                                                      //'id': 'mapbox.mapbox-streets-v7'
+                                                                    },
+                                                                    subdomains: [
+                                                                      'a',
+                                                                      'b',
+                                                                      'c',
+                                                                      'd'
+                                                                    ],
+                                                                  )
+                                                                : TileLayerOptions(
+                                                                    tileProvider:
+                                                                        NonCachingNetworkTileProvider(),
+                                                                    //urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                                                                    urlTemplate:
+                                                                        'https://api.mapbox.com/styles/v1/rezand/ck7ge41221jke1inrbezkflve/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoicmV6YW5kIiwiYSI6ImNrNWNkdHg3djAwdDAzZnMwcTc1N2ZpY2YifQ.fl5LG72G5Uz6CLVfhbazNw',
+                                                                    additionalOptions: {
+                                                                      'accessToken':
+                                                                          'pk.eyJ1IjoicmV6YW5kIiwiYSI6ImNrNWNkdHg3djAwdDAzZnMwcTc1N2ZpY2YifQ.fl5LG72G5Uz6CLVfhbazNw',
+                                                                      'id':
+                                                                          'mapbox.mapbox-streets-v7'
+                                                                    },
+                                                                    subdomains: [
+                                                                      'a',
+                                                                      'b',
+                                                                      'c'
+                                                                    ],
+                                                                    //additionalOptions: {'key':'2UnTxClTTOQ2d3xsUL5T'},
                                                                   ),
 
-                                                                  // MarkerLayerOptions(
-                                                                  //     markers:
-                                                                  //         carAnimMarkers),
+                                                            // (forAnim &&
+                                                            //         _polyLineAnim !=
+                                                            //             null)
+                                                            //     ? PolylineLayerOptions(
+                                                            //         polylines: statefulMapController
+                                                            //             .lines)
+                                                            //   <Polyline>[
+                                                            //   _polyLineAnim
+                                                            // ])
+                                                            PolylineLayerOptions(
+                                                                polylines: latLngPoints !=
+                                                                            null &&
+                                                                        latLngPoints
+                                                                            .isNotEmpty
+                                                                    ? [
+                                                                        Polyline(
+                                                                          points:
+                                                                              latLngPoints,
+                                                                          color:
+                                                                              Colors.red,
+                                                                          strokeWidth: (8.0 *
+                                                                              _myzoom /
+                                                                              _zoom),
+                                                                        ),
+                                                                      ]
+                                                                    : []),
+                                                            MarkerLayerOptions(
+                                                              markers: markers,
+                                                            ),
+                                                            ZoomButtonsPluginOption(
+                                                                minZoom: 4,
+                                                                maxZoom: 19,
+                                                                mini: true,
+                                                                padding: 10,
+                                                                alignment: Alignment
+                                                                    .centerLeft),
+                                                            MarkerLayerOptions(
+                                                                markers:
+                                                                    carAnimMarkers),
 
-                                                                  //userLocationOptions,
-                                                                ],
-                                                                // children: [
-                                                                //   TileLayerWidget(
-                                                                //     options:
-                                                                //         TileLayerOptions(
-                                                                //       tileProvider:
-                                                                //           NonCachingNetworkTileProvider(),
-                                                                //       //urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-                                                                //       urlTemplate:
-                                                                //           'https://api.mapbox.com/styles/v1/rezand/ck7ge41221jke1inrbezkflve/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoicmV6YW5kIiwiYSI6ImNrNWNkdHg3djAwdDAzZnMwcTc1N2ZpY2YifQ.fl5LG72G5Uz6CLVfhbazNw',
-                                                                //       additionalOptions: {
-                                                                //         'accessToken':
-                                                                //             'pk.eyJ1IjoicmV6YW5kIiwiYSI6ImNrNWNkdHg3djAwdDAzZnMwcTc1N2ZpY2YifQ.fl5LG72G5Uz6CLVfhbazNw',
-                                                                //         'id':
-                                                                //             'mapbox.mapbox-streets-v7'
-                                                                //       },
-                                                                //       subdomains: [
-                                                                //         'a',
-                                                                //         'b',
-                                                                //         'c'
-                                                                //       ],
-                                                                //       //additionalOptions: {'key':'2UnTxClTTOQ2d3xsUL5T'},
-                                                                //     ),
-                                                                //   ),
-                                                                //   PolylineLayerWidget(
-                                                                //       options:
-                                                                //           PolylineLayerOptions(
-                                                                //               polylines: [
-                                                                //         Polyline(
-                                                                //           points:
-                                                                //               latLngPoints,
-                                                                //           color: Colors
-                                                                //               .red,
-                                                                //           strokeWidth:
-                                                                //               3.0,
-                                                                //         )
-                                                                //       ])),
-                                                                //   MarkerLayerWidget(
-                                                                //     options:
-                                                                //         MarkerLayerOptions(
-                                                                //       markers:
-                                                                //           markers,
-                                                                //     ),
-                                                                //   ),
-                                                                // ],
-                                                              );
+                                                            //userLocationOptions,
+                                                          ],
+                                                          // children: [
+                                                          //   TileLayerWidget(
+                                                          //     options:
+                                                          //         TileLayerOptions(
+                                                          //       tileProvider:
+                                                          //           NonCachingNetworkTileProvider(),
+                                                          //       //urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                                                          //       urlTemplate:
+                                                          //           'https://api.mapbox.com/styles/v1/rezand/ck7ge41221jke1inrbezkflve/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoicmV6YW5kIiwiYSI6ImNrNWNkdHg3djAwdDAzZnMwcTc1N2ZpY2YifQ.fl5LG72G5Uz6CLVfhbazNw',
+                                                          //       additionalOptions: {
+                                                          //         'accessToken':
+                                                          //             'pk.eyJ1IjoicmV6YW5kIiwiYSI6ImNrNWNkdHg3djAwdDAzZnMwcTc1N2ZpY2YifQ.fl5LG72G5Uz6CLVfhbazNw',
+                                                          //         'id':
+                                                          //             'mapbox.mapbox-streets-v7'
+                                                          //       },
+                                                          //       subdomains: [
+                                                          //         'a',
+                                                          //         'b',
+                                                          //         'c'
+                                                          //       ],
+                                                          //       //additionalOptions: {'key':'2UnTxClTTOQ2d3xsUL5T'},
+                                                          //     ),
+                                                          //   ),
+                                                          //   PolylineLayerWidget(
+                                                          //       options:
+                                                          //           PolylineLayerOptions(
+                                                          //               polylines: [
+                                                          //         Polyline(
+                                                          //           points:
+                                                          //               latLngPoints,
+                                                          //           color: Colors
+                                                          //               .red,
+                                                          //           strokeWidth:
+                                                          //               3.0,
+                                                          //         )
+                                                          //       ])),
+                                                          //   MarkerLayerWidget(
+                                                          //     options:
+                                                          //         MarkerLayerOptions(
+                                                          //       markers:
+                                                          //           markers,
+                                                          //     ),
+                                                          //   ),
+                                                          // ],
+                                                        );
                                                       }),
                                                   // Positioned(
                                                   //     top: 15.0,
@@ -6273,77 +6417,77 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
 
                                                   //         controller:
                                                   //             statefulMapController)),
-                                                  Positioned(
-                                                      bottom: 80.0,
-                                                      left: 25.0,
-                                                      child: GestureDetector(
-                                                          onTap: () {
-                                                            controller
-                                                                .animateCamera(
-                                                              mbox.CameraUpdate
-                                                                  .zoomIn(),
-                                                            );
-                                                          },
-                                                          child: Container(
-                                                              width: 32,
-                                                              height: 32,
-                                                              child:
-                                                                  Image.asset(
-                                                                'assets/images/plus.png',
-                                                                color: Colors
-                                                                    .black38,
-                                                              )))),
-                                                  Positioned(
-                                                      bottom: 130.0,
-                                                      left: 25.0,
-                                                      child: GestureDetector(
-                                                          onTap: () {
-                                                            controller
-                                                                .animateCamera(
-                                                              mbox.CameraUpdate
-                                                                  .zoomOut(),
-                                                            );
-                                                          },
-                                                          child: Container(
-                                                            width: 32,
-                                                            height: 32,
-                                                            child: Image.asset(
-                                                              'assets/images/minus.png',
-                                                              color: Colors
-                                                                  .black38,
-                                                            ),
-                                                          ))),
                                                   // Positioned(
-                                                  //   right: 20.0,
-                                                  //   bottom: 90.0,
-                                                  //   child: Container(
-                                                  //     width: 38.0,
-                                                  //     height: 38.0,
-                                                  //     child:
-                                                  //         FloatingActionButton(
-                                                  //       onPressed: () async {
-                                                  //         animateToCurrentLocation();
-                                                  //       },
-                                                  //       child: Container(
-                                                  //         width: 38.0,
-                                                  //         height: 38.0,
-                                                  //         child: Image.asset(
-                                                  //           'assets/images/location.png',
-                                                  //           color: Colors.white,
-                                                  //         ),
-                                                  //       ),
-                                                  //       elevation: 0.0,
-                                                  //       backgroundColor:
-                                                  //           Colors.blueAccent,
-                                                  //       heroTag:
-                                                  //           'CURRENTLOCATION1',
-                                                  //     ),
-                                                  //   ),
-                                                  // ),
+                                                  //     bottom: 100.0,
+                                                  //     left: 25.0,
+                                                  //     child: GestureDetector(
+                                                  //         onTap: () {
+                                                  //           controller
+                                                  //               .animateCamera(
+                                                  //             mbox.CameraUpdate
+                                                  //                 .zoomIn(),
+                                                  //           );
+                                                  //         },
+                                                  //         child: Container(
+                                                  //             width: 32,
+                                                  //             height: 32,
+                                                  //             child:
+                                                  //                 Image.asset(
+                                                  //               'assets/images/plus.png',
+                                                  //               color: Colors
+                                                  //                   .black38,
+                                                  //             )))),
+                                                  // Positioned(
+                                                  //     bottom: 150.0,
+                                                  //     left: 25.0,
+                                                  //     child: GestureDetector(
+                                                  //         onTap: () {
+                                                  //           controller
+                                                  //               .animateCamera(
+                                                  //             mbox.CameraUpdate
+                                                  //                 .zoomOut(),
+                                                  //           );
+                                                  //         },
+                                                  //         child: Container(
+                                                  //           width: 32,
+                                                  //           height: 32,
+                                                  //           child: Image.asset(
+                                                  //             'assets/images/minus.png',
+                                                  //             color: Colors
+                                                  //                 .black38,
+                                                  //           ),
+                                                  //         ))),
+                                                  Positioned(
+                                                    right: 20.0,
+                                                    bottom: 90.0,
+                                                    child: Container(
+                                                      width: 38.0,
+                                                      height: 38.0,
+                                                      child:
+                                                          FloatingActionButton(
+                                                        onPressed: () async {
+                                                          animateToCurrentLocation();
+                                                        },
+                                                        child: Container(
+                                                          width: 38.0,
+                                                          height: 38.0,
+                                                          child: Image.asset(
+                                                            'assets/images/location.png',
+                                                            color: Colors.white,
+                                                          ),
+                                                        ),
+                                                        elevation: 0.0,
+                                                        backgroundColor:
+                                                            Colors.blueAccent,
+                                                        heroTag:
+                                                            'CURRENTLOCATION1',
+                                                      ),
+                                                    ),
+                                                  ),
                                                   showAllItemsOnMap
                                                       ? Positioned(
                                                           right: 20.0,
-                                                          bottom: 320.0,
+                                                          bottom: 340.0,
                                                           child: Container(
                                                             width: 38.0,
                                                             height: 38.0,
@@ -6388,7 +6532,7 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
                                                       : Container(),
                                                   Positioned(
                                                     right: 20.0,
-                                                    bottom: 120.0,
+                                                    bottom: 140.0,
                                                     child: Container(
                                                       width: 38.0,
                                                       height: 38.0,
@@ -6433,7 +6577,7 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
                                                   showAllItemsOnMap
                                                       ? Positioned(
                                                           right: 20.0,
-                                                          bottom: 220.0,
+                                                          bottom: 240.0,
                                                           child: Container(
                                                             width: 38.0,
                                                             height: 38.0,
@@ -6469,7 +6613,7 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
                                                   showAllItemsOnMap
                                                       ? Positioned(
                                                           right: 20.0,
-                                                          bottom: 270.0,
+                                                          bottom: 290.0,
                                                           child: Container(
                                                             width: 38.0,
                                                             height: 38.0,
@@ -6500,7 +6644,7 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
                                                   showAllItemsOnMap
                                                       ? Positioned(
                                                           right: 20.0,
-                                                          bottom: 170.0,
+                                                          bottom: 190.0,
                                                           child: Container(
                                                             width: 38.0,
                                                             height: 38.0,
@@ -6592,162 +6736,196 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
                                                         snapshot.data != null) {
                                                       if (_fpoint !=
                                                           null) if (!kIsWeb) {
-                                                        // mapController.move(
-                                                        //     _fpoint, _myzoom);
+                                                        // _updateCameraPosition(
+                                                        //     mbox.LatLng(
+                                                        //         _fpoint
+                                                        //             .latitude,
+                                                        //         _fpoint
+                                                        //             .longitude));
+                                                        mapController.move(
+                                                            _fpoint, _myzoom);
                                                       } else {
-                                                        // mapController.move(
-                                                        //     _fpoint, _myzoom);
+                                                        // _updateCameraPosition(
+                                                        //     mbox.LatLng(
+                                                        //         _fpoint
+                                                        //             .latitude,
+                                                        //         _fpoint
+                                                        //             .longitude));
+                                                        mapController.move(
+                                                            _fpoint, _myzoom);
                                                       }
                                                     }
-                                                    return kIsWeb
-                                                        ? Padding(
-                                                            padding: EdgeInsets
-                                                                .only(
-                                                                    top: 150.0),
-                                                            child: Container(
-                                                                width: MediaQuery.of(
-                                                                        context)
-                                                                    .size
-                                                                    .width,
-                                                                height: MediaQuery.of(
-                                                                            context)
-                                                                        .size
-                                                                        .height *
-                                                                    0.80,
-                                                                child:
-                                                                    mapboxMap))
-                                                        : FlutterMap(
-                                                            options: MapOptions(
-                                                              center: LatLng(
-                                                                45.13065,
-                                                                5.58213,
+                                                    return
+                                                        //  kIsWeb
+                                                        //     ? Padding(
+                                                        //         padding:
+                                                        //             EdgeInsets.only(
+                                                        //                 top: 150.0),
+                                                        //         child: Container(
+                                                        //             width:
+                                                        //                 MediaQuery.of(context)
+                                                        //                     .size
+                                                        //                     .width,
+                                                        //             height: MediaQuery.of(context)
+                                                        //                     .size
+                                                        //                     .height *
+                                                        //                 0.80,
+                                                        //             child:
+                                                        //                 mapboxMap))
+                                                        //     : Padding(
+                                                        //         padding:
+                                                        //             EdgeInsets.only(
+                                                        //                 top: 150.0),
+                                                        //         child: Container(
+                                                        //             width:
+                                                        //                 MediaQuery.of(context)
+                                                        //                     .size
+                                                        //                     .width,
+                                                        //             height: MediaQuery.of(context)
+                                                        //                     .size
+                                                        //                     .height *
+                                                        //                 0.80,
+                                                        //             child:
+                                                        //                 mapboxMap));
+
+                                                        FlutterMap(
+                                                      options: MapOptions(
+                                                        center: LatLng(
+                                                          45.13065,
+                                                          5.58213,
+                                                        ),
+                                                        zoom: _myzoom,
+                                                        plugins: [
+                                                          ZoomButtonsPlugin(),
+                                                        ],
+                                                      ),
+
+                                                      layers: [
+                                                        // statefulMapController
+                                                        //     .tileLayer,
+
+                                                        showSattelite
+                                                            ? TileLayerOptions(
+                                                                tileProvider:
+                                                                    NonCachingNetworkTileProvider(),
+                                                                urlTemplate:
+                                                                    'https://api.mapbox.com/styles/v1/rezand/ck7d3ul4c0k3w1ir0n2a419pd/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoicmV6YW5kIiwiYSI6ImNrNWNkdHg3djAwdDAzZnMwcTc1N2ZpY2YifQ.fl5LG72G5Uz6CLVfhbazNw',
+                                                                additionalOptions: {
+                                                                  'accessToken':
+                                                                      'pk.eyJ1IjoicmV6YW5kIiwiYSI6ImNrNWNkdHg3djAwdDAzZnMwcTc1N2ZpY2YifQ.fl5LG72G5Uz6CLVfhbazNw',
+                                                                  //'id': 'mapbox.mapbox-streets-v7'
+                                                                },
+                                                                subdomains: [
+                                                                  'a',
+                                                                  'b',
+                                                                  'c',
+                                                                  'd'
+                                                                ],
+                                                              )
+                                                            : TileLayerOptions(
+                                                                tileProvider:
+                                                                    NonCachingNetworkTileProvider(),
+                                                                //urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                                                                urlTemplate:
+                                                                    'https://api.mapbox.com/styles/v1/rezand/ck7ge41221jke1inrbezkflve/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoicmV6YW5kIiwiYSI6ImNrNWNkdHg3djAwdDAzZnMwcTc1N2ZpY2YifQ.fl5LG72G5Uz6CLVfhbazNw',
+                                                                additionalOptions: {
+                                                                  'accessToken':
+                                                                      'pk.eyJ1IjoicmV6YW5kIiwiYSI6ImNrNWNkdHg3djAwdDAzZnMwcTc1N2ZpY2YifQ.fl5LG72G5Uz6CLVfhbazNw',
+                                                                  'id':
+                                                                      'mapbox.mapbox-streets-v7'
+                                                                },
+                                                                subdomains: [
+                                                                  'a',
+                                                                  'b',
+                                                                  'c'
+                                                                ],
                                                               ),
-                                                              zoom: _myzoom,
-                                                              /*plugins: [
-                                                                    UserLocationPlugin()
-                                                                  ],*/
-                                                            ),
 
-                                                            layers: [
-                                                              // statefulMapController
-                                                              //     .tileLayer,
-
-                                                              showSattelite
-                                                                  ? TileLayerOptions(
-                                                                      tileProvider:
-                                                                          NonCachingNetworkTileProvider(),
-                                                                      urlTemplate:
-                                                                          'https://api.mapbox.com/styles/v1/rezand/ck7d3ul4c0k3w1ir0n2a419pd/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoicmV6YW5kIiwiYSI6ImNrNWNkdHg3djAwdDAzZnMwcTc1N2ZpY2YifQ.fl5LG72G5Uz6CLVfhbazNw',
-                                                                      additionalOptions: {
-                                                                        'accessToken':
-                                                                            'pk.eyJ1IjoicmV6YW5kIiwiYSI6ImNrNWNkdHg3djAwdDAzZnMwcTc1N2ZpY2YifQ.fl5LG72G5Uz6CLVfhbazNw',
-                                                                        //'id': 'mapbox.mapbox-streets-v7'
-                                                                      },
-                                                                      subdomains: [
-                                                                        'a',
-                                                                        'b',
-                                                                        'c',
-                                                                        'd'
-                                                                      ],
+                                                        // (forAnim &&
+                                                        //         _polyLineAnim !=
+                                                        //             null)
+                                                        //     ?
+                                                        PolylineLayerOptions(
+                                                            polylines: latLngPoints !=
+                                                                        null &&
+                                                                    latLngPoints
+                                                                        .isNotEmpty
+                                                                ? [
+                                                                    Polyline(
+                                                                      //           // An optional tag to distinguish polylines in callback
+                                                                      points:
+                                                                          latLngPoints,
+                                                                      color: Colors
+                                                                          .red,
+                                                                      strokeWidth: (8.0 *
+                                                                          _myzoom /
+                                                                          _zoom),
                                                                     )
-                                                                  : TileLayerOptions(
-                                                                      tileProvider:
-                                                                          NonCachingNetworkTileProvider(),
-                                                                      //urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-                                                                      urlTemplate:
-                                                                          'https://api.mapbox.com/styles/v1/rezand/ck7ge41221jke1inrbezkflve/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoicmV6YW5kIiwiYSI6ImNrNWNkdHg3djAwdDAzZnMwcTc1N2ZpY2YifQ.fl5LG72G5Uz6CLVfhbazNw',
-                                                                      additionalOptions: {
-                                                                        'accessToken':
-                                                                            'pk.eyJ1IjoicmV6YW5kIiwiYSI6ImNrNWNkdHg3djAwdDAzZnMwcTc1N2ZpY2YifQ.fl5LG72G5Uz6CLVfhbazNw',
-                                                                        'id':
-                                                                            'mapbox.mapbox-streets-v7'
-                                                                      },
-                                                                      subdomains: [
-                                                                        'a',
-                                                                        'b',
-                                                                        'c'
-                                                                      ],
-                                                                    ),
+                                                                  ]
+                                                                : []),
 
-                                                              // (forAnim &&
-                                                              //         _polyLineAnim !=
-                                                              //             null)
-                                                              //     ?
-                                                              PolylineLayerOptions(
-                                                                  polylines: latLngPoints !=
-                                                                              null &&
-                                                                          latLngPoints
-                                                                              .isNotEmpty
-                                                                      ? [
-                                                                          Polyline(
-                                                                            //           // An optional tag to distinguish polylines in callback
-                                                                            points:
-                                                                                latLngPoints,
-                                                                            color:
-                                                                                Colors.red,
-                                                                            strokeWidth: (8.0 *
-                                                                                _myzoom /
-                                                                                _zoom),
-                                                                          )
-                                                                        ]
-                                                                      : []),
-
-                                                              MarkerLayerOptions(
-                                                                markers:
-                                                                    markers,
-                                                              ),
-                                                              // MarkerLayerOptions(
-                                                              //     markers:
-                                                              //         carAnimMarkers),
-                                                            ],
-                                                            // children: [
-                                                            //   TileLayerWidget(
-                                                            //     options:
-                                                            //         TileLayerOptions(
-                                                            //       tileProvider:
-                                                            //           NonCachingNetworkTileProvider(),
-                                                            //       //urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-                                                            //       urlTemplate:
-                                                            //           'https://api.mapbox.com/styles/v1/rezand/ck7ge41221jke1inrbezkflve/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoicmV6YW5kIiwiYSI6ImNrNWNkdHg3djAwdDAzZnMwcTc1N2ZpY2YifQ.fl5LG72G5Uz6CLVfhbazNw',
-                                                            //       additionalOptions: {
-                                                            //         'accessToken':
-                                                            //             'pk.eyJ1IjoicmV6YW5kIiwiYSI6ImNrNWNkdHg3djAwdDAzZnMwcTc1N2ZpY2YifQ.fl5LG72G5Uz6CLVfhbazNw',
-                                                            //         'id':
-                                                            //             'mapbox.mapbox-streets-v7'
-                                                            //       },
-                                                            //       subdomains: [
-                                                            //         'a',
-                                                            //         'b',
-                                                            //         'c'
-                                                            //       ],
-                                                            //       //additionalOptions: {'key':'2UnTxClTTOQ2d3xsUL5T'},
-                                                            //     ),
-                                                            //   ),
-                                                            //   PolylineLayerWidget(
-                                                            //       options:
-                                                            //           PolylineLayerOptions(
-                                                            //               polylines: [
-                                                            //         Polyline(
-                                                            //           // An optional tag to distinguish polylines in callback
-                                                            //           points:
-                                                            //               latLngPoints,
-                                                            //           color:
-                                                            //               Colors.red,
-                                                            //           strokeWidth:
-                                                            //               3.0,
-                                                            //         ),
-                                                            //       ])),
-                                                            //   MarkerLayerWidget(
-                                                            //     options:
-                                                            //         MarkerLayerOptions(
-                                                            //       markers: markers,
-                                                            //     ),
-                                                            //   ),
-                                                            // ],
-                                                            mapController: !kIsWeb
-                                                                ? mapController
-                                                                : mapController,
-                                                          );
+                                                        MarkerLayerOptions(
+                                                          markers: markers,
+                                                        ),
+                                                        MarkerLayerOptions(
+                                                            markers:
+                                                                carAnimMarkers),
+                                                        ZoomButtonsPluginOption(
+                                                            minZoom: 4,
+                                                            maxZoom: 19,
+                                                            mini: true,
+                                                            padding: 10,
+                                                            alignment: Alignment
+                                                                .centerLeft),
+                                                      ],
+                                                      // children: [
+                                                      //   TileLayerWidget(
+                                                      //     options:
+                                                      //         TileLayerOptions(
+                                                      //       tileProvider:
+                                                      //           NonCachingNetworkTileProvider(),
+                                                      //       //urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                                                      //       urlTemplate:
+                                                      //           'https://api.mapbox.com/styles/v1/rezand/ck7ge41221jke1inrbezkflve/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoicmV6YW5kIiwiYSI6ImNrNWNkdHg3djAwdDAzZnMwcTc1N2ZpY2YifQ.fl5LG72G5Uz6CLVfhbazNw',
+                                                      //       additionalOptions: {
+                                                      //         'accessToken':
+                                                      //             'pk.eyJ1IjoicmV6YW5kIiwiYSI6ImNrNWNkdHg3djAwdDAzZnMwcTc1N2ZpY2YifQ.fl5LG72G5Uz6CLVfhbazNw',
+                                                      //         'id':
+                                                      //             'mapbox.mapbox-streets-v7'
+                                                      //       },
+                                                      //       subdomains: [
+                                                      //         'a',
+                                                      //         'b',
+                                                      //         'c'
+                                                      //       ],
+                                                      //       //additionalOptions: {'key':'2UnTxClTTOQ2d3xsUL5T'},
+                                                      //     ),
+                                                      //   ),
+                                                      //   PolylineLayerWidget(
+                                                      //       options:
+                                                      //           PolylineLayerOptions(
+                                                      //               polylines: [
+                                                      //         Polyline(
+                                                      //           // An optional tag to distinguish polylines in callback
+                                                      //           points:
+                                                      //               latLngPoints,
+                                                      //           color:
+                                                      //               Colors.red,
+                                                      //           strokeWidth:
+                                                      //               3.0,
+                                                      //         ),
+                                                      //       ])),
+                                                      //   MarkerLayerWidget(
+                                                      //     options:
+                                                      //         MarkerLayerOptions(
+                                                      //       markers: markers,
+                                                      //     ),
+                                                      //   ),
+                                                      // ],
+                                                      mapController: !kIsWeb
+                                                          ? mapController
+                                                          : mapController,
+                                                    );
                                                   },
                                                 ),
                                                 // Positioned(
@@ -6756,69 +6934,69 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
                                                 //     child: TileLayersBar(
                                                 //         controller:
                                                 //             statefulMapController)),
-                                                Positioned(
-                                                    bottom: 80.0,
-                                                    left: 25.0,
-                                                    child: GestureDetector(
-                                                        onTap: () {
-                                                          controller
-                                                              .animateCamera(
-                                                            mbox.CameraUpdate
-                                                                .zoomIn(),
-                                                          );
-                                                        },
-                                                        child: Container(
-                                                            width: 32,
-                                                            height: 32,
-                                                            child: Image.asset(
-                                                                'assets/images/plus.png')))),
-                                                Positioned(
-                                                    bottom: 130.0,
-                                                    left: 25.0,
-                                                    child: GestureDetector(
-                                                        onTap: () {
-                                                          controller
-                                                              .animateCamera(
-                                                            mbox.CameraUpdate
-                                                                .zoomOut(),
-                                                          );
-                                                        },
-                                                        child: Container(
-                                                          width: 32,
-                                                          height: 32,
-                                                          child: Image.asset(
-                                                              'assets/images/minus.png'),
-                                                        ))),
                                                 // Positioned(
-                                                //   right: 20.0,
-                                                //   bottom: 90.0,
-                                                //   child: Container(
-                                                //     width: 38.0,
-                                                //     height: 38.0,
-                                                //     child: FloatingActionButton(
-                                                //       onPressed: () async {
-                                                //         animateToCurrentLocation();
-                                                //       },
-                                                //       child: Container(
-                                                //         width: 38.0,
-                                                //         height: 38.0,
-                                                //         child: Image.asset(
-                                                //           'assets/images/location.png',
-                                                //           color: Colors.white,
-                                                //         ),
-                                                //       ),
-                                                //       elevation: 0.0,
-                                                //       backgroundColor:
-                                                //           Colors.blueAccent,
-                                                //       heroTag:
-                                                //           'CURRENTLOCATION2',
-                                                //     ),
-                                                //   ),
-                                                // ),
+                                                //     bottom: 100.0,
+                                                //     left: 25.0,
+                                                //     child: GestureDetector(
+                                                //         onTap: () {
+                                                //           controller
+                                                //               .animateCamera(
+                                                //             mbox.CameraUpdate
+                                                //                 .zoomIn(),
+                                                //           );
+                                                //         },
+                                                //         child: Container(
+                                                //             width: 32,
+                                                //             height: 32,
+                                                //             child: Image.asset(
+                                                //                 'assets/images/plus.png')))),
+                                                // Positioned(
+                                                //     bottom: 150.0,
+                                                //     left: 25.0,
+                                                //     child: GestureDetector(
+                                                //         onTap: () {
+                                                //           controller
+                                                //               .animateCamera(
+                                                //             mbox.CameraUpdate
+                                                //                 .zoomOut(),
+                                                //           );
+                                                //         },
+                                                //         child: Container(
+                                                //           width: 32,
+                                                //           height: 32,
+                                                //           child: Image.asset(
+                                                //               'assets/images/minus.png'),
+                                                //         ))),
+                                                Positioned(
+                                                  right: 20.0,
+                                                  bottom: 90.0,
+                                                  child: Container(
+                                                    width: 38.0,
+                                                    height: 38.0,
+                                                    child: FloatingActionButton(
+                                                      onPressed: () async {
+                                                        animateToCurrentLocation();
+                                                      },
+                                                      child: Container(
+                                                        width: 38.0,
+                                                        height: 38.0,
+                                                        child: Image.asset(
+                                                          'assets/images/location.png',
+                                                          color: Colors.white,
+                                                        ),
+                                                      ),
+                                                      elevation: 0.0,
+                                                      backgroundColor:
+                                                          Colors.blueAccent,
+                                                      heroTag:
+                                                          'CURRENTLOCATION2',
+                                                    ),
+                                                  ),
+                                                ),
                                                 showAllItemsOnMap
                                                     ? Positioned(
                                                         right: 20.0,
-                                                        bottom: 320.0,
+                                                        bottom: 340.0,
                                                         child: Container(
                                                           width: 38.0,
                                                           height: 38.0,
@@ -6861,7 +7039,7 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
                                                     : Container(),
                                                 Positioned(
                                                   right: 20.0,
-                                                  bottom: 120.0,
+                                                  bottom: 140.0,
                                                   child: Container(
                                                     width: 38.0,
                                                     height: 38.0,
@@ -6903,7 +7081,7 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
                                                 showAllItemsOnMap
                                                     ? Positioned(
                                                         right: 20.0,
-                                                        bottom: 270.0,
+                                                        bottom: 290.0,
                                                         child: Container(
                                                           width: 38.0,
                                                           height: 38.0,
@@ -6940,7 +7118,7 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
                                                 showAllItemsOnMap
                                                     ? Positioned(
                                                         right: 20.0,
-                                                        bottom: 220.0,
+                                                        bottom: 240.0,
                                                         child: Container(
                                                             width: 38.0,
                                                             height: 38.0,
@@ -6970,7 +7148,7 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
                                                 showAllItemsOnMap
                                                     ? Positioned(
                                                         right: 20.0,
-                                                        bottom: 170.0,
+                                                        bottom: 190.0,
                                                         child: Container(
                                                           width: 38.0,
                                                           height: 38.0,
