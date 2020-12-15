@@ -40,6 +40,16 @@ class SaveMagicarResponeQuery {
     );
   }
 
+factory SaveMagicarResponeQuery.fromJsonErrorException(Map<String, dynamic> json) {
+    return SaveMagicarResponeQuery(
+      isSuccessful: json["IsSuccessful"],
+      message: json["Message"],
+      userId: json["UserId"],
+      roleId: json["RoleId"],
+      carId: json["CarId"],
+    returnValue: null);
+  }
+
   factory SaveMagicarResponeQuery.fromJson(Map<String, dynamic> json) {
     return SaveMagicarResponeQuery(
       isSuccessful: json["IsSuccessful"],

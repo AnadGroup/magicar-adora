@@ -503,10 +503,10 @@ class RestDatasource extends BaseRest {
   }
 
   Future<List<ApiRoute>> getRouteList(ApiRoute route) async {
-    // String res2= await loadAsset();
+    //  String res2= await loadAsset();
 
-    // dynamic res3 = _decoder.convert(res2);
-    // return res3.map<ApiRoute>((r) => ApiRoute.fromJsonResult(r)).toList();
+    //  dynamic res3 = _decoder.convert(res2);
+    //  return res3.map<ApiRoute>((r) => ApiRoute.fromJsonResult(r)).toList();
     return _netUtil.post(GetROUTE_URL, body: route.toJson()).then((res) {
       if (res != null)
         return res.map<ApiRoute>((r) => ApiRoute.fromJsonResult(r)).toList();
@@ -1106,15 +1106,25 @@ class RestDatasource extends BaseRest {
     /*String content="application/json";
     Map<String,String> headers=new Map();
     headers.putIfAbsent("Content-Type",()=> content);*/
-
-    return _netUtil
-        .postNoCookie(
-      SAVE_USER_MAGICAR_URL,
-      body: body,
-    )
-        .then((res) {
-      return SaveMagicarResponeQuery.fromJson(res);
-    });
+    try {
+      return _netUtil
+          .postNoCookie(
+        SAVE_USER_MAGICAR_URL,
+        body: body,
+      )
+          .then((res) {
+        return SaveMagicarResponeQuery.fromJson(res);
+      });
+    } catch (ex) {
+      Map<String, dynamic> error = {
+        "IsSuccessful": false,
+        "Message": ex.toString(),
+        "UserId": 0,
+        "RoleId": 0,
+        "CarId": 0
+      };
+      return SaveMagicarResponeQuery.fromJsonErrorException(error);
+    }
   }
 
   Future<dynamic> editProfile({Map<String, dynamic> body}) async {
@@ -1151,7 +1161,7 @@ class RestDatasource extends BaseRest {
     Map<String, String> headers = new Map();
     headers.putIfAbsent("Content-Type", () => content);
     headers.putIfAbsent('Authorization',
-        () => '5b3ce3597851110001cf62480efcf9a66bbf4819825a3f50e2bfa0ea');
+        () => '5b3ce3597851110001cf62481a3d0886f2ee46a49ff02f527cc5c7d6');
     headers.putIfAbsent(
         'Accept',
         () =>
