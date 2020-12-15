@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map/plugin_api.dart';
+import 'package:anad_magicar/data/rxbus.dart';
+import 'package:anad_magicar/model/message.dart';
 
 class ZoomButtonsPluginOption extends LayerOptions {
   final int minZoom;
@@ -80,6 +82,7 @@ class ZoomButtons extends StatelessWidget {
                 } else {
                   map.move(centerZoom.center, zoom);
                 }
+                RxBus.post(Message(type: 'ZOOM',value: zoom));
               },
               child: Icon(zoomButtonsOpts.zoomInIcon),
             ),
@@ -100,6 +103,8 @@ class ZoomButtons extends StatelessWidget {
                 } else {
                   map.move(centerZoom.center, zoom);
                 }
+                RxBus.post(Message(type: 'ZOOM',value: zoom));
+
               },
               child: Icon(zoomButtonsOpts.zoomOutIcon),
             ),
