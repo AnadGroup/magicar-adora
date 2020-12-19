@@ -138,7 +138,7 @@ class _LoginFormState extends BaseState<LoginForm> //State<LoginForm>
     }
 
     isLoginDisabled = false;
-    formAnimationController = new AnimationController(
+    formAnimationController = AnimationController(
       vsync: this,
       duration: Duration(milliseconds: 3000),
     );
@@ -1154,7 +1154,7 @@ class _LoginFormState extends BaseState<LoginForm> //State<LoginForm>
                           ),
                         ),
                         Container(
-                          height: MediaQuery.of(context).size.height * 0.65,
+                          height: MediaQuery.of(context).size.height * 0.54,
                           child: PageView(
                             physics: BouncingScrollPhysics(),
                             controller: _pvController,
