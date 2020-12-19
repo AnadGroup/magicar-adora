@@ -33,7 +33,7 @@ import 'package:anad_magicar/service/user_location/src/user_location_options.dar
 import 'package:anad_magicar/translation_strings.dart';
 import 'package:anad_magicar/ui/map/geojson/geojson.dart';
 
-import 'package:mapbox_gl/mapbox_gl.dart' as mbox;
+//import 'package:mapbox_gl/mapbox_gl.dart' as mbox;
 import 'package:location/location.dart' as mboxLoc;
 import 'package:anad_magicar/ui/map/openmapstreet/pages/location_data.dart';
 import 'package:anad_magicar/ui/map/openmapstreet/pages/show_marker.dart';
@@ -62,7 +62,7 @@ import 'package:geopoint/geopoint.dart';
 import 'package:latlong/latlong.dart';
 //import 'package:livemap/livemap.dart';
 import 'package:location/location.dart' as loc;
-import 'package:map_launcher/map_launcher.dart' as ml;
+//import 'package:map_launcher/map_launcher.dart' as ml;
 import 'package:maps_toolkit/maps_toolkit.dart' as maptoolkit;
 import 'package:pedantic/pedantic.dart';
 import 'package:popup_menu/popup_menu.dart' as popmenu;
@@ -186,7 +186,7 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
   static final String MAX_SPEED_TAG = 'MAX_SPEED';
   String userName = '';
   double buttonWidth = 110;
-  int periodicTimePosition = 60;
+  int periodicTimePosition = 300;
   int userId = 0;
   int minSpeed = 10;
   int maxSpeed = 100;
@@ -325,493 +325,493 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
   String pelak_part3 = '';
   String pelak_part4 = '';
 
-  static final mbox.LatLng center = const mbox.LatLng(35.7169447, 51.3103267);
+  // static final mbox.LatLng center = const mbox.LatLng(35.7169447, 51.3103267);
 
-  static final mbox.CameraPosition _kInitialPosition =
-      const mbox.CameraPosition(
-    target: mbox.LatLng(35.7169447, 51.3103267),
-    zoom: 11.0,
-  );
+  // static final mbox.CameraPosition _kInitialPosition =
+  //     const mbox.CameraPosition(
+  //   target: mbox.LatLng(35.7169447, 51.3103267),
+  //   zoom: 11.0,
+  // );
 
-  final mbox.LatLngBounds sydneyBounds = mbox.LatLngBounds(
-    southwest: const mbox.LatLng(35.7169447, 51.3103267),
-    northeast: const mbox.LatLng(35.7169447, 51.3103267),
-  );
+  // final mbox.LatLngBounds sydneyBounds = mbox.LatLngBounds(
+  //   southwest: const mbox.LatLng(35.7169447, 51.3103267),
+  //   northeast: const mbox.LatLng(35.7169447, 51.3103267),
+  // );
 
-  mbox.CameraPosition _position = _kInitialPosition;
-  bool _isMoving = false;
-  bool _compassEnabled = true;
-  mbox.CameraTargetBounds _cameraTargetBounds =
-      mbox.CameraTargetBounds.unbounded;
-  mbox.MinMaxZoomPreference _minMaxZoomPreference =
-      mbox.MinMaxZoomPreference.unbounded;
-  int _styleStringIndex = 0;
-  // Style string can a reference to a local or remote resources.
-  // On Android the raw JSON can also be passed via a styleString, on iOS this is not supported.
-  List<String> _styleStrings = [
-    mbox.MapboxStyles.MAPBOX_STREETS,
-    mbox.MapboxStyles.SATELLITE,
-    "assets/style.json"
-  ];
-  List<String> _styleStringLabels = [
-    "MAPBOX_STREETS",
-    "SATELLITE",
-    "LOCAL_ASSET"
-  ];
+  // mbox.CameraPosition _position = _kInitialPosition;
+  // bool _isMoving = false;
+  // bool _compassEnabled = true;
+  // mbox.CameraTargetBounds _cameraTargetBounds =
+  //     mbox.CameraTargetBounds.unbounded;
+  // mbox.MinMaxZoomPreference _minMaxZoomPreference =
+  //     mbox.MinMaxZoomPreference.unbounded;
+  // int _styleStringIndex = 0;
+  // // Style string can a reference to a local or remote resources.
+  // // On Android the raw JSON can also be passed via a styleString, on iOS this is not supported.
+  // List<String> _styleStrings = [
+  //   mbox.MapboxStyles.MAPBOX_STREETS,
+  //   mbox.MapboxStyles.SATELLITE,
+  //   "assets/style.json"
+  // ];
+  // List<String> _styleStringLabels = [
+  //   "MAPBOX_STREETS",
+  //   "SATELLITE",
+  //   "LOCAL_ASSET"
+  // ];
   bool _rotateGesturesEnabled = true;
   bool _scrollGesturesEnabled = true;
   bool _tiltGesturesEnabled = false;
   bool _zoomGesturesEnabled = true;
   bool _myLocationEnabled = true;
   bool _telemetryEnabled = false;
-  mbox.MyLocationTrackingMode _myLocationTrackingMode =
-      mbox.MyLocationTrackingMode.None;
-  List<Object> _featureQueryFilter;
-  //mbox.Fill _selectedFill;
-  mbox.MapboxMapController controller;
-  int _lineCount = 0;
-  int _symbolCount = 0;
-  mbox.Symbol _selectedSymbol;
-  mbox.Line _selectedLine;
+  // mbox.MyLocationTrackingMode _myLocationTrackingMode =
+  //     mbox.MyLocationTrackingMode.None;
+  // List<Object> _featureQueryFilter;
+  // //mbox.Fill _selectedFill;
+  // mbox.MapboxMapController controller;
+  // int _lineCount = 0;
+  // int _symbolCount = 0;
+  // mbox.Symbol _selectedSymbol;
+  // mbox.Line _selectedLine;
 
-  void _onMapCreated(mbox.MapboxMapController controller) {
-    this.controller = controller;
-    this.controller.addListener(_onMapChanged);
-    this.controller.onSymbolTapped.add(_onSymbolTapped);
-    this.controller.setMapLanguage('name');
-    this.controller.setMapRTL('RTL');
-    _extractMapInfo();
+  // void _onMapCreated(mbox.MapboxMapController controller) {
+  //   this.controller = controller;
+  //   this.controller.addListener(_onMapChanged);
+  //   this.controller.onSymbolTapped.add(_onSymbolTapped);
+  //   this.controller.setMapLanguage('name');
+  //   this.controller.setMapRTL('RTL');
+  //   _extractMapInfo();
 
-    this.controller.getTelemetryEnabled().then((isEnabled) => setState(() {
-          _telemetryEnabled = isEnabled;
-        }));
-  }
+  //   this.controller.getTelemetryEnabled().then((isEnabled) => setState(() {
+  //         _telemetryEnabled = isEnabled;
+  //       }));
+  // }
 
-  void _onMapChanged() {
-    setState(() {
-      _extractMapInfo();
-    });
-  }
+  // void _onMapChanged() {
+  //   setState(() {
+  //     _extractMapInfo();
+  //   });
+  // }
 
-  void _extractMapInfo() {
-    _position = controller.cameraPosition;
-    _isMoving = controller.isCameraMoving;
-  }
+  // void _extractMapInfo() {
+  //   _position = controller.cameraPosition;
+  //   _isMoving = controller.isCameraMoving;
+  // }
 
-  Widget _myLocationTrackingModeCycler() {
-    final mbox.MyLocationTrackingMode nextType =
-        mbox.MyLocationTrackingMode.values[(_myLocationTrackingMode.index + 1) %
-            mbox.MyLocationTrackingMode.values.length];
-    return FlatButton(
-      child: Text('change to $nextType'),
-      onPressed: () {
-        setState(() {
-          _myLocationTrackingMode = nextType;
-        });
-      },
-    );
-  }
+  // Widget _myLocationTrackingModeCycler() {
+  //   final mbox.MyLocationTrackingMode nextType =
+  //       mbox.MyLocationTrackingMode.values[(_myLocationTrackingMode.index + 1) %
+  //           mbox.MyLocationTrackingMode.values.length];
+  //   return FlatButton(
+  //     child: Text('change to $nextType'),
+  //     onPressed: () {
+  //       setState(() {
+  //         _myLocationTrackingMode = nextType;
+  //       });
+  //     },
+  //   );
+  // }
 
-  Widget _queryFilterToggler() {
-    return FlatButton(
-      child: Text(
-          'filter zoo on click ${_featureQueryFilter == null ? 'disabled' : 'enabled'}'),
-      onPressed: () {
-        setState(() {
-          if (_featureQueryFilter == null) {
-            _featureQueryFilter = [
-              "==",
-              ["get", "type"],
-              "zoo"
-            ];
-          } else {
-            _featureQueryFilter = null;
-          }
-        });
-      },
-    );
-  }
+  // Widget _queryFilterToggler() {
+  //   return FlatButton(
+  //     child: Text(
+  //         'filter zoo on click ${_featureQueryFilter == null ? 'disabled' : 'enabled'}'),
+  //     onPressed: () {
+  //       setState(() {
+  //         if (_featureQueryFilter == null) {
+  //           _featureQueryFilter = [
+  //             "==",
+  //             ["get", "type"],
+  //             "zoo"
+  //           ];
+  //         } else {
+  //           _featureQueryFilter = null;
+  //         }
+  //       });
+  //     },
+  //   );
+  // }
 
-  Widget _compassToggler() {
-    return FlatButton(
-      child: Text('${_compassEnabled ? 'disable' : 'enable'} compasss'),
-      onPressed: () {
-        setState(() {
-          _compassEnabled = !_compassEnabled;
-        });
-      },
-    );
-  }
+  // Widget _compassToggler() {
+  //   return FlatButton(
+  //     child: Text('${_compassEnabled ? 'disable' : 'enable'} compasss'),
+  //     onPressed: () {
+  //       setState(() {
+  //         _compassEnabled = !_compassEnabled;
+  //       });
+  //     },
+  //   );
+  // }
 
-  Widget _latLngBoundsToggler() {
-    return FlatButton(
-      child: Text(
-        _cameraTargetBounds.bounds == null
-            ? 'bound camera target'
-            : 'release camera target',
-      ),
-      onPressed: () {
-        setState(() {
-          _cameraTargetBounds = _cameraTargetBounds.bounds == null
-              ? mbox.CameraTargetBounds(sydneyBounds)
-              : mbox.CameraTargetBounds.unbounded;
-        });
-      },
-    );
-  }
+  // Widget _latLngBoundsToggler() {
+  //   return FlatButton(
+  //     child: Text(
+  //       _cameraTargetBounds.bounds == null
+  //           ? 'bound camera target'
+  //           : 'release camera target',
+  //     ),
+  //     onPressed: () {
+  //       setState(() {
+  //         _cameraTargetBounds = _cameraTargetBounds.bounds == null
+  //             ? mbox.CameraTargetBounds(sydneyBounds)
+  //             : mbox.CameraTargetBounds.unbounded;
+  //       });
+  //     },
+  //   );
+  // }
 
-  Widget _zoomBoundsToggler() {
-    return FlatButton(
-      child: Text(_minMaxZoomPreference.minZoom == null
-          ? 'bound zoom'
-          : 'release zoom'),
-      onPressed: () {
-        setState(() {
-          _minMaxZoomPreference = _minMaxZoomPreference.minZoom == null
-              ? const mbox.MinMaxZoomPreference(12.0, 16.0)
-              : mbox.MinMaxZoomPreference.unbounded;
-        });
-      },
-    );
-  }
+  // Widget _zoomBoundsToggler() {
+  //   return FlatButton(
+  //     child: Text(_minMaxZoomPreference.minZoom == null
+  //         ? 'bound zoom'
+  //         : 'release zoom'),
+  //     onPressed: () {
+  //       setState(() {
+  //         _minMaxZoomPreference = _minMaxZoomPreference.minZoom == null
+  //             ? const mbox.MinMaxZoomPreference(12.0, 16.0)
+  //             : mbox.MinMaxZoomPreference.unbounded;
+  //       });
+  //     },
+  //   );
+  // }
 
-  _setStyleToSatellite(bool show) {
-    setState(() {
-      if (show) {
-        _styleStringIndex = 1; //
-        // (_styleStringIndex + 1) % _styleStrings.length;
-      } else {
-        _styleStringIndex = 0;
-      }
-    });
-  }
+  // _setStyleToSatellite(bool show) {
+  //   setState(() {
+  //     if (show) {
+  //       _styleStringIndex = 1; //
+  //       // (_styleStringIndex + 1) % _styleStrings.length;
+  //     } else {
+  //       _styleStringIndex = 0;
+  //     }
+  //   });
+  // }
 
-  Widget _rotateToggler() {
-    return FlatButton(
-      child: Text('${_rotateGesturesEnabled ? 'disable' : 'enable'} rotate'),
-      onPressed: () {
-        setState(() {
-          _rotateGesturesEnabled = !_rotateGesturesEnabled;
-        });
-      },
-    );
-  }
+  // Widget _rotateToggler() {
+  //   return FlatButton(
+  //     child: Text('${_rotateGesturesEnabled ? 'disable' : 'enable'} rotate'),
+  //     onPressed: () {
+  //       setState(() {
+  //         _rotateGesturesEnabled = !_rotateGesturesEnabled;
+  //       });
+  //     },
+  //   );
+  // }
 
-  Widget _scrollToggler() {
-    return FlatButton(
-      child: Text('${_scrollGesturesEnabled ? 'disable' : 'enable'} scroll'),
-      onPressed: () {
-        setState(() {
-          _scrollGesturesEnabled = !_scrollGesturesEnabled;
-        });
-      },
-    );
-  }
+  // Widget _scrollToggler() {
+  //   return FlatButton(
+  //     child: Text('${_scrollGesturesEnabled ? 'disable' : 'enable'} scroll'),
+  //     onPressed: () {
+  //       setState(() {
+  //         _scrollGesturesEnabled = !_scrollGesturesEnabled;
+  //       });
+  //     },
+  //   );
+  // }
 
-  Widget _tiltToggler() {
-    return FlatButton(
-      child: Text('${_tiltGesturesEnabled ? 'disable' : 'enable'} tilt'),
-      onPressed: () {
-        setState(() {
-          _tiltGesturesEnabled = !_tiltGesturesEnabled;
-        });
-      },
-    );
-  }
+  // Widget _tiltToggler() {
+  //   return FlatButton(
+  //     child: Text('${_tiltGesturesEnabled ? 'disable' : 'enable'} tilt'),
+  //     onPressed: () {
+  //       setState(() {
+  //         _tiltGesturesEnabled = !_tiltGesturesEnabled;
+  //       });
+  //     },
+  //   );
+  // }
 
-  Widget _zoomToggler() {
-    return FlatButton(
-      child: Text('${_zoomGesturesEnabled ? 'disable' : 'enable'} zoom'),
-      onPressed: () {
-        setState(() {
-          _zoomGesturesEnabled = !_zoomGesturesEnabled;
-        });
-      },
-    );
-  }
+  // Widget _zoomToggler() {
+  //   return FlatButton(
+  //     child: Text('${_zoomGesturesEnabled ? 'disable' : 'enable'} zoom'),
+  //     onPressed: () {
+  //       setState(() {
+  //         _zoomGesturesEnabled = !_zoomGesturesEnabled;
+  //       });
+  //     },
+  //   );
+  // }
 
-  Widget _myLocationToggler() {
-    return FlatButton(
-      child: Text('${_myLocationEnabled ? 'disable' : 'enable'} my location'),
-      onPressed: () {
-        setState(() {
-          _myLocationEnabled = !_myLocationEnabled;
-        });
-      },
-    );
-  }
+  // Widget _myLocationToggler() {
+  //   return FlatButton(
+  //     child: Text('${_myLocationEnabled ? 'disable' : 'enable'} my location'),
+  //     onPressed: () {
+  //       setState(() {
+  //         _myLocationEnabled = !_myLocationEnabled;
+  //       });
+  //     },
+  //   );
+  // }
 
-  Widget _telemetryToggler() {
-    return FlatButton(
-      child: Text('${_telemetryEnabled ? 'disable' : 'enable'} telemetry'),
-      onPressed: () {
-        setState(() {
-          _telemetryEnabled = !_telemetryEnabled;
-        });
-        controller?.setTelemetryEnabled(_telemetryEnabled);
-      },
-    );
-  }
+  // Widget _telemetryToggler() {
+  //   return FlatButton(
+  //     child: Text('${_telemetryEnabled ? 'disable' : 'enable'} telemetry'),
+  //     onPressed: () {
+  //       setState(() {
+  //         _telemetryEnabled = !_telemetryEnabled;
+  //       });
+  //       controller?.setTelemetryEnabled(_telemetryEnabled);
+  //     },
+  //   );
+  // }
 
-  Widget _visibleRegionGetter() {
-    return FlatButton(
-      child: Text('get currently visible region'),
-      onPressed: () async {
-        var result = await controller.getVisibleRegion();
-        Scaffold.of(context).showSnackBar(SnackBar(
-          content: Text(
-              "SW: ${result.southwest.toString()} NE: ${result.northeast.toString()}"),
-        ));
-      },
-    );
-  }
+  // Widget _visibleRegionGetter() {
+  //   return FlatButton(
+  //     child: Text('get currently visible region'),
+  //     onPressed: () async {
+  //       var result = await controller.getVisibleRegion();
+  //       Scaffold.of(context).showSnackBar(SnackBar(
+  //         content: Text(
+  //             "SW: ${result.southwest.toString()} NE: ${result.northeast.toString()}"),
+  //       ));
+  //     },
+  //   );
+  // }
 
-  void onStyleLoadedCallback() {
-    addImageFromAsset("assetImage", map_marker);
-    String carImage = '';
-    var car = carInfos.where((c) => c.carId == lastCarIdSelected).toList();
-    if (car != null && car.length > 0) {
-      carImage = Constants.mapCarImagesInColorMap[car.first.colorId];
-    }
+  // void onStyleLoadedCallback() {
+  //   addImageFromAsset("assetImage", map_marker);
+  //   String carImage = '';
+  //   var car = carInfos.where((c) => c.carId == lastCarIdSelected).toList();
+  //   if (car != null && car.length > 0) {
+  //     carImage = Constants.mapCarImagesInColorMap[car.first.colorId];
+  //   }
 
-    if (carImage == null || carImage.isEmpty) {
-      carImage =
-          Constants.mapCarImagesInColorMap[Constants.CAR_COLOR_WHITE_TAG];
-    }
-    addImageFromAsset("assetCarImage", carImage);
-  }
+  //   if (carImage == null || carImage.isEmpty) {
+  //     carImage =
+  //         Constants.mapCarImagesInColorMap[Constants.CAR_COLOR_WHITE_TAG];
+  //   }
+  //   addImageFromAsset("assetCarImage", carImage);
+  // }
 
-  void _onLineTapped(mbox.Line line) {
-    if (_selectedLine != null) {
-      _updateSelectedLine(
-        const mbox.LineOptions(
-          lineWidth: 28.0,
-        ),
-      );
-    }
-    setState(() {
-      _selectedLine = line;
-    });
-    _updateSelectedLine(
-      mbox.LineOptions(
-          // linecolor: ,
-          ),
-    );
-  }
+  // void _onLineTapped(mbox.Line line) {
+  //   if (_selectedLine != null) {
+  //     _updateSelectedLine(
+  //       const mbox.LineOptions(
+  //         lineWidth: 28.0,
+  //       ),
+  //     );
+  //   }
+  //   setState(() {
+  //     _selectedLine = line;
+  //   });
+  //   _updateSelectedLine(
+  //     mbox.LineOptions(
+  //         // linecolor: ,
+  //         ),
+  //   );
+  // }
 
-  void _updateSelectedLine(mbox.LineOptions changes) {
-    controller.updateLine(_selectedLine, changes);
-  }
+  // void _updateSelectedLine(mbox.LineOptions changes) {
+  //   controller.updateLine(_selectedLine, changes);
+  // }
 
-  void _add(List<mbox.LatLng> geos, double lw) {
-    controller.addLine(
-      mbox.LineOptions(
-          geometry: geos,
-          lineColor: "#ff0000",
-          lineWidth: lw,
-          lineOpacity: 0.5,
-          draggable: true),
-    );
-    // setState(() {
-    //   _lineCount += 1;
-    // });
-  }
+  // void _add(List<mbox.LatLng> geos, double lw) {
+  //   controller.addLine(
+  //     mbox.LineOptions(
+  //         geometry: geos,
+  //         lineColor: "#ff0000",
+  //         lineWidth: lw,
+  //         lineOpacity: 0.5,
+  //         draggable: true),
+  //   );
+  //   // setState(() {
+  //   //   _lineCount += 1;
+  //   // });
+  // }
 
-  void _remove() {
-    controller.removeLine(_selectedLine);
-    setState(() {
-      _selectedLine = null;
-      _lineCount -= 1;
-    });
-  }
+  // void _remove() {
+  //   controller.removeLine(_selectedLine);
+  //   setState(() {
+  //     _selectedLine = null;
+  //     _lineCount -= 1;
+  //   });
+  // }
 
-  Future<void> _changeAlpha() async {
-    double current = _selectedLine.options.lineOpacity;
-    if (current == null) {
-      // default value
-      current = 1.0;
-    }
+  // Future<void> _changeAlpha() async {
+  //   double current = _selectedLine.options.lineOpacity;
+  //   if (current == null) {
+  //     // default value
+  //     current = 1.0;
+  //   }
 
-    _updateSelectedLine(
-      mbox.LineOptions(lineOpacity: current < 0.1 ? 1.0 : current * 0.75),
-    );
-  }
+  //   _updateSelectedLine(
+  //     mbox.LineOptions(lineOpacity: current < 0.1 ? 1.0 : current * 0.75),
+  //   );
+  // }
 
-  Future<void> _toggleVisible() async {
-    double current = _selectedLine.options.lineOpacity;
-    if (current == null) {
-      // default value
-      current = 1.0;
-    }
-    _updateSelectedLine(
-      mbox.LineOptions(lineOpacity: current == 0.0 ? 1.0 : 0.0),
-    );
-  }
+  // Future<void> _toggleVisible() async {
+  //   double current = _selectedLine.options.lineOpacity;
+  //   if (current == null) {
+  //     // default value
+  //     current = 1.0;
+  //   }
+  //   _updateSelectedLine(
+  //     mbox.LineOptions(lineOpacity: current == 0.0 ? 1.0 : 0.0),
+  //   );
+  // }
 
   /// Adds an asset image to the currently displayed style
-  Future<void> addImageFromAsset(String name, String assetName) async {
-    final ByteData bytes = await rootBundle.load(assetName);
-    final Uint8List list = bytes.buffer.asUint8List();
-    return controller.addImage(name, list);
-  }
+  // Future<void> addImageFromAsset(String name, String assetName) async {
+  //   final ByteData bytes = await rootBundle.load(assetName);
+  //   final Uint8List list = bytes.buffer.asUint8List();
+  //   return controller.addImage(name, list);
+  // }
 
-  void _addSymbol(String iconImage, mbox.LatLng latLng,
-      {bool isAnim = false, int speed = 0}) async {
-    List<int> availableNumbers = Iterable<int>.generate(12).toList();
-    controller.symbols.forEach(
-        (s) => availableNumbers.removeWhere((i) => i == s.data['count']));
-    if (availableNumbers.isNotEmpty) {
-      await controller.addSymbol(
-          _getSymbolOptions(iconImage, availableNumbers.first, latLng), {
-        'count': availableNumbers.first,
-        'speed': speed.toString()
-      }).then((value) {
-        if (isAnim) {
-          _selectedSymbol = controller.symbols.last;
-        }
-        setState(() {
-          _symbolCount += 1;
-        });
-      });
-    }
-  }
+  // void _addSymbol(String iconImage, mbox.LatLng latLng,
+  //     {bool isAnim = false, int speed = 0}) async {
+  //   List<int> availableNumbers = Iterable<int>.generate(12).toList();
+  //   controller.symbols.forEach(
+  //       (s) => availableNumbers.removeWhere((i) => i == s.data['count']));
+  //   if (availableNumbers.isNotEmpty) {
+  //     await controller.addSymbol(
+  //         _getSymbolOptions(iconImage, availableNumbers.first, latLng), {
+  //       'count': availableNumbers.first,
+  //       'speed': speed.toString()
+  //     }).then((value) {
+  //       if (isAnim) {
+  //         _selectedSymbol = controller.symbols.last;
+  //       }
+  //       setState(() {
+  //         _symbolCount += 1;
+  //       });
+  //     });
+  //   }
+  // }
 
-  void _onSymbolTapped(mbox.Symbol symbol) {
-    if (_selectedSymbol != null) {
-      _updateSelectedSymbol(
-        const mbox.SymbolOptions(iconSize: 1.0),
-      );
-    }
+  // void _onSymbolTapped(mbox.Symbol symbol) {
+  //   if (_selectedSymbol != null) {
+  //     _updateSelectedSymbol(
+  //       const mbox.SymbolOptions(iconSize: 1.0),
+  //     );
+  //   }
 
-    setState(() {
-      _selectedSymbol = symbol;
-    });
-    _updateSelectedSymbol(
-      const mbox.SymbolOptions(
-        iconSize: 1.4,
-      ),
-    );
-    int speed = symbol.data['speed'];
-    if (speed == null) speed = 0;
-    showSpeedDialog(speed);
-  }
+  //   setState(() {
+  //     _selectedSymbol = symbol;
+  //   });
+  //   _updateSelectedSymbol(
+  //     const mbox.SymbolOptions(
+  //       iconSize: 1.4,
+  //     ),
+  //   );
+  //   int speed = symbol.data['speed'];
+  //   if (speed == null) speed = 0;
+  //   showSpeedDialog(speed);
+  // }
 
-  Future<void> _changeRotation(double degree) async {
-    double current = _selectedSymbol.options.iconRotate;
-    if (current == null) {
-      // default value
-      current = 0;
-    }
-    _updateSelectedSymbol(
-      mbox.SymbolOptions(iconRotate: current == 330.0 ? 0.0 : current = degree),
-    );
-  }
+  // Future<void> _changeRotation(double degree) async {
+  //   double current = _selectedSymbol.options.iconRotate;
+  //   if (current == null) {
+  //     // default value
+  //     current = 0;
+  //   }
+  //   _updateSelectedSymbol(
+  //     mbox.SymbolOptions(iconRotate: current == 330.0 ? 0.0 : current = degree),
+  //   );
+  // }
 
-  mbox.SymbolOptions _getSymbolOptions(
-      String iconImage, int symbolCount, mbox.LatLng latLng) {
-    mbox.LatLng geometry = latLng;
-    return iconImage == 'customFont'
-        ? mbox.SymbolOptions(
-            geometry: geometry,
-            iconImage: 'airport-15',
-            fontNames: ['DIN Offc Pro Bold', 'Arial Unicode MS Regular'],
-            textField: 'Airport',
-            textSize: 12.5,
-            textOffset: Offset(0, 0.8),
-            textAnchor: 'top',
-            textColor: '#000000',
-            textHaloBlur: 1,
-            textHaloColor: '#ffffff',
-            textHaloWidth: 0.8,
-          )
-        : mbox.SymbolOptions(
-            geometry: geometry,
-            iconImage: iconImage,
-          );
-  }
+  // mbox.SymbolOptions _getSymbolOptions(
+  //     String iconImage, int symbolCount, mbox.LatLng latLng) {
+  //   mbox.LatLng geometry = latLng;
+  //   return iconImage == 'customFont'
+  //       ? mbox.SymbolOptions(
+  //           geometry: geometry,
+  //           iconImage: 'airport-15',
+  //           fontNames: ['DIN Offc Pro Bold', 'Arial Unicode MS Regular'],
+  //           textField: 'Airport',
+  //           textSize: 12.5,
+  //           textOffset: Offset(0, 0.8),
+  //           textAnchor: 'top',
+  //           textColor: '#000000',
+  //           textHaloBlur: 1,
+  //           textHaloColor: '#ffffff',
+  //           textHaloWidth: 0.8,
+  //         )
+  //       : mbox.SymbolOptions(
+  //           geometry: geometry,
+  //           iconImage: iconImage,
+  //         );
+  // }
 
-  void _removeSymbol() {
-    controller.removeSymbol(_selectedSymbol);
-    setState(() {
-      _selectedSymbol = null;
-      _symbolCount -= 1;
-    });
-  }
+  // void _removeSymbol() {
+  //   controller.removeSymbol(_selectedSymbol);
+  //   setState(() {
+  //     _selectedSymbol = null;
+  //     _symbolCount -= 1;
+  //   });
+  // }
 
-  void _removeAllSymbols() {
-    controller.removeSymbols(controller.symbols);
-    setState(() {
-      _selectedSymbol = null;
-      _symbolCount = 0;
-    });
-  }
+  // void _removeAllSymbols() {
+  //   controller.removeSymbols(controller.symbols);
+  //   setState(() {
+  //     _selectedSymbol = null;
+  //     _symbolCount = 0;
+  //   });
+  // }
 
-  void _updateSelectedSymbol(mbox.SymbolOptions changes) {
-    controller.updateSymbol(_selectedSymbol, changes);
-  }
+  // void _updateSelectedSymbol(mbox.SymbolOptions changes) {
+  //   controller.updateSymbol(_selectedSymbol, changes);
+  // }
 
-  void _changePositionSymbol(mbox.LatLng newlatLng) {
-    //final mbox.LatLng current = _selectedSymbol.options.geometry;
-    // final Offset offset = Offset(
-    //   newlatLng.latitude,
-    //   newlatLng.longitude,
-    // );
-    _updateSelectedSymbol(
-      mbox.SymbolOptions(
-        geometry: newlatLng,
-      ),
-    );
-  }
+  // void _changePositionSymbol(mbox.LatLng newlatLng) {
+  //   //final mbox.LatLng current = _selectedSymbol.options.geometry;
+  //   // final Offset offset = Offset(
+  //   //   newlatLng.latitude,
+  //   //   newlatLng.longitude,
+  //   // );
+  //   _updateSelectedSymbol(
+  //     mbox.SymbolOptions(
+  //       geometry: newlatLng,
+  //     ),
+  //   );
+  // }
 
-  _updateCameraPosition(mbox.LatLng point) {
-    controller.animateCamera(
-      mbox.CameraUpdate.newCameraPosition(
-        mbox.CameraPosition(
-            bearing: 270.0, target: point, tilt: 30.0, zoom: _myzoom),
-      ),
-    );
-  }
+  // _updateCameraPosition(mbox.LatLng point) {
+  //   controller.animateCamera(
+  //     mbox.CameraUpdate.newCameraPosition(
+  //       mbox.CameraPosition(
+  //           bearing: 270.0, target: point, tilt: 30.0, zoom: _myzoom),
+  //     ),
+  //   );
+  // }
 
-  openMapsSheet(context) async {
-    try {
-      final title = "Shanghai Tower";
-      final description = "Asia's tallest building";
-      final coords = ml.Coords(31.233568, 121.505504);
-      final availableMaps = await ml.MapLauncher.installedMaps;
+  // openMapsSheet(context) async {
+  //   try {
+  //     final title = "Shanghai Tower";
+  //     final description = "Asia's tallest building";
+  //     final coords = ml.Coords(31.233568, 121.505504);
+  //     final availableMaps = await ml.MapLauncher.installedMaps;
 
-      showModalBottomSheet(
-        context: context,
-        builder: (BuildContext context) {
-          return SafeArea(
-            child: SingleChildScrollView(
-              child: Container(
-                child: Wrap(
-                  children: <Widget>[
-                    for (var map in availableMaps)
-                      ListTile(
-                        onTap: () => map.showMarker(
-                          coords: coords,
-                          title: title,
-                          description: description,
-                        ),
-                        title: Text(map.mapName),
-                        leading: Image(
-                          image: AssetImage(map.icon),
-                          height: 30.0,
-                          width: 30.0,
-                        ),
-                      ),
-                  ],
-                ),
-              ),
-            ),
-          );
-        },
-      );
-    } catch (e) {
-      print(e);
-    }
-  }
+  //     showModalBottomSheet(
+  //       context: context,
+  //       builder: (BuildContext context) {
+  //         return SafeArea(
+  //           child: SingleChildScrollView(
+  //             child: Container(
+  //               child: Wrap(
+  //                 children: <Widget>[
+  //                   for (var map in availableMaps)
+  //                     ListTile(
+  //                       onTap: () => map.showMarker(
+  //                         coords: coords,
+  //                         title: title,
+  //                         description: description,
+  //                       ),
+  //                       title: Text(map.mapName),
+  //                       leading: Image(
+  //                         image: AssetImage(map.icon),
+  //                         height: 30.0,
+  //                         width: 30.0,
+  //                       ),
+  //                     ),
+  //                 ],
+  //               ),
+  //             ),
+  //           ),
+  //         );
+  //       },
+  //     );
+  //   } catch (e) {
+  //     print(e);
+  //   }
+  // }
 
   Widget _buildPelakField(
     double width,
@@ -1074,8 +1074,8 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
           for (var m in markers) {
             var mark = Marker(
                 point: m.point,
-                width: (((markerSize + 28) * _myzoom) / _zoom),
-                height: (((markerSize + 28) * _myzoom) / _zoom),
+                width: (((markerSize + 10) * _myzoom) / _zoom),
+                height: (((markerSize + 10) * _myzoom) / _zoom),
                 builder: m.builder);
             mrks.add(mark);
           }
@@ -1143,7 +1143,7 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
     periodicTimePosition = await prefRepository
         .getPeriodicTime(SettingsScreenState.PERIODIC_TIME_TAG);
     if (periodicTimePosition == null || periodicTimePosition == 0)
-      periodicTimePosition = 60;
+      periodicTimePosition = 300;
   }
 
   getDefaultSettingsValues() async {
@@ -1379,7 +1379,8 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
         centerRepository.showFancyToast(result.Message, true);
         // setState(() {
         carsPairedList.removeWhere((c) => c.SecondCarId == secondCar);
-        pairedChangedNoty.updateValue(new Message(type: 'CAR_PAIRED'));
+        carPairedItemsList.removeWhere((element) => element.body == secondCar);
+        pairedChangedNoty.updateValue(Message(type: 'CAR_PAIRED'));
         //});
       } else {
         centerRepository.showFancyToast(result.Message, false);
@@ -2591,11 +2592,36 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
 
             //حداکثر فاصله زمانی دو دقیقه
             if (diff >= 2) {
-              if (speed <= maxSpeed) {
+              if (speed <= maxSpeed && speed >= minSpeed) {
                 double x = speed * (diff / 60);
                 if (x > 50) {
                   points += '[$lng,$lat],';
                   radiusBody += '16000,';
+                  var marker = Marker(
+                      width: markerSize,
+                      height: markerSize,
+                      point: LatLng(lat, lng),
+                      builder: (ctx) {
+                        return GestureDetector(
+                          onTap: () {
+                            _showInfoPopUp = true;
+                            showSpeedDialog(speed);
+                          },
+                          child: Container(
+                              width: markerSize,
+                              height: markerSize,
+                              child: CircleAvatar(
+                                radius: markerSize,
+                                backgroundColor: Colors.transparent,
+                                child: getMarkerOnSpeed(speed, diff),
+                              )),
+                        );
+                      });
+
+                  if ((((speed >= minSpeed && showMinSpeedMarkers) ||
+                          (speed <= maxSpeed && showMaxSpeedMarkers)) ||
+                      (diff >= minDelay && showStopSpeedMarkers)))
+                    markers.add(marker);
                 }
               }
             } else {
@@ -2605,39 +2631,65 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
                 if ((i % div.floor()) == 0) {
                   points += '[$lng,$lat],';
                   radiusBody += '16000,';
+
+                  var marker = Marker(
+                      width: markerSize,
+                      height: markerSize,
+                      point: LatLng(lat, lng),
+                      builder: (ctx) {
+                        return GestureDetector(
+                          onTap: () {
+                            _showInfoPopUp = true;
+                            showSpeedDialog(speed);
+                          },
+                          child: Container(
+                              width: markerSize,
+                              height: markerSize,
+                              child: CircleAvatar(
+                                radius: markerSize,
+                                backgroundColor: Colors.transparent,
+                                child: getMarkerOnSpeed(speed, diff),
+                              )),
+                        );
+                      });
+
+                  if (((speed >= minSpeed && showMinSpeedMarkers) ||
+                      (speed <= maxSpeed && showMaxSpeedMarkers) ||
+                      (diff >= minDelay && showStopSpeedMarkers)))
+                    markers.add(marker);
                 }
                 //}
               }
             }
           }
 
-          var marker = Marker(
-              width: markerSize,
-              height: markerSize,
-              point: LatLng(lat, lng),
-              builder: (ctx) {
-                return GestureDetector(
-                  onTap: () {
-                    _showInfoPopUp = true;
-                    showSpeedDialog(speed);
-                  },
-                  child: Container(
-                      width: markerSize,
-                      height: markerSize,
-                      child: CircleAvatar(
-                        radius: markerSize,
-                        backgroundColor: Colors.transparent,
-                        child: getMarkerOnSpeed(speed, diff),
-                      )),
-                );
-              });
-
-          if (((speed <= minSpeed && showMinSpeedMarkers) ||
-              (speed >= maxSpeed && showMaxSpeedMarkers) ||
-              (diff >= minDelay && showStopSpeedMarkers))) markers.add(marker);
-
           if (routType == Constants.routingTypeMap[RoutingType.AIR]) {
             geoSeries..add(LatLng(lat, lng));
+            var marker = Marker(
+                width: markerSize,
+                height: markerSize,
+                point: LatLng(lat, lng),
+                builder: (ctx) {
+                  return GestureDetector(
+                    onTap: () {
+                      _showInfoPopUp = true;
+                      showSpeedDialog(speed);
+                    },
+                    child: Container(
+                        width: markerSize,
+                        height: markerSize,
+                        child: CircleAvatar(
+                          radius: markerSize,
+                          backgroundColor: Colors.transparent,
+                          child: getMarkerOnSpeed(speed, diff),
+                        )),
+                  );
+                });
+
+            if ((((speed >= minSpeed && showMinSpeedMarkers) ||
+                    (speed <= maxSpeed && showMaxSpeedMarkers)) ||
+                (diff >= minDelay && showStopSpeedMarkers)))
+              markers.add(marker);
           }
         }
 
@@ -2800,7 +2852,7 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
             points: geoSeries);
       } else {
         if (fromGo) {
-          routType = Constants.routingTypeMap[RoutingType.WALKING];
+          routType = Constants.routingTypeMap[RoutingType.DRIVING];
         } else {}
         final openRoutegeoJSON = await restDatasource
             .fetchOpenRouteServiceURlJSON(body: queryBody, routeType: routType);
@@ -2831,7 +2883,7 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
           RxBus.post(new ChangeEvent(type: 'CLOSE_MORE_BUTTON'));
         }
         mapController.move(firstPoint, _myzoom);
-        // animateNoty.updateValue(Message(text: 'ROUTE_DONE'));
+        animateNoty.updateValue(Message(text: 'ROUTE_DONE'));
         if (anim) {
           forAnim = true;
           reportNoty.updateValue(Message(type: 'ANIM_ROUTE'));
@@ -4231,27 +4283,27 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
     //gpsStatus = checkGPSStatus();
 
     // geolocator.getPositionStream().listen((event) {});
-    markerlocationStream.stream.asBroadcastStream().listen((onData) {
-      print(onData.latitude);
-    });
+    // markerlocationStream.stream.asBroadcastStream().listen((onData) {
+    //   print(onData.latitude);
+    // });
 
-    userLocationOptions = UserLocationOptions(
-        context: context,
-        mapController: mapController,
-        // !kIsWeb ? liveMapController.mapController : mapController,
-        markers: markers,
-        onLocationUpdate: (LatLng pos) {
-          print("onLocationUpdate ${pos.toString()}");
-          // mapController.move(pos, 17.0);
-          // liveMapController.mapController.move(pos, 14);
-        },
-        updateMapLocationOnPositionChange: true,
-        showMoveToCurrentLocationFloatingActionButton: true,
-        zoomToCurrentLocationOnLoad: true,
-        //showHeading: true,
-        fabBottom: 90,
-        fabRight: 20,
-        verbose: true);
+    // userLocationOptions = UserLocationOptions(
+    //     context: context,
+    //     mapController: mapController,
+    //     // !kIsWeb ? liveMapController.mapController : mapController,
+    //     markers: markers,
+    //     onLocationUpdate: (LatLng pos) {
+    //       print("onLocationUpdate ${pos.toString()}");
+    //       // mapController.move(pos, 17.0);
+    //       // liveMapController.mapController.move(pos, 14);
+    //     },
+    //     updateMapLocationOnPositionChange: true,
+    //     showMoveToCurrentLocationFloatingActionButton: true,
+    //     zoomToCurrentLocationOnLoad: true,
+    //     //showHeading: true,
+    //     fabBottom: 90,
+    //     fabRight: 20,
+    //     verbose: true);
 
     super.initState();
 
@@ -5026,24 +5078,24 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
       }
 
       if (route) {
-        if (latLng != null)
-          // _changePositionSymbol(mbox.LatLng(latLng.latitude, latLng.longitude));
-          updateMarkerPosition(lastCarIdSelected, marker, latLng,
-              marker: Container(
-                  width: 38.0,
-                  height: 38.0,
-                  child: GestureDetector(
-                      onTap: () {
-                        _showInfoDialog(lastCarIdSelected);
-                        _showInfoPopUp = true;
-                      },
-                      child: CircleAvatar(
-                          radius: 38.0,
-                          backgroundColor: Colors.transparent,
-                          child: Image.asset(
-                            imgUrl,
-                            key: ObjectKey(Colors.green),
-                          )))));
+        // if (latLng != null)
+        // _changePositionSymbol(mbox.LatLng(latLng.latitude, latLng.longitude));
+        // updateMarkerPosition(lastCarIdSelected, marker, latLng,
+        //     marker: Container(
+        //         width: 38.0,
+        //         height: 38.0,
+        //         child: GestureDetector(
+        //             onTap: () {
+        //               _showInfoDialog(lastCarIdSelected);
+        //               _showInfoPopUp = true;
+        //             },
+        //             child: CircleAvatar(
+        //                 radius: 38.0,
+        //                 backgroundColor: Colors.transparent,
+        //                 child: Image.asset(
+        //                   imgUrl,
+        //                   key: ObjectKey(Colors.green),
+        //                 )))));
         //_updateCameraPosition(mbox.LatLng(latLng.latitude, latLng.longitude));
       } else {
         if (latLng != null) {
@@ -5056,22 +5108,22 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
 
       if (isCarPaired) {
         // _changePositionSymbol(mbox.LatLng(latLng.latitude, latLng.longitude));
-        updateMarkerPosition(lastCarIdSelected, marker, latLng,
-            marker: Container(
-                width: 38.0,
-                height: 38.0,
-                child: GestureDetector(
-                    onTap: () {
-                      _showInfoDialog(lastCarIdSelected);
-                      _showInfoPopUp = true;
-                    },
-                    child: CircleAvatar(
-                        radius: 38.0,
-                        backgroundColor: Colors.transparent,
-                        child: Image.asset(
-                          imgUrl,
-                          key: ObjectKey(Colors.green),
-                        )))));
+        // updateMarkerPosition(lastCarIdSelected, marker, latLng,
+        //     marker: Container(
+        //         width: 38.0,
+        //         height: 38.0,
+        //         child: GestureDetector(
+        //             onTap: () {
+        //               _showInfoDialog(lastCarIdSelected);
+        //               _showInfoPopUp = true;
+        //             },
+        //             child: CircleAvatar(
+        //                 radius: 38.0,
+        //                 backgroundColor: Colors.transparent,
+        //                 child: Image.asset(
+        //                   imgUrl,
+        //                   key: ObjectKey(Colors.green),
+        //                 )))));
         mapController.move(latLng, _myzoom);
       }
       if (_timerupdate == null || !_timerupdate.isActive) if (!kIsWeb)
@@ -6260,14 +6312,15 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
 
   @override
   void dispose() {
-    // geolocator = null;
+    _locationSubscription?.cancel();
+    //markerlocationStream?.close();
     userLocationOptions = null;
     reportNoty?.dispose();
     statusNoty?.dispose();
     pairedChangedNoty?.dispose();
     markerlocationStream?.close();
     animateNoty?.dispose();
-    //location=null;
+
     _timerupdate?.cancel();
     showAllItemsdNoty?.dispose();
     showAllItemsdNoty2?.dispose();
@@ -6385,6 +6438,7 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
       carPairedItemsList = <ParallaxCardItem>[
         for (var carp in pcarsPairedActivated)
           ParallaxCardItem(
+            data: carp.SecondCar.carId,
             backColor: Colors.blueAccent,
             title: DartHelper.isNullOrEmptyString(carp.SecondCar.pelaueNumber),
             body:
@@ -6818,11 +6872,9 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
                                                                 ? TileLayerOptions(
                                                                     tileProvider:
                                                                         NonCachingNetworkTileProvider(),
-                                                                    urlTemplate:
-                                                                        'https://basemap.nationalmap.gov/arcgis/rest/services/USGSImageryOnly/MapServer/tile/{Z}/{Y}/{X}',
-
-                                                                    // urlTemplate:
-                                                                    //     'https://api.mapbox.com/styles/v1/rezand/ck7d3ul4c0k3w1ir0n2a419pd/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoicmV6YW5kIiwiYSI6ImNrNWNkdHg3djAwdDAzZnMwcTc1N2ZpY2YifQ.fl5LG72G5Uz6CLVfhbazNw',
+                                                                    
+                                                                     urlTemplate:
+                                                                         'https://api.mapbox.com/styles/v1/rezand/ck7d3ul4c0k3w1ir0n2a419pd/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoicmV6YW5kIiwiYSI6ImNrNWNkdHg3djAwdDAzZnMwcTc1N2ZpY2YifQ.fl5LG72G5Uz6CLVfhbazNw',
                                                                     // additionalOptions: {
                                                                     //   'accessToken':
                                                                     //       'pk.eyJ1IjoicmV6YW5kIiwiYSI6ImNrNWNkdHg3djAwdDAzZnMwcTc1N2ZpY2YifQ.fl5LG72G5Uz6CLVfhbazNw',
@@ -7349,10 +7401,8 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
                                                             ? TileLayerOptions(
                                                                 tileProvider:
                                                                     NonCachingNetworkTileProvider(),
-                                                                urlTemplate:
-                                                                    'https://basemap.nationalmap.gov/arcgis/rest/services/USGSImageryOnly/MapServer/tile/{Z}/{Y}/{X}',
-                                                                // urlTemplate:
-                                                                //     'https://api.mapbox.com/styles/v1/rezand/ck7d3ul4c0k3w1ir0n2a419pd/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoicmV6YW5kIiwiYSI6ImNrNWNkdHg3djAwdDAzZnMwcTc1N2ZpY2YifQ.fl5LG72G5Uz6CLVfhbazNw',
+                                                                   urlTemplate:
+                                                                     'https://api.mapbox.com/styles/v1/rezand/ck7d3ul4c0k3w1ir0n2a419pd/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoicmV6YW5kIiwiYSI6ImNrNWNkdHg3djAwdDAzZnMwcTc1N2ZpY2YifQ.fl5LG72G5Uz6CLVfhbazNw',
                                                                 // additionalOptions: {
                                                                 //   'accessToken':
                                                                 //       'pk.eyJ1IjoicmV6YW5kIiwiYSI6ImNrNWNkdHg3djAwdDAzZnMwcTc1N2ZpY2YifQ.fl5LG72G5Uz6CLVfhbazNw',

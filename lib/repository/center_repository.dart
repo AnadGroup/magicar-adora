@@ -123,7 +123,7 @@ class CenterRepository {
   static int userId;
   static int currentCarId = 0;
   static int messageCounts = 0;
-  static int periodicUpdateTime = 60;
+  static int periodicUpdateTime = 300;
   static int lastPageSelected = -1;
   static bool isFromMapForGPSCheckForFirstTime = false;
   static ProgressDialog progressDialog;
@@ -214,14 +214,14 @@ class CenterRepository {
 
   static setPeriodicUpdateTime() async {
     await prefRepository.setPeriodicUpdate(
-        SettingsScreenState.PERIODIC_UPDTAE_TIME_TAG, 60);
+        SettingsScreenState.PERIODIC_UPDTAE_TIME_TAG, 300);
   }
 
   static Future<int> getPeriodicUpdateTime() async {
     periodicUpdateTime = await prefRepository
         .getPeriodicUpdate(SettingsScreenState.PERIODIC_UPDTAE_TIME_TAG);
     if (periodicUpdateTime == 0 || periodicUpdateTime == null)
-      periodicUpdateTime = 60;
+      periodicUpdateTime = 300;
     return periodicUpdateTime;
   }
 
@@ -230,11 +230,11 @@ class CenterRepository {
     userId = 0;
     currentCarId = 0;
     messageCounts = 0;
-    periodicUpdateTime = 60;
+    periodicUpdateTime = 300;
   }
 
   initCarMinMaxSpeed() async {
-    prefRepository.setMinMaxSpeed(SettingsScreenState.MIN_SPEED_TAG, 60);
+    prefRepository.setMinMaxSpeed(SettingsScreenState.MIN_SPEED_TAG, 10);
     prefRepository.setMinMaxSpeed(SettingsScreenState.MAX_SPEED_TAG, 100);
   }
 
@@ -314,7 +314,7 @@ class CenterRepository {
   static sendCarStatusCommand() async {
     int actionId =
         ActionsCommand.actionCommandsMap[ActionsCommand.STATUS_CAR_TAG];
-    var result = await restDatasource.sendCommand(new SendCommandModel(
+    var result = await restDatasource.sendCommand(SendCommandModel(
         UserId: userId,
         ActionId: actionId,
         CarId: currentCarId,
@@ -328,8 +328,7 @@ class CenterRepository {
     Timer tmr = Timer.periodic(Duration(seconds: min), (t) {
       prefRepository.setStatusDateTime(
           DateTimeUtils.getDateJalali(), DateTimeUtils.getTimeNow(), false);
-      statusNoty
-          .updateValue(new Message(status: false, type: 'GET_CAR_STATUS'));
+      statusNoty.updateValue(Message(status: false, type: 'GET_CAR_STATUS'));
       sendCarStatusCommand();
     });
     return tmr;
