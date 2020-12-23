@@ -8,6 +8,7 @@ class Message {
   double value;
   CarStateVM currentCarState;
   bool status = false;
+  List<int> Ids = List();
   Message(
       {this.text,
       this.type,
@@ -15,5 +16,6 @@ class Message {
       this.index,
       this.currentCarState,
       this.id,
-      this.value});
+      this.value,
+      this.Ids});
 }
