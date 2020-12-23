@@ -147,12 +147,12 @@ class _EngineStatusState extends State<EngineStatus>
     });
   }
 
-  getAppTheme() async {
-    centerRepository.getAppTheme().then((value) {
-      setState(() {
-        isDark = value;
-      });
-    });
+  Future<bool> getAppTheme() async {
+    bool value = await centerRepository.getAppTheme();
+    if (value != null) {
+      return value;
+    }
+    return null;
   }
 
   createEngineOnOffBorder() {
@@ -989,7 +989,7 @@ class _EngineStatusState extends State<EngineStatus>
                               child: new Container(
                                 margin: EdgeInsets.only(
                                     right: 25.0, bottom: 5, top: 1.0),
-                                width:iconSizeWidth,
+                                width: iconSizeWidth,
                                 height: iconSizeHeight,
                                 child: new GestureDetector(
                                   onTap: () {
@@ -1154,8 +1154,8 @@ class _EngineStatusState extends State<EngineStatus>
                               child: new Container(
                                 margin: EdgeInsets.only(
                                     left: 25.0, bottom: 5, top: 1.0),
-                                width:iconSizeWidth,
-                                height:iconSizeHeight,
+                                width: iconSizeWidth,
+                                height: iconSizeHeight,
                                 child: new GestureDetector(
                                   onTap: () {
                                     showWaitingFlash();
@@ -1231,7 +1231,7 @@ class _EngineStatusState extends State<EngineStatus>
                               child: new Container(
                                 margin: EdgeInsets.only(
                                     right: 0.0, bottom: 0, top: 0.0),
-                                width:iconSizeWidth,
+                                width: iconSizeWidth,
                                 height: iconSizeHeight,
                                 child: new GestureDetector(
                                   onTap: () {},
@@ -1262,7 +1262,6 @@ class _EngineStatusState extends State<EngineStatus>
                                           'Cut Off',
                                           textAlign: TextAlign.center,
                                           style: TextStyle(
-                                          
                                               color: Colors.black38,
                                               fontSize: 10.0),
                                         )),
@@ -1434,7 +1433,7 @@ class _EngineStatusState extends State<EngineStatus>
   @override
   void initState() {
     registerRxBus();
-    getAppTheme();
+    // getAppTheme();
     restDS = new RestDatasource();
     Constants.createSoundToActionMap();
     ActionsCommand.createActionsMap();
@@ -1442,9 +1441,7 @@ class _EngineStatusState extends State<EngineStatus>
       vsync: this,
       duration: Duration(seconds: 10),
     );
-
     _currentColor = widget.carStateVM.getCurrentColor();
-
     advancedPlayer = new AudioPlayer();
     player = new AudioCache();
     player.load(Constants.DOOR_OPEN_SOUND);
@@ -1481,7 +1478,24 @@ class _EngineStatusState extends State<EngineStatus>
 
   @override
   Widget build(BuildContext context) {
-    return buildControlRow(
-        context, engineImageUrl, null, widget.engineStatus, widget.lockStatus);
+    return FutureBuilder<bool>(
+      initialData: false,
+      future: getAppTheme(),
+      builder: (context, snapshot) {
+        if (snapshot.hasData && snapshot.data != null) {
+          bool value = snapshot.data;
+
+          if (value) {
+            if (_currentColor == Colors.black ||
+                _currentColor == Colors.black38 ||
+                _currentColor == Colors.black54) {
+              _currentColor = Colors.white;
+            }
+          }
+        }
+        return buildControlRow(context, engineImageUrl, null,
+            widget.engineStatus, widget.lockStatus);
+      },
+    );
   }
 }
