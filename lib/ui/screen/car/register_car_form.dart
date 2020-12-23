@@ -921,10 +921,11 @@ class _RegisterCarFormState extends State<RegisterCarForm> with TickerProviderSt
 
   onCarPageTap()
   {
-    Navigator.of(context).pushNamed('/carpage',arguments: new CarPageVM(
-        userId: userId,
-        isSelf: true,
-        carAddNoty: home.valueNotyModelBloc));
+    Navigator.of(context).pop();
+    // .pushNamed('/carpage',arguments: new CarPageVM(
+    //     userId: userId,
+    //     isSelf: true,
+    //     carAddNoty: home.valueNotyModelBloc));
   }
 
   @override
@@ -1043,8 +1044,8 @@ class _RegisterCarFormState extends State<RegisterCarForm> with TickerProviderSt
             Stack(
               overflow: Overflow.visible,
               children: <Widget> [
-          new Padding(padding: EdgeInsets.only(top: 75.0),
-          child:  new FancyCarForm(addCarVM: widget.addCarVM,
+           Padding(padding: EdgeInsets.only(top: 75.0),
+          child:   FancyCarForm(addCarVM: widget.addCarVM,
               authUser: _authAddCar, recoverPassword: null, onSubmit: () { }),
           ),
                 FormsAppBar(

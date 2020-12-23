@@ -24,10 +24,12 @@ import 'package:anad_magicar/repository/pref_repository.dart';
 import 'package:anad_magicar/translation_strings.dart';
 import 'package:anad_magicar/ui/factory/car/factory_car.dart';
 import 'package:anad_magicar/ui/screen/base/main_page.dart';
+import 'package:anad_magicar/ui/screen/car/register_car_screen.dart';
 import 'package:anad_magicar/ui/screen/car/role_sheet.dart';
 import 'package:anad_magicar/ui/screen/content_pager/page_container.dart';
 import 'package:anad_magicar/utils/dart_helper.dart';
 import 'package:anad_magicar/widgets/bottom_sheet_custom.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:anad_magicar/widgets/animated_dialog_box.dart';
@@ -266,13 +268,22 @@ class CarPageState extends MainPage<CarPage> {
   }
   _addCar(SaveCarModel editModel,int userId, bool edit) {
 
-    Navigator.of(context).pushReplacementNamed('/addcar',
-        arguments: new AddCarVM(
+    Navigator.push(context, CupertinoPageRoute(builder: (context)=>RegisterCarScreen(
+      addCarVM:  AddCarVM(
         fromMainApp: true,
         editMode: edit,
         editCarModel: editModel,
         addNotyBloc: carChangedNoty,
-        notyBloc: widget.carPageVM.carAddNoty));
+        notyBloc: widget.carPageVM.carAddNoty),
+        fromMainApp: true,
+    
+    )));
+        // arguments: new AddCarVM(
+        // fromMainApp: true,
+        // editMode: edit,
+        // editCarModel: editModel,
+        // addNotyBloc: carChangedNoty,
+        // notyBloc: widget.carPageVM.carAddNoty));
   }
 
   _showBottomSheetWaitingCars(BuildContext cntext)

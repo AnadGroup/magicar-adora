@@ -208,7 +208,7 @@ class _AnimatedTextFormFieldState extends State<AnimatedTextFormField> {
     final theme = Theme.of(context);
     Widget textField = TextFormField(
       initialValue: widget.initValue,
-      controller: widget.initValue==null ? widget.controller : null,
+      controller: widget.initValue == null ? widget.controller : null,
       inputFormatters: [
         LengthLimitingTextInputFormatter(20),
       ],
@@ -306,7 +306,7 @@ class _AnimatedPasswordTextFormFieldState
       width: widget.animatedWidth,
       enabled: widget.enabled,
       labelText: widget.labelText,
-      //prefixIcon: Icon(Icons.lock, size: 20),
+      prefixIcon: Icon(Icons.lock, size: 20),
       suffixIcon: GestureDetector(
         onTap: () => setState(() => _obscureText = !_obscureText),
         dragStartBehavior: DragStartBehavior.down,

@@ -102,9 +102,9 @@ class _RegisterCarScreenState extends State<RegisterCarScreen>
                           fromMainApp: widget.addCarVM.fromMainApp,);
                     }
                 );
-          }
+          } 
             return
-              new NoDataWidget();
+               NoDataWidget();
           }
       ),
     );
