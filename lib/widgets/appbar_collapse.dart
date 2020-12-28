@@ -14,7 +14,7 @@ import 'package:anad_magicar/widgets/transform_page_utils.dart';
 
 
 import 'package:flutter_swiper/flutter_swiper.dart';
-import 'package:liquid_swipe/Constants/Helpers.dart';
+import 'package:liquid_swipe/Helpers/Helpers.dart';
 
 
 

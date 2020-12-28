@@ -12,7 +12,7 @@ class AnimatedSplashScreen extends StatefulWidget {
   AnimatedSplashScreen(this._authenticationBloc);
 
   @override
-  SplashScreenState createState() => new SplashScreenState();
+  SplashScreenState createState() => SplashScreenState();
 }
 
 class SplashScreenState extends State<AnimatedSplashScreen>
@@ -23,9 +23,10 @@ class SplashScreenState extends State<AnimatedSplashScreen>
   Animation<double> animation;
 
   String logoPath = 'assets/images/i7.png';
+
   startTime() async {
-    var _duration = new Duration(seconds: 3);
-    return new Timer(_duration, navigationPage);
+    var _duration = Duration(seconds: 3);
+    return Timer(_duration, navigationPage);
   }
 
   void navigationPage() {
@@ -35,16 +36,16 @@ class SplashScreenState extends State<AnimatedSplashScreen>
 
   @override
   void initState() {
-    if(CenterRepository.APP_TYPE_ADORA){
-      logoPath = 'assets/images/adora_logo.png';
+    if (CenterRepository.APP_TYPE_ADORA) {
+      logoPath = 'assets/images/i7_adora.png';
     } else {
       logoPath = 'assets/images/i7.png';
     }
     super.initState();
     animationController =
-        AnimationController(vsync: this, duration: new Duration(seconds: 2));
+        AnimationController(vsync: this, duration: Duration(seconds: 2));
     animation =
-        new CurvedAnimation(parent: animationController, curve: Curves.easeOut);
+        CurvedAnimation(parent: animationController, curve: Curves.easeOut);
 
     animation.addListener(() => this.setState(() {}));
     animationController.forward();
@@ -64,15 +65,17 @@ class SplashScreenState extends State<AnimatedSplashScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: CenterRepository.APP_TYPE_ADORA ? Color(0xffffffff) : Color(0xff424242),
+      backgroundColor: CenterRepository.APP_TYPE_ADORA
+          ? Color(0xffffffff)
+          : Color(0xff424242),
       body: Center(
-        child: new Column(
+        child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
-            new Padding(
+            Padding(
               padding: EdgeInsets.only(top: 20.0),
-              child: new Row(
+              child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   SizedBox(

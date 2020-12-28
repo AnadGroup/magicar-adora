@@ -36,7 +36,6 @@ import 'package:anad_magicar/ui/map/geojson/geojson.dart';
 //import 'package:mapbox_gl/mapbox_gl.dart' as mbox;
 import 'package:location/location.dart' as mboxLoc;
 import 'package:anad_magicar/ui/map/openmapstreet/pages/location_data.dart';
-import 'package:anad_magicar/ui/map/openmapstreet/pages/show_marker.dart';
 import 'package:anad_magicar/ui/screen/home/index.dart';
 import 'package:anad_magicar/ui/screen/setting/native_settings_screen.dart';
 import 'package:anad_magicar/ui/theme/app_themes.dart';
