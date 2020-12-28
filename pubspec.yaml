@@ -90,7 +90,7 @@ dependencies:
   equatable: ^1.0.1
   rxdart: ^0.16.0
 
-    #f_orm_m8: ^0.8.0+3
+  #f_orm_m8: ^0.8.0+3
 
   cached_network_image: ^2.0.0
   transparent_image: ^1.0.0
@@ -119,9 +119,9 @@ dependencies:
   #sider_bar: ^0.1.1
   location: ^3.0.2
   #mapbox_gl:
-    #path: ./flutter-mapbox-gl
+  #path: ./flutter-mapbox-gl
   liquid_swipe: ^1.3.0
-  simple_animations: ^1.3.4
+  simple_animations: ^2.4.2
   sliding_up_panel: ^0.3.6
   flutter_swiper: ^1.1.6
   transformer_page_view: ^0.1.6
@@ -176,7 +176,7 @@ dependencies:
   vibration: ^1.2.4
   flutter_full_pdf_viewer: ^1.0.6
   maps_toolkit: ^1.0.1+3
-  sa_stateless_animation: ^1.0.0
+  #sa_stateless_animation: ^1.1.0
   flutter_keyboard_visibility: ^2.0.0
   #screen_state: ^0.1.1
   #flutter_svg: any
@@ -201,17 +201,17 @@ dev_dependencies:
 
   flutter_flavorizr: ^1.0.9
   flutter_launcher_icons: ^0.7.2
-  simple_animations: ^1.2.0
+  simple_animations: ^2.4.2
 
-  #flutter_web: any  
-  #flutter_web_ui: any  
-  #google_maps: ">=3.0.0 <4.0.0"  
+  #flutter_web: any
+  #flutter_web_ui: any
+  #google_maps: ">=3.0.0 <4.0.0"
   #build_runner: ^1.6.2
   #map_launcher: any
 
   # mapbox_gl:
   #   path: flutter-mapbox-gl
-  
+
 flutter_icons:
   android: true
   ios: true
@@ -230,7 +230,7 @@ dependency_overrides:
   location: ^3.0.2
   #flutter_svg: ^0.19.2+1
   provider: ^3.2.0
-  # mapbox_gl_platform_interface: 
+  # mapbox_gl_platform_interface:
   #   path: flutter-mapbox-gl/mapbox_gl_platform_interface
   # mapbox_gl_web:
   #   path: flutter-mapbox-gl/mapbox_gl_web
