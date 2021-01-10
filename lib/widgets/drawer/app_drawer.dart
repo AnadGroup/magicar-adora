@@ -44,6 +44,7 @@ import 'package:anad_magicar/widgets/persian_datepicker/persian_datepicker.dart'
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:package_info/package_info.dart';
 import 'package:path_provider/path_provider.dart';
 
 String _documentPath = 'help.pdf';
@@ -663,6 +664,11 @@ class AppDrawerState extends State<AppDrawer> {
     );
   }
 
+  Future<String> getVersionNumber() async {
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    return packageInfo.version;
+  }
+
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
@@ -847,8 +853,26 @@ class AppDrawerState extends State<AppDrawer> {
                 }),
             Divider(),
             ListTile(
-              title: Text('1.0.2'),
-              onTap: () {},
+              enabled: false,
+              title: Container(
+                height: 38.0,
+                child: Row(
+                  children: <Widget>[
+                    Icon(Icons.system_update, color: Colors.black38),
+                    Text('ورژن'),
+
+                  ],
+                ),
+              ),
+              trailing: FutureBuilder(
+                future: getVersionNumber(),
+                builder:
+                    (BuildContext context, AsyncSnapshot<String> snapshot) =>
+                    Text(
+                      snapshot.hasData ? snapshot.data : "Loading ...",
+                      style: TextStyle(color: Colors.black38),
+                    ),
+              ),
             ),
           ],
         ),
