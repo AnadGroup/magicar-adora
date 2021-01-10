@@ -1098,7 +1098,7 @@ class SettingsScreenState extends MainPage<SettingsScreen> {
                 tiles: [
                   SettingsTile(
                     title: Translations.current.local(),
-                    // subtitle: Intl.canonicalizedLocale(Intl.getCurrentLocale()),
+                    //subtitle: Intl.canonicalizedLocale(Intl.getCurrentLocale()),
                     subtitle: Translations.current.language(),
                     leading: Icon(Icons.language),
                     onTap: () {
@@ -1108,7 +1108,7 @@ class SettingsScreenState extends MainPage<SettingsScreen> {
                     },
                   ),
                   SettingsTile(
-                    title: 'زمان دریافت اطلاعات خودرو برحسب ثانیه',
+                    title: 'زمان دریافت اطلاعات(ثانیه) ',
                     subtitle: 'تنظیمات اطلاعات دریافت',
                     leading: Icon(Icons.update),
                     onTap: () {

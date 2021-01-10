@@ -34,7 +34,7 @@ import 'package:anad_magicar/translation_strings.dart';
 import 'package:anad_magicar/ui/map/geojson/geojson.dart';
 
 //import 'package:mapbox_gl/mapbox_gl.dart' as mbox;
-import 'package:location/location.dart' as mboxLoc;
+//import 'package:location/location.dart' as mboxLoc;
 import 'package:anad_magicar/ui/map/openmapstreet/pages/location_data.dart';
 import 'package:anad_magicar/ui/map/openmapstreet/pages/show_marker.dart';
 import 'package:anad_magicar/ui/screen/home/index.dart';
@@ -2384,7 +2384,605 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
       bool forReport,
       bool anim,
       bool fromGo) async {
-    List<LatLng> geoSeries = new List();
+    if (kIsWeb) {
+      return processLineData2(
+          fromCurrent, clat, clng, fromDate, toDate, forReport, anim, fromGo);
+    } else {
+      List<LatLng> geoSeries = new List();
+
+      String routType = Constants.routingTypeMap[RoutingType.DRIVING];
+      int rout = await prefRepository
+          .getRoutingType(CenterRepository.ROUTING_TYPE_TAG);
+      if (rout == 1) routType = Constants.routingTypeMap[RoutingType.AIR];
+      if (rout == 2) routType = Constants.routingTypeMap[RoutingType.DRIVING];
+      if (rout == 3) routType = Constants.routingTypeMap[RoutingType.WALKING];
+
+      String tdate = DateTimeUtils.convertIntoDateTimeWithTime(
+          DateTimeUtils.getDateJalali(), 0, 0);
+      String sdate = DateTimeUtils.convertIntoDateTimeWithTime(
+          DateTimeUtils.getDateJalaliWithAddDays(0), 23, 59);
+
+      ApiRoute route = new ApiRoute(
+          carId: lastCarIdSelected,
+          startDate: forReport
+              ? DateTimeUtils.convertIntoDate(
+                  fromDate) //DateTimeUtils.convertIntoDateTimeWithTime(fromDate, 0, 0)
+              : sdate,
+          endDate: forReport
+              ? DateTimeUtils.convertIntoDate(
+                  toDate) //DateTimeUtils.convertIntoDateTimeWithTime(toDate, 23, 59)
+              : tdate,
+          dateTime: null,
+          speed: null,
+          lat: null,
+          long: null,
+          enterTime: null,
+          carIds: null,
+          DeviceId: null,
+          Latitude: null,
+          Longitude: null,
+          Date: null,
+          Time: null,
+          CreatedDateTime: null);
+
+      centerRepository.showProgressDialog(
+          context, Translations.current.loadingdata());
+      List<ApiRoute> validPoints = List();
+      await getDefaultSettingsValues();
+      var queryBody = '{"coordinates":['; //$lng2,$lat2],[$lng1,$lat1]]}';
+      var radiusBody = '';
+      if (!fromCurrent) {
+        final pointDatas = await restDatasource.getRouteList(route);
+        if (pointDatas != null && pointDatas.length > 0) {
+          if (markers != null && markers.length > 0) {
+            markers.clear();
+          }
+          var points = '';
+          int index = pointDatas.length - 1;
+
+          Distance dist2 = Distance();
+          for (int i = 0; i < pointDatas.length - 1; i++) {
+            String latStr1 = pointDatas[i].lat;
+            String lngStr1 = pointDatas[i].long;
+            var firstLat = latStr1.split('*');
+            var firstLng = lngStr1.split('*');
+            var secondLat = firstLat[1].split("'");
+            var secondLng = firstLng[1].split("'");
+
+            double latLng1 = ConvertDegreeAngleToDouble(
+                double.tryParse(firstLat[0]),
+                double.tryParse(secondLat[0]),
+                double.tryParse(secondLat[1]));
+
+            double latLng2 = ConvertDegreeAngleToDouble(
+                double.tryParse(firstLng[0]),
+                double.tryParse(secondLng[0]),
+                double.tryParse(secondLng[1]));
+
+            String latStr11 = pointDatas[i + 1].lat;
+            String lngStr11 = pointDatas[i + 1].long;
+            var firstLat1 = latStr11.split('*');
+            var firstLng1 = lngStr11.split('*');
+            var secondLat1 = firstLat1[1].split("'");
+            var secondLng1 = firstLng1[1].split("'");
+            double latLng12 = ConvertDegreeAngleToDouble(
+                double.tryParse(firstLat1[0]),
+                double.tryParse(secondLat1[0]),
+                double.tryParse(secondLat1[1]));
+
+            double latLng22 = ConvertDegreeAngleToDouble(
+                double.tryParse(firstLng1[0]),
+                double.tryParse(secondLng1[0]),
+                double.tryParse(secondLng1[1]));
+            double totalDistanceInM = dist2.distance(
+                LatLng(latLng1, latLng2), LatLng(latLng12, latLng22));
+            if (totalDistanceInM <= 350) {
+              validPoints..add(pointDatas[i]);
+              validPoints..add(pointDatas[i + 1]);
+            }
+          }
+          String latStr1 = pointDatas[0].lat;
+          String lngStr1 = pointDatas[0].long;
+          var firstLat = latStr1.split('*');
+          var firstLng = lngStr1.split('*');
+          var secondLat = firstLat[1].split("'");
+          var secondLng = firstLng[1].split("'");
+
+          double fresultLatLng = ConvertDegreeAngleToDouble(
+              double.tryParse(firstLat[0]),
+              double.tryParse(secondLat[0]),
+              double.tryParse(secondLat[1]));
+
+          double sresultLatLng = ConvertDegreeAngleToDouble(
+              double.tryParse(firstLng[0]),
+              double.tryParse(secondLng[0]),
+              double.tryParse(secondLng[1]));
+
+          firstPoint = LatLng(fresultLatLng, sresultLatLng);
+          points += '[$sresultLatLng,$fresultLatLng],';
+          radiusBody += '16000,';
+          var marker = Marker(
+              width: markerSize + 28,
+              height: markerSize + 28,
+              point: firstPoint,
+              builder: (ctx) {
+                return GestureDetector(
+                  onTap: () {
+                    _showInfoPopUp = true;
+                    showSpeedDialog(0);
+                  },
+                  child: Container(
+                      width: markerSize + 28,
+                      height: markerSize + 28,
+                      child: CircleAvatar(
+                        radius: markerSize + 28,
+                        backgroundColor: Colors.transparent,
+                        child: Image.asset(markerStart,
+                            key: ObjectKey(Colors.red)),
+                      )),
+                );
+              });
+          markers..add(marker);
+          //////////////////////////////////
+          minStopTime = '';
+          minStopTime2 = '';
+          minStopDate = '';
+          minStopDate2 = '';
+
+          //////////////////////
+
+          int firstIndex = 0;
+          int nextIndex = 0;
+          double div = (index + 1) / 29;
+          if (index < 29) {
+            div = 1;
+          }
+          if (minDelay == null) minDelay = 0;
+          geoSeries..add(firstPoint);
+          // var valid_ponits = List()..add(firstPoint);
+          for (var i = 1; i < pointDatas.length - 1; i++) {
+            int diff = 0;
+            firstIndex = i;
+            String latStr2 = pointDatas[i].lat;
+            String lngStr2 = pointDatas[i].long;
+            var firstLat1 = latStr2.split('*');
+            var firstLng1 = lngStr2.split('*');
+            var secondLat1 = firstLat1[1].split("'");
+            var secondLng1 = firstLng1[1].split("'");
+
+            double fresultLatLng1 = ConvertDegreeAngleToDouble(
+                double.tryParse(firstLat1[0]),
+                double.tryParse(secondLat1[0]),
+                double.tryParse(secondLat1[1]));
+
+            double sresultLatLng1 = ConvertDegreeAngleToDouble(
+                double.tryParse(firstLng1[0]),
+                double.tryParse(secondLng1[0]),
+                double.tryParse(secondLng1[1]));
+
+            double lat = fresultLatLng1;
+            double lng = sresultLatLng1;
+            int speed = pointDatas[i].speed;
+            if (speed == null) speed = 0;
+
+            if (i < index) {
+              firstIndex = i;
+              nextIndex = firstIndex + 1;
+            }
+
+            minStopDate = pointDatas[firstIndex].dateTime;
+            minStopTime = pointDatas[firstIndex].enterTime;
+
+            minStopDate2 = pointDatas[nextIndex].dateTime;
+            minStopTime2 = pointDatas[nextIndex].enterTime;
+
+            var time1 = minStopTime.split(':');
+            var time2 = minStopTime2.split(':');
+            /* int h1=int.tryParse(time1[0]);
+              int m1=int.tryParse(time1[1]);
+              int s1=int.tryParse(time1[2]);
+
+              int h2=int.tryParse(time2[0]);
+              int m2=int.tryParse(time2[1]);
+              int s2=int.tryParse(time2[2]);*/
+
+            minStopDate = minStopDate.replaceAll('/', '');
+            minStopDate2 = minStopDate2.replaceAll('/', '');
+
+            if (minStopDate.trim() == minStopDate2.trim()) {
+              diff = DateTimeUtils.diffMinsFromDateToDate4(
+                  DateTimeUtils.convertIntoTimeOnly(minStopTime2),
+                  DateTimeUtils.convertIntoTimeOnly(minStopTime));
+
+              //حداکثر فاصله زمانی دو دقیقه
+              if (diff >= 2) {
+                if (speed <= maxSpeed && speed >= minSpeed) {
+                  double x = speed * (diff / 60);
+                  if (x > 50) {
+                    points += '[$lng,$lat],';
+                    radiusBody += '16000,';
+                    var marker = Marker(
+                        width: markerSize,
+                        height: markerSize,
+                        point: LatLng(lat, lng),
+                        builder: (ctx) {
+                          return GestureDetector(
+                            onTap: () {
+                              _showInfoPopUp = true;
+                              showSpeedDialog(speed);
+                            },
+                            child: Container(
+                                width: markerSize,
+                                height: markerSize,
+                                child: CircleAvatar(
+                                  radius: markerSize,
+                                  backgroundColor: Colors.transparent,
+                                  child: getMarkerOnSpeed(speed, diff),
+                                )),
+                          );
+                        });
+
+                    if ((((speed >= minSpeed && showMinSpeedMarkers) ||
+                            (speed <= maxSpeed && showMaxSpeedMarkers)) ||
+                        (diff >= minDelay && showStopSpeedMarkers)))
+                      markers.add(marker);
+                  }
+                }
+              } else {
+                if (speed <= maxSpeed) {
+                  // double x=speed*(diff / 60);
+                  // if(x>50) {
+                  if ((i % div.floor()) == 0) {
+                    points += '[$lng,$lat],';
+                    radiusBody += '16000,';
+
+                    var marker = Marker(
+                        width: markerSize,
+                        height: markerSize,
+                        point: LatLng(lat, lng),
+                        builder: (ctx) {
+                          return GestureDetector(
+                            onTap: () {
+                              _showInfoPopUp = true;
+                              showSpeedDialog(speed);
+                            },
+                            child: Container(
+                                width: markerSize,
+                                height: markerSize,
+                                child: CircleAvatar(
+                                  radius: markerSize,
+                                  backgroundColor: Colors.transparent,
+                                  child: getMarkerOnSpeed(speed, diff),
+                                )),
+                          );
+                        });
+
+                    if (((speed >= minSpeed && showMinSpeedMarkers) ||
+                        (speed <= maxSpeed && showMaxSpeedMarkers) ||
+                        (diff >= minDelay && showStopSpeedMarkers)))
+                      markers.add(marker);
+                  }
+                  //}
+                }
+              }
+            }
+
+            if (routType == Constants.routingTypeMap[RoutingType.AIR]) {
+              geoSeries..add(LatLng(lat, lng));
+              var marker = Marker(
+                  width: markerSize,
+                  height: markerSize,
+                  point: LatLng(lat, lng),
+                  builder: (ctx) {
+                    return GestureDetector(
+                      onTap: () {
+                        _showInfoPopUp = true;
+                        showSpeedDialog(speed);
+                      },
+                      child: Container(
+                          width: markerSize,
+                          height: markerSize,
+                          child: CircleAvatar(
+                            radius: markerSize,
+                            backgroundColor: Colors.transparent,
+                            child: getMarkerOnSpeed(speed, diff),
+                          )),
+                    );
+                  });
+
+              if ((((speed >= minSpeed && showMinSpeedMarkers) ||
+                      (speed <= maxSpeed && showMaxSpeedMarkers)) ||
+                  (diff >= minDelay && showStopSpeedMarkers)))
+                markers.add(marker);
+            }
+          }
+
+          latStr1 = pointDatas[index].lat;
+          lngStr1 = pointDatas[index].long;
+          firstLat = latStr1.split('*');
+          firstLng = lngStr1.split('*');
+          secondLat = firstLat[1].split("'");
+          secondLng = firstLng[1].split("'");
+
+          fresultLatLng = ConvertDegreeAngleToDouble(
+              double.tryParse(firstLat[0]),
+              double.tryParse(secondLat[0]),
+              double.tryParse(secondLat[1]));
+
+          sresultLatLng = ConvertDegreeAngleToDouble(
+              double.tryParse(firstLng[0]),
+              double.tryParse(secondLng[0]),
+              double.tryParse(secondLng[1]));
+
+          points += '[$sresultLatLng,$fresultLatLng]';
+          radiusBody += '16000,';
+          int speed = pointDatas[index].speed;
+          if (speed == null) speed = 0;
+
+          marker = Marker(
+              width: markerSize + 28,
+              height: markerSize + 28,
+              point: LatLng(fresultLatLng, sresultLatLng),
+              builder: (ctx) {
+                return GestureDetector(
+                  onTap: () {
+                    _showInfoPopUp = true;
+                    showSpeedDialog(speed);
+                  },
+                  child: Container(
+                      width: markerSize + 28,
+                      height: markerSize + 28,
+                      child: CircleAvatar(
+                        radius: markerSize + 28,
+                        backgroundColor: Colors.transparent,
+                        child:
+                            Image.asset(markerEnd, key: ObjectKey(Colors.red)),
+                      )),
+                );
+              });
+          markers..add(marker);
+          if (points.endsWith(',')) {
+            points = points.substring(0, points.length - 1);
+          }
+          if (radiusBody.endsWith(',')) {
+            radiusBody = radiusBody.substring(0, radiusBody.length - 1);
+          }
+
+          queryBody =
+              queryBody + points + ']' + ',"radiuses":[' + radiusBody + ']}';
+          hasPoint = true;
+          geoSeries..add(LatLng(fresultLatLng, sresultLatLng));
+        } else {
+          hasPoint = false;
+          /*var points = '';
+        double lat = 35.7511447;
+        double lng = 51.4716509 ;
+        firstPoint = LatLng(lat,lng);
+        double lat2 = 35.796249;
+        double lng2 = 51.427583 ;
+
+        points += '[$lng,$lat],';
+        points += '[$lng2,$lat2]';
+
+        queryBody = queryBody + points + ']}';*/
+
+        }
+      } else {
+        double speed = 0.0 + maxSpeed;
+        if (currentLocation == null) {
+          await getLocationForRoute();
+        }
+        if (currentLocation != null) {
+          double lat1 = double.tryParse(clat);
+          double lng1 = double.tryParse(clng);
+          firstPoint = LatLng(lat1, lng1);
+          if (clat == null || clat.isEmpty || clng == null || clng.isEmpty) {
+            lat1 = 35.7511447;
+            lng1 = 51.4716509;
+          }
+
+          double lat2 = double.tryParse(currentLocation.latitude.toString());
+          double lng2 = double.tryParse(currentLocation.longitude.toString());
+          speed = currentLocation.speed;
+          if (speed == null) speed = 0;
+          if (currentCarLocationSpeed == null || currentCarLocationSpeed == 0)
+            currentCarLocationSpeed = 0;
+          var marker = Marker(
+              width: markerSize,
+              height: markerSize,
+              point: LatLng(lat1, lng1),
+              builder: (ctx) {
+                return GestureDetector(
+                  onTap: () {
+                    _showInfoPopUp = true;
+                    showSpeedDialog(
+                        int.tryParse(currentCarLocationSpeed.toString()));
+                  },
+                  child: Container(
+                      width: markerSize,
+                      height: markerSize,
+                      child: CircleAvatar(
+                        radius: markerSize,
+                        backgroundColor: Colors.transparent,
+                        child: getMarkerOnSpeed(
+                            int.tryParse(currentCarLocationSpeed.toString()),
+                            0),
+                      )),
+                );
+              });
+
+          markers.add(marker);
+
+          marker = Marker(
+              width: markerSize,
+              height: markerSize,
+              point: LatLng(lat2, lng2),
+              builder: (ctx) {
+                return GestureDetector(
+                  onTap: () {
+                    _showInfoPopUp = true;
+                    showSpeedDialog(int.tryParse(speed.toString()));
+                  },
+                  child: Container(
+                      width: markerSize,
+                      height: markerSize,
+                      child: CircleAvatar(
+                        radius: markerSize,
+                        backgroundColor: Colors.transparent,
+                        child:
+                            getMarkerOnSpeed(int.tryParse(speed.toString()), 0),
+                      )),
+                );
+              });
+
+          markers.add(marker);
+          queryBody =
+              '{"coordinates":[[$lng2,$lat2],[$lng1,$lat1]],"radiuses":[16000,16000]}';
+          hasPoint = true;
+        } else {
+          centerRepository.showFancyToast(
+              Translations.current.yourLocationNotFound(), false);
+        }
+      }
+      if (lines != null && lines.length > 0) {
+        lines.clear();
+      }
+      if (hasPoint) {
+        // String routType='';
+
+        if (routType == Constants.routingTypeMap[RoutingType.AIR]) {
+          final color = Colors.blueAccent.withOpacity(0.7);
+          lines.add(Polyline(
+              strokeWidth: (8.0 * _myzoom) / _zoom,
+              color: color,
+              points: geoSeries));
+          polyLine = Polyline(
+              strokeWidth: (8.0 * _myzoom) / _zoom,
+              color: color,
+              points: geoSeries);
+        } else {
+          if (fromGo) {
+            routType = Constants.routingTypeMap[RoutingType.DRIVING];
+          } else {}
+          final openRoutegeoJSON =
+              await restDatasource.fetchOpenRouteServiceURlJSON(
+                  body: queryBody, routeType: routType);
+          if (openRoutegeoJSON != null) {
+            final geojson = GeoJson();
+            geojson.processedLines.listen((GeoJsonLine line) {
+              final color = Colors.blueAccent.withOpacity(0.7);
+              lines.add(Polyline(
+                  strokeWidth: 8.0,
+                  color: color,
+                  points: line.geoSerie.toLatLng()));
+              polyLine = Polyline(
+                  strokeWidth: (8.0 * _myzoom) / _zoom,
+                  color: color,
+                  points: line.geoSerie.toLatLng());
+            });
+            geojson.endSignal.listen((_) {
+              geojson.dispose();
+            });
+            // unawaited(geojson.parse(openRoutegeoJSON, verbose: true));
+            await geojson.parse(openRoutegeoJSON, verbose: true);
+          }
+        }
+        if (lines != null && lines.length > 0) {
+          // moreButtonNoty.updateValue(new Message(type:'CLOSE_MORE_BUTTON'));
+          centerRepository.dismissDialog(context);
+          if (!fromGo) {
+            RxBus.post(new ChangeEvent(type: 'CLOSE_MORE_BUTTON'));
+          }
+          mapController.move(firstPoint, _myzoom);
+          animateNoty.updateValue(Message(text: 'ROUTE_DONE'));
+          if (anim) {
+            forAnim = true;
+            reportNoty.updateValue(Message(type: 'ANIM_ROUTE'));
+          }
+          return lines;
+        } else {
+          centerRepository.dismissDialog(context);
+        }
+      } else {
+        centerRepository.showFancyToast('اطلاعاتی یافت نشد', false);
+      }
+
+      return null;
+    }
+  }
+
+  Future<void> processData() async {
+    final geojson = GeoJson();
+    geojson.processedMultipolygons.listen((GeoJsonMultiPolygon multiPolygon) {
+      for (final polygon in multiPolygon.polygons) {
+        final geoSerie = GeoSerie(
+            type: GeoSerieType.polygon,
+            name: polygon.geoSeries[0].name,
+            geoPoints: <GeoPoint>[]);
+        for (final serie in polygon.geoSeries) {
+          geoSerie.geoPoints.addAll(serie.geoPoints);
+        }
+        final color =
+            Color((math.Random().nextDouble() * 0xFFFFFF).toInt() << 0)
+                .withOpacity(0.3);
+        final poly = Polygon(
+            points: geoSerie.toLatLng(ignoreErrors: true), color: color);
+        setState(() => polygons.add(poly));
+      }
+    });
+    geojson.endSignal.listen((bool _) => geojson.dispose());
+    final data = await rootBundle.loadString('assets/images/test.geojson');
+    final nameProperty = "ADMIN";
+    unawaited(geojson.parse(data, nameProperty: nameProperty, verbose: true));
+  }
+
+  distance(lat1, lon1, lat2, lon2) {
+    var p = 0.017453292519943295; // Math.PI / 180
+    var c = math.cos;
+    var a = 0.5 -
+        c((lat2 - lat1) * p) / 2 +
+        c(lat1 * p) * c(lat2 * p) * (1 - c((lon2 - lon1) * p)) / 2;
+
+    return 0.7 * math.asin(math.sqrt(a)); // 2 * R; R = 350 m
+  }
+
+  bool isMarkerOutsideCircle(
+      LatLng centerLatLng, LatLng draggedLatLng, double radius) {
+    // var distances ;
+    //  .distanceBetween(centerLatLng.latitude,
+    //         centerLatLng.longitude,
+    //         draggedLatLng.latitude,
+    //         draggedLatLng.longitude, distances);
+    // return radius < distances[0];
+  }
+
+  calcDistance(lat1, lon1, lat2, lon2) {
+    var R = 6371; // Earth's radius in Km
+    return math.acos(math.sin(lat1) * math.sin(lat2) +
+            math.cos(lat1) * math.cos(lat2) * math.cos(lon2 - lon1)) *
+        R;
+  }
+
+  double calculateDistanceBetweenTwoLatLongsInKm(
+      double lat1, double lon1, double lat2, double lon2) {
+    var p = 0.017453292519943295;
+    var c = cos;
+    var a = 0.5 -
+        c((lat2 - lat1) * p) / 2 +
+        c(lat1 * p) * c(lat2 * p) * (1 - c((lon2 - lon1) * p)) / 2;
+    return 0.7 * asin(sqrt(a));
+  }
+
+  Future<List<Polyline>> processLineData2(
+      bool fromCurrent,
+      String clat,
+      String clng,
+      String fromDate,
+      String toDate,
+      bool forReport,
+      bool anim,
+      bool fromGo) async {
+    List<LatLng> geoSeries = List();
 
     String routType = Constants.routingTypeMap[RoutingType.DRIVING];
     int rout =
@@ -2398,7 +2996,8 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
     String sdate = DateTimeUtils.convertIntoDateTimeWithTime(
         DateTimeUtils.getDateJalaliWithAddDays(0), 23, 59);
 
-    ApiRoute route = new ApiRoute(
+    // lastCarIdSelected = 20180;
+    ApiRoute route = ApiRoute(
         carId: lastCarIdSelected,
         startDate: forReport
             ? DateTimeUtils.convertIntoDate(
@@ -2423,60 +3022,19 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
 
     centerRepository.showProgressDialog(
         context, Translations.current.loadingdata());
-    List<ApiRoute> validPoints = List();
-    await getDefaultSettingsValues();
     var queryBody = '{"coordinates":['; //$lng2,$lat2],[$lng1,$lat1]]}';
     var radiusBody = '';
     if (!fromCurrent) {
       final pointDatas = await restDatasource.getRouteList(route);
+
       if (pointDatas != null && pointDatas.length > 0) {
         if (markers != null && markers.length > 0) {
           markers.clear();
         }
         var points = '';
         int index = pointDatas.length - 1;
+        List<List<double>> temp_points = List();
 
-        Distance dist2 = Distance();
-        for (int i = 0; i < pointDatas.length - 1; i++) {
-          String latStr1 = pointDatas[i].lat;
-          String lngStr1 = pointDatas[i].long;
-          var firstLat = latStr1.split('*');
-          var firstLng = lngStr1.split('*');
-          var secondLat = firstLat[1].split("'");
-          var secondLng = firstLng[1].split("'");
-
-          double latLng1 = ConvertDegreeAngleToDouble(
-              double.tryParse(firstLat[0]),
-              double.tryParse(secondLat[0]),
-              double.tryParse(secondLat[1]));
-
-          double latLng2 = ConvertDegreeAngleToDouble(
-              double.tryParse(firstLng[0]),
-              double.tryParse(secondLng[0]),
-              double.tryParse(secondLng[1]));
-
-          String latStr11 = pointDatas[i + 1].lat;
-          String lngStr11 = pointDatas[i + 1].long;
-          var firstLat1 = latStr11.split('*');
-          var firstLng1 = lngStr11.split('*');
-          var secondLat1 = firstLat1[1].split("'");
-          var secondLng1 = firstLng1[1].split("'");
-          double latLng12 = ConvertDegreeAngleToDouble(
-              double.tryParse(firstLat1[0]),
-              double.tryParse(secondLat1[0]),
-              double.tryParse(secondLat1[1]));
-
-          double latLng22 = ConvertDegreeAngleToDouble(
-              double.tryParse(firstLng1[0]),
-              double.tryParse(secondLng1[0]),
-              double.tryParse(secondLng1[1]));
-          double totalDistanceInM = dist2.distance(
-              LatLng(latLng1, latLng2), LatLng(latLng12, latLng22));
-          if (totalDistanceInM <= 350) {
-            validPoints..add(pointDatas[i]);
-            validPoints..add(pointDatas[i + 1]);
-          }
-        }
         String latStr1 = pointDatas[0].lat;
         String lngStr1 = pointDatas[0].long;
         var firstLat = latStr1.split('*');
@@ -2496,7 +3054,7 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
 
         firstPoint = LatLng(fresultLatLng, sresultLatLng);
         points += '[$sresultLatLng,$fresultLatLng],';
-        radiusBody += '16000,';
+        temp_points..add([sresultLatLng, fresultLatLng]);
         var marker = Marker(
             width: markerSize + 28,
             height: markerSize + 28,
@@ -2518,6 +3076,25 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
                     )),
               );
             });
+        //Place place = Place('first', firstPoint);
+        // _addSymbol('assetImage${firstPoint.latitude - firstPoint.longitude}',
+        //     mbox.LatLng(firstPoint.latitude, firstPoint.longitude));
+        // addMarker(context, place,
+        //     marker: GestureDetector(
+        //       onTap: () {
+        //         _showInfoPopUp = true;
+        //         showSpeedDialog(0);
+        //       },
+        //       child: Container(
+        //           width: markerSize + 28,
+        //           height: markerSize + 28,
+        //           child: CircleAvatar(
+        //               radius: markerSize + 28,
+        //               backgroundColor: Colors.transparent,
+        //               child: Icon(Icons.location_on, key: ObjectKey(Colors.red))
+        //               //Image.asset(markerStart, key: ObjectKey(Colors.red)),
+        //               )),
+        //     ));
         markers..add(marker);
         //////////////////////////////////
         minStopTime = '';
@@ -2529,13 +3106,16 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
 
         int firstIndex = 0;
         int nextIndex = 0;
-        double div = (index + 1) / 29;
-        if (index < 29) {
+        double div = (index + 1) / 6;
+        if (index < 6) {
           div = 1;
         }
         if (minDelay == null) minDelay = 0;
         geoSeries..add(firstPoint);
-        // var valid_ponits = List()..add(firstPoint);
+
+        // int mod = (pointDatas.length / 10).toInt();
+        // int size = 1;
+
         for (var i = 1; i < pointDatas.length - 1; i++) {
           int diff = 0;
           firstIndex = i;
@@ -2558,6 +3138,7 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
 
           double lat = fresultLatLng1;
           double lng = sresultLatLng1;
+
           int speed = pointDatas[i].speed;
           if (speed == null) speed = 0;
 
@@ -2842,646 +3423,11 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
 
       if (routType == Constants.routingTypeMap[RoutingType.AIR]) {
         final color = Colors.blueAccent.withOpacity(0.7);
+
         lines.add(Polyline(
-            strokeWidth: (8.0 * _myzoom) / _zoom,
+            strokeWidth: (8.0 * _myzoom / _zoom),
             color: color,
             points: geoSeries));
-        polyLine = Polyline(
-            strokeWidth: (8.0 * _myzoom) / _zoom,
-            color: color,
-            points: geoSeries);
-      } else {
-        if (fromGo) {
-          routType = Constants.routingTypeMap[RoutingType.DRIVING];
-        } else {}
-        final openRoutegeoJSON = await restDatasource
-            .fetchOpenRouteServiceURlJSON(body: queryBody, routeType: routType);
-        if (openRoutegeoJSON != null) {
-          final geojson = GeoJson();
-          geojson.processedLines.listen((GeoJsonLine line) {
-            final color = Colors.blueAccent.withOpacity(0.7);
-            lines.add(Polyline(
-                strokeWidth: 8.0,
-                color: color,
-                points: line.geoSerie.toLatLng()));
-            polyLine = Polyline(
-                strokeWidth: (8.0 * _myzoom) / _zoom,
-                color: color,
-                points: line.geoSerie.toLatLng());
-          });
-          geojson.endSignal.listen((_) {
-            geojson.dispose();
-          });
-          // unawaited(geojson.parse(openRoutegeoJSON, verbose: true));
-          await geojson.parse(openRoutegeoJSON, verbose: true);
-        }
-      }
-      if (lines != null && lines.length > 0) {
-        // moreButtonNoty.updateValue(new Message(type:'CLOSE_MORE_BUTTON'));
-        centerRepository.dismissDialog(context);
-        if (!fromGo) {
-          RxBus.post(new ChangeEvent(type: 'CLOSE_MORE_BUTTON'));
-        }
-        mapController.move(firstPoint, _myzoom);
-        animateNoty.updateValue(Message(text: 'ROUTE_DONE'));
-        if (anim) {
-          forAnim = true;
-          reportNoty.updateValue(Message(type: 'ANIM_ROUTE'));
-        }
-        return lines;
-      } else {
-        centerRepository.dismissDialog(context);
-      }
-    } else {
-      centerRepository.showFancyToast('اطلاعاتی یافت نشد', false);
-    }
-
-    return null;
-  }
-
-  Future<void> processData() async {
-    final geojson = GeoJson();
-    geojson.processedMultipolygons.listen((GeoJsonMultiPolygon multiPolygon) {
-      for (final polygon in multiPolygon.polygons) {
-        final geoSerie = GeoSerie(
-            type: GeoSerieType.polygon,
-            name: polygon.geoSeries[0].name,
-            geoPoints: <GeoPoint>[]);
-        for (final serie in polygon.geoSeries) {
-          geoSerie.geoPoints.addAll(serie.geoPoints);
-        }
-        final color =
-            Color((math.Random().nextDouble() * 0xFFFFFF).toInt() << 0)
-                .withOpacity(0.3);
-        final poly = Polygon(
-            points: geoSerie.toLatLng(ignoreErrors: true), color: color);
-        setState(() => polygons.add(poly));
-      }
-    });
-    geojson.endSignal.listen((bool _) => geojson.dispose());
-    final data = await rootBundle.loadString('assets/images/test.geojson');
-    final nameProperty = "ADMIN";
-    unawaited(geojson.parse(data, nameProperty: nameProperty, verbose: true));
-  }
-
-  distance(lat1, lon1, lat2, lon2) {
-    var p = 0.017453292519943295; // Math.PI / 180
-    var c = math.cos;
-    var a = 0.5 -
-        c((lat2 - lat1) * p) / 2 +
-        c(lat1 * p) * c(lat2 * p) * (1 - c((lon2 - lon1) * p)) / 2;
-
-    return 0.7 * math.asin(math.sqrt(a)); // 2 * R; R = 350 m
-  }
-
-  bool isMarkerOutsideCircle(
-      LatLng centerLatLng, LatLng draggedLatLng, double radius) {
-    // var distances ;
-    //  .distanceBetween(centerLatLng.latitude,
-    //         centerLatLng.longitude,
-    //         draggedLatLng.latitude,
-    //         draggedLatLng.longitude, distances);
-    // return radius < distances[0];
-  }
-
-  calcDistance(lat1, lon1, lat2, lon2) {
-    var R = 6371; // Earth's radius in Km
-    return math.acos(math.sin(lat1) * math.sin(lat2) +
-            math.cos(lat1) * math.cos(lat2) * math.cos(lon2 - lon1)) *
-        R;
-  }
-
-  double calculateDistanceBetweenTwoLatLongsInKm(
-      double lat1, double lon1, double lat2, double lon2) {
-    var p = 0.017453292519943295;
-    var c = cos;
-    var a = 0.5 -
-        c((lat2 - lat1) * p) / 2 +
-        c(lat1 * p) * c(lat2 * p) * (1 - c((lon2 - lon1) * p)) / 2;
-    return 0.7 * asin(sqrt(a));
-  }
-
-  Future<List<Polyline>> processLineData2(
-      bool fromCurrent,
-      String clat,
-      String clng,
-      String fromDate,
-      String toDate,
-      bool forReport,
-      bool anim,
-      bool fromGo) async {
-    List<LatLng> geoSeries = List();
-
-    String routType = Constants.routingTypeMap[RoutingType.DRIVING];
-    int rout =
-        await prefRepository.getRoutingType(CenterRepository.ROUTING_TYPE_TAG);
-    if (rout == 1) routType = Constants.routingTypeMap[RoutingType.AIR];
-    if (rout == 2) routType = Constants.routingTypeMap[RoutingType.DRIVING];
-    if (rout == 3) routType = Constants.routingTypeMap[RoutingType.WALKING];
-
-    String tdate = DateTimeUtils.convertIntoDateTimeWithTime(
-        DateTimeUtils.getDateJalali(), 0, 0);
-    String sdate = DateTimeUtils.convertIntoDateTimeWithTime(
-        DateTimeUtils.getDateJalaliWithAddDays(0), 23, 59);
-
-    // lastCarIdSelected = 20180;
-    ApiRoute route = ApiRoute(
-        carId: lastCarIdSelected,
-        startDate: forReport
-            ? DateTimeUtils.convertIntoDate(
-                fromDate) //DateTimeUtils.convertIntoDateTimeWithTime(fromDate, 0, 0)
-            : sdate,
-        endDate: forReport
-            ? DateTimeUtils.convertIntoDate(
-                toDate) //DateTimeUtils.convertIntoDateTimeWithTime(toDate, 23, 59)
-            : tdate,
-        dateTime: null,
-        speed: null,
-        lat: null,
-        long: null,
-        enterTime: null,
-        carIds: null,
-        DeviceId: null,
-        Latitude: null,
-        Longitude: null,
-        Date: null,
-        Time: null,
-        CreatedDateTime: null);
-
-    centerRepository.showProgressDialog(
-        context, Translations.current.loadingdata());
-    var queryBody = '{"coordinates":['; //$lng2,$lat2],[$lng1,$lat1]]}';
-    if (!fromCurrent) {
-      final pointDatas = await restDatasource.getRouteList(route);
-
-      if (pointDatas != null && pointDatas.length > 0) {
-        if (markers != null && markers.length > 0) {
-          markers.clear();
-        }
-        var points = '';
-        int index = pointDatas.length - 1;
-        List<List<double>> temp_points = List();
-
-        String latStr1 = pointDatas[0].lat;
-        String lngStr1 = pointDatas[0].long;
-        var firstLat = latStr1.split('*');
-        var firstLng = lngStr1.split('*');
-        var secondLat = firstLat[1].split("'");
-        var secondLng = firstLng[1].split("'");
-
-        double fresultLatLng = ConvertDegreeAngleToDouble(
-            double.tryParse(firstLat[0]),
-            double.tryParse(secondLat[0]),
-            double.tryParse(secondLat[1]));
-
-        double sresultLatLng = ConvertDegreeAngleToDouble(
-            double.tryParse(firstLng[0]),
-            double.tryParse(secondLng[0]),
-            double.tryParse(secondLng[1]));
-
-        firstPoint = LatLng(fresultLatLng, sresultLatLng);
-        points += '[$sresultLatLng,$fresultLatLng],';
-        temp_points..add([sresultLatLng, fresultLatLng]);
-        var marker = Marker(
-            width: markerSize + 28,
-            height: markerSize + 28,
-            point: firstPoint,
-            builder: (ctx) {
-              return GestureDetector(
-                onTap: () {
-                  _showInfoPopUp = true;
-                  showSpeedDialog(0);
-                },
-                child: Container(
-                    width: markerSize + 28,
-                    height: markerSize + 28,
-                    child: CircleAvatar(
-                      radius: markerSize + 28,
-                      backgroundColor: Colors.transparent,
-                      child:
-                          Image.asset(markerStart, key: ObjectKey(Colors.red)),
-                    )),
-              );
-            });
-        //Place place = Place('first', firstPoint);
-        // _addSymbol('assetImage${firstPoint.latitude - firstPoint.longitude}',
-        //     mbox.LatLng(firstPoint.latitude, firstPoint.longitude));
-        // addMarker(context, place,
-        //     marker: GestureDetector(
-        //       onTap: () {
-        //         _showInfoPopUp = true;
-        //         showSpeedDialog(0);
-        //       },
-        //       child: Container(
-        //           width: markerSize + 28,
-        //           height: markerSize + 28,
-        //           child: CircleAvatar(
-        //               radius: markerSize + 28,
-        //               backgroundColor: Colors.transparent,
-        //               child: Icon(Icons.location_on, key: ObjectKey(Colors.red))
-        //               //Image.asset(markerStart, key: ObjectKey(Colors.red)),
-        //               )),
-        //     ));
-        markers..add(marker);
-        //////////////////////////////////
-        minStopTime = '';
-        minStopTime2 = '';
-        minStopDate = '';
-        minStopDate2 = '';
-
-        //////////////////////
-
-        int firstIndex = 0;
-        int nextIndex = 0;
-        double div = (index + 1) / 6;
-        if (index < 6) {
-          div = 1;
-        }
-        if (minDelay == null) minDelay = 0;
-        geoSeries..add(firstPoint);
-
-        // int mod = (pointDatas.length / 10).toInt();
-        // int size = 1;
-
-        for (var i = 1; i < pointDatas.length - 1; i++) {
-          int diff = 0;
-          firstIndex = i;
-          String latStr2 = pointDatas[i].lat;
-          String lngStr2 = pointDatas[i].long;
-          var firstLat1 = latStr2.split('*');
-          var firstLng1 = lngStr2.split('*');
-          var secondLat1 = firstLat1[1].split("'");
-          var secondLng1 = firstLng1[1].split("'");
-
-          double fresultLatLng1 = ConvertDegreeAngleToDouble(
-              double.tryParse(firstLat1[0]),
-              double.tryParse(secondLat1[0]),
-              double.tryParse(secondLat1[1]));
-
-          double sresultLatLng1 = ConvertDegreeAngleToDouble(
-              double.tryParse(firstLng1[0]),
-              double.tryParse(secondLng1[0]),
-              double.tryParse(secondLng1[1]));
-
-          double lat = fresultLatLng1;
-          double lng = sresultLatLng1;
-
-          int speed = pointDatas[i].speed;
-          if (speed == null) speed = 0;
-
-          if (i < index) {
-            firstIndex = i;
-            nextIndex = firstIndex + 1;
-          }
-
-          minStopDate = pointDatas[firstIndex].dateTime;
-          minStopTime = pointDatas[firstIndex].enterTime;
-
-          minStopDate2 = pointDatas[nextIndex].dateTime;
-          minStopTime2 = pointDatas[nextIndex].enterTime;
-
-          var time1 = minStopTime.split(':');
-          var time2 = minStopTime2.split(':');
-          /* int h1=int.tryParse(time1[0]);
-              int m1=int.tryParse(time1[1]);
-              int s1=int.tryParse(time1[2]);
-
-              int h2=int.tryParse(time2[0]);
-              int m2=int.tryParse(time2[1]);
-              int s2=int.tryParse(time2[2]);*/
-
-          minStopDate = minStopDate.replaceAll('/', '');
-          minStopDate2 = minStopDate2.replaceAll('/', '');
-
-          if (minStopDate.trim() == minStopDate2.trim()) {
-            diff = DateTimeUtils.diffMinsFromDateToDate4(
-                DateTimeUtils.convertIntoTimeOnly(minStopTime2),
-                DateTimeUtils.convertIntoTimeOnly(minStopTime));
-
-            //حداکثر فاصله زمانی دو دقیقه
-            if (diff >= 1) {
-              if (speed > 5) {
-                double x = speed * (diff / 60);
-                if (x > 50) {
-                  String latStr22 = pointDatas[nextIndex].lat;
-                  String lngStr22 = pointDatas[nextIndex].long;
-                  var firstLat11 = latStr22.split('*');
-                  var firstLng11 = lngStr22.split('*');
-                  var secondLat11 = firstLat11[1].split("'");
-                  var secondLng11 = firstLng11[1].split("'");
-
-                  double fresultLatLng11 = ConvertDegreeAngleToDouble(
-                      double.tryParse(firstLat11[0]),
-                      double.tryParse(secondLat11[0]),
-                      double.tryParse(secondLat11[1]));
-
-                  double sresultLatLng11 = ConvertDegreeAngleToDouble(
-                      double.tryParse(firstLng11[0]),
-                      double.tryParse(secondLng11[0]),
-                      double.tryParse(secondLng11[1]));
-
-                  double lat2 = fresultLatLng11;
-                  double lng2 = sresultLatLng11;
-                  if (calcDistance(temp_points[temp_points.length - 1][1],
-                          temp_points[temp_points.length - 1][0], lat2, lng2) <
-                      0.35) {
-                    points += '[$lng,$lat],';
-                    temp_points..add([lng, lat]);
-                  }
-                }
-              }
-            } else {
-              if (speed > 5) {
-                // double x=speed*(diff / 60);
-                // if(x>50) {
-                if ((i % div.floor()) == 0) {
-                  String latStr22 = pointDatas[nextIndex].lat;
-                  String lngStr22 = pointDatas[nextIndex].long;
-                  var firstLat11 = latStr22.split('*');
-                  var firstLng11 = lngStr22.split('*');
-                  var secondLat11 = firstLat11[1].split("'");
-                  var secondLng11 = firstLng11[1].split("'");
-
-                  double fresultLatLng11 = ConvertDegreeAngleToDouble(
-                      double.tryParse(firstLat11[0]),
-                      double.tryParse(secondLat11[0]),
-                      double.tryParse(secondLat11[1]));
-
-                  double sresultLatLng11 = ConvertDegreeAngleToDouble(
-                      double.tryParse(firstLng11[0]),
-                      double.tryParse(secondLng11[0]),
-                      double.tryParse(secondLng11[1]));
-
-                  double lat2 = fresultLatLng11;
-                  double lng2 = sresultLatLng11;
-                  if (calcDistance(temp_points[temp_points.length - 1][1],
-                          temp_points[temp_points.length - 1][0], lat2, lng2) <
-                      0.35) {
-                    points += '[$lng,$lat],';
-                    temp_points..add([lng, lat]);
-                  }
-                }
-                //}
-              }
-            }
-          }
-
-          var marker = Marker(
-              width: markerSize,
-              height: markerSize,
-              point: LatLng(lat, lng),
-              builder: (ctx) {
-                return GestureDetector(
-                  onTap: () {
-                    _showInfoPopUp = true;
-                    showSpeedDialog(speed);
-                  },
-                  child: Container(
-                      width: markerSize,
-                      height: markerSize,
-                      child: CircleAvatar(
-                        radius: markerSize,
-                        backgroundColor: Colors.transparent,
-                        child: getMarkerOnSpeed(speed, diff),
-                      )),
-                );
-              });
-
-          if (((speed <= minSpeed && showMinSpeedMarkers) ||
-              (speed >= maxSpeed && showMaxSpeedMarkers) ||
-              (diff >= minDelay && showStopSpeedMarkers))) {
-            markers.add(marker);
-            // Place place2 = Place('speed${lat - lng}', LatLng(lat, lng));
-
-            // _addSymbol('assetImage${i}', mbox.LatLng(lat, lng), speed: speed);
-            // addMarker(context, place2,
-            //     marker: GestureDetector(
-            //       onTap: () {
-            //         _showInfoPopUp = true;
-            //         showSpeedDialog(speed);
-            //       },
-            //       child: Container(
-            //           width: markerSize,
-            //           height: markerSize,
-            //           child: CircleAvatar(
-            //             radius: markerSize,
-            //             backgroundColor: Colors.transparent,
-            //             child: getMarkerOnSpeed(speed, diff),
-            //           )),
-            //     ));
-          }
-
-          if (routType == Constants.routingTypeMap[RoutingType.AIR]) {
-            geoSeries..add(LatLng(lat, lng));
-          }
-        }
-
-        latStr1 = pointDatas[index].lat;
-        lngStr1 = pointDatas[index].long;
-        firstLat = latStr1.split('*');
-        firstLng = lngStr1.split('*');
-        secondLat = firstLat[1].split("'");
-        secondLng = firstLng[1].split("'");
-
-        fresultLatLng = ConvertDegreeAngleToDouble(double.tryParse(firstLat[0]),
-            double.tryParse(secondLat[0]), double.tryParse(secondLat[1]));
-
-        sresultLatLng = ConvertDegreeAngleToDouble(double.tryParse(firstLng[0]),
-            double.tryParse(secondLng[0]), double.tryParse(secondLng[1]));
-
-        points += '[$sresultLatLng,$fresultLatLng]';
-
-        int speed = pointDatas[index].speed;
-        if (speed == null) speed = 0;
-
-        marker = Marker(
-            width: markerSize + 28,
-            height: markerSize + 28,
-            point: LatLng(fresultLatLng, sresultLatLng),
-            builder: (ctx) {
-              return GestureDetector(
-                onTap: () {
-                  _showInfoPopUp = true;
-                  showSpeedDialog(speed);
-                },
-                child: Container(
-                    width: markerSize + 28,
-                    height: markerSize + 28,
-                    child: CircleAvatar(
-                      radius: markerSize + 28,
-                      backgroundColor: Colors.transparent,
-                      child: Image.asset(markerEnd, key: ObjectKey(Colors.red)),
-                    )),
-              );
-            });
-        // Place place2 = Place('speed${fresultLatLng - sresultLatLng}',
-        //     LatLng(fresultLatLng, sresultLatLng));
-        // _addSymbol('assetImage${fresultLatLng - sresultLatLng}',
-        //     mbox.LatLng(fresultLatLng, sresultLatLng),
-        //     speed: speed);
-        // addMarker(context, place2,
-        //     marker: GestureDetector(
-        //       onTap: () {
-        //         _showInfoPopUp = true;
-        //         showSpeedDialog(speed);
-        //       },
-        //       child: Container(
-        //           width: markerSize + 28,
-        //           height: markerSize + 28,
-        //           child: CircleAvatar(
-        //               radius: markerSize + 28,
-        //               backgroundColor: Colors.transparent,
-        //               child: Icon(Icons.location_on, key: ObjectKey(Colors.red))
-        //               //Image.asset(markerEnd, key: ObjectKey(Colors.red)),
-        //               )),
-        //     ));
-
-        markers..add(marker);
-        if (points.endsWith(',')) {
-          points = points.substring(0, points.length - 1);
-        }
-
-        queryBody = queryBody + points + ']}';
-        hasPoint = true;
-        geoSeries..add(LatLng(fresultLatLng, sresultLatLng));
-      } else {
-        hasPoint = false;
-        /*var points = '';
-        double lat = 35.7511447;
-        double lng = 51.4716509 ;
-        firstPoint = LatLng(lat,lng);
-        double lat2 = 35.796249;
-        double lng2 = 51.427583 ;
-
-        points += '[$lng,$lat],';
-        points += '[$lng2,$lat2]';
-
-        queryBody = queryBody + points + ']}';*/
-
-      }
-    } else {
-      double speed = 80;
-      if (currentLocation == null) {
-        await getLocationForRoute();
-      }
-      if (currentLocation != null) {
-        double lat1 = double.tryParse(clat);
-        double lng1 = double.tryParse(clng);
-        firstPoint = LatLng(lat1, lng1);
-        if (clat == null || clat.isEmpty || clng == null || clng.isEmpty) {
-          lat1 = 35.7511447;
-          lng1 = 51.4716509;
-        }
-
-        double lat2 = double.tryParse(currentLocation.latitude.toString());
-        double lng2 = double.tryParse(currentLocation.longitude.toString());
-        speed = currentLocation.speed;
-        if (speed == null) speed = 0;
-        if (currentCarLocationSpeed == null || currentCarLocationSpeed == 0)
-          currentCarLocationSpeed = 0;
-        var marker = Marker(
-            width: markerSize,
-            height: markerSize,
-            point: LatLng(lat1, lng1),
-            builder: (ctx) {
-              return GestureDetector(
-                onTap: () {
-                  _showInfoPopUp = true;
-                  showSpeedDialog(
-                      int.tryParse(currentCarLocationSpeed.toString()));
-                },
-                child: Container(
-                    width: markerSize,
-                    height: markerSize,
-                    child: CircleAvatar(
-                      radius: markerSize,
-                      backgroundColor: Colors.transparent,
-                      child: getMarkerOnSpeed(
-                          int.tryParse(currentCarLocationSpeed.toString()), 0),
-                    )),
-              );
-            });
-        // Place place2 = Place('speed${lat1 - lng1}', LatLng(lat1, lng1));
-        // _addSymbol('assetImage${lat1 - lng1}', mbox.LatLng(lat1, lng1),
-        //     speed: int.tryParse(currentCarLocationSpeed.toString()));
-
-        // addMarker(context, place2,
-        //     marker: GestureDetector(
-        //       onTap: () {
-        //         _showInfoPopUp = true;
-        //         showSpeedDialog(
-        //             int.tryParse(currentCarLocationSpeed.toString()));
-        //       },
-        //       child: Container(
-        //           width: markerSize,
-        //           height: markerSize,
-        //           child: CircleAvatar(
-        //             radius: markerSize,
-        //             backgroundColor: Colors.transparent,
-        //             child: getMarkerOnSpeed(
-        //                 int.tryParse(currentCarLocationSpeed.toString()), 0),
-        //           )),
-        //     ));
-        markers.add(marker);
-
-        marker = Marker(
-            width: markerSize,
-            height: markerSize,
-            point: LatLng(lat2, lng2),
-            builder: (ctx) {
-              return GestureDetector(
-                onTap: () {
-                  _showInfoPopUp = true;
-                  showSpeedDialog(int.tryParse(speed.toString()));
-                },
-                child: Container(
-                    width: markerSize,
-                    height: markerSize,
-                    child: CircleAvatar(
-                      radius: markerSize,
-                      backgroundColor: Colors.transparent,
-                      child:
-                          getMarkerOnSpeed(int.tryParse(speed.toString()), 0),
-                    )),
-              );
-            });
-        // place2 = Place('speed${lat2 - lng2}', LatLng(lat2, lng2));
-        // _addSymbol('assetImage${lat2 - lng2}', mbox.LatLng(lat2, lng2),
-        //     speed: int.tryParse(speed.toString()));
-
-        // addMarker(context, place2,
-        //     marker: GestureDetector(
-        //       onTap: () {
-        //         _showInfoPopUp = true;
-        //         showSpeedDialog(int.tryParse(speed.toString()));
-        //       },
-        //       child: Container(
-        //           width: markerSize,
-        //           height: markerSize,
-        //           child: CircleAvatar(
-        //             radius: markerSize,
-        //             backgroundColor: Colors.transparent,
-        //             child: getMarkerOnSpeed(int.tryParse(speed.toString()), 0),
-        //           )),
-        //     ));
-        markers.add(marker);
-        queryBody = '{"coordinates":[[$lng2,$lat2],[$lng1,$lat1]]}';
-        hasPoint = true;
-      } else {
-        centerRepository.showFancyToast(
-            Translations.current.yourLocationNotFound(), false);
-      }
-    }
-    if (lines != null && lines.length > 0) {
-      lines.clear();
-    }
-    if (hasPoint) {
-      // String routType='';
-
-      if (routType == Constants.routingTypeMap[RoutingType.AIR]) {
-        final color = Colors.blueAccent.withOpacity(0.7);
-
-        //lines.add(Polyline(strokeWidth: 8.0, color: color, points: geoSeries));
         polyLine = Polyline(
             strokeWidth: (8.0 * _myzoom) / _zoom,
             color: color,
@@ -3515,12 +3461,12 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
             //     (8.0 * _myzoom) / _zoom);
             if (kIsWeb) {
               animateNoty.updateValue(Message(text: 'ANIM_ROUTE_DONE'));
+              if (!fromGo) {
+                RxBus.post(ChangeEvent(type: 'CLOSE_MORE_BUTTON'));
+              }
               // _updateCameraPosition(
               //     mbox.LatLng(firstPoint.latitude, firstPoint.longitude));
               mapController.move(firstPoint, _myzoom);
-              if (anim) {
-                animateRoutecarPolyLines();
-              }
             }
             //addLines(context, line.geoSerie.geoPoints);
           });
@@ -3534,30 +3480,22 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
             geojson.parseWeb(openRoutegeoJSON, verbose: true);
         }
       }
-      // if (lines != null && lines.length > 0) {
-      if (!kIsWeb) {
-        if ((latLngPoints != null && latLngPoints.isNotEmpty) ||
-            (markers != null && markers.isNotEmpty)) {
-          // moreButtonNoty.updateValue(new Message(type:'CLOSE_MORE_BUTTON'));
-          animateNoty.updateValue(Message(text: 'ANIM_ROUTE_DONE'));
-          if (!fromGo) {
-            RxBus.post(ChangeEvent(type: 'CLOSE_MORE_BUTTON'));
-          }
-          if (!kIsWeb) {
-            // _updateCameraPosition(
-            //     mbox.LatLng(firstPoint.latitude, firstPoint.longitude));
-            mapController.move(firstPoint, _myzoom);
-          } else {
-            // _updateCameraPosition(
-            //     mbox.LatLng(firstPoint.latitude, firstPoint.longitude));
-            mapController.move(firstPoint, _myzoom);
-          }
-          return lines;
+
+      if (lines != null && lines.length > 0) {
+        // moreButtonNoty.updateValue(new Message(type:'CLOSE_MORE_BUTTON'));
+        centerRepository.dismissDialog(context);
+        if (!fromGo) {
+          RxBus.post(ChangeEvent(type: 'CLOSE_MORE_BUTTON'));
         }
+        mapController.move(firstPoint, _myzoom);
+        animateNoty.updateValue(Message(text: 'ROUTE_DONE'));
+        if (anim) {
+          forAnim = true;
+          reportNoty.updateValue(Message(type: 'ANIM_ROUTE'));
+        }
+        return lines;
       } else {
-        if ((markers != null && markers.isNotEmpty)) {
-          // animateNoty.updateValue(Message(text: 'ANIM_ROUTE_DONE'));
-        }
+        centerRepository.dismissDialog(context);
       }
     } else {
       centerRepository.showFancyToast('اطلاعاتی یافت نشد', false);
@@ -5250,6 +5188,18 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
   }
 
   _showBottomSheetDates(BuildContext cntext) {
+    double wid = kIsWeb
+        ? MediaQuery.of(context).size.width * 0.75
+        : MediaQuery.of(context).size.width * 0.75;
+    double heit = kIsWeb
+        ? MediaQuery.of(context).size.width * 0.75
+        : MediaQuery.of(context).size.width * 0.75;
+    if (wid > 350.0) {
+      wid = 350.0;
+    }
+    if (heit > 350.0) {
+      heit = 350.0;
+    }
     showModalBottomSheetCustom(
         context: cntext,
         mHeight: 0.90,
@@ -5264,8 +5214,8 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
               //   textAlign: TextAlign.center,
               // ),
               Container(
-                width: MediaQuery.of(context).size.width * 0.75,
-                height: MediaQuery.of(context).size.width * 0.75,
+                width: wid,
+                height: heit,
                 child: initDatePicker(textEditingController, 'From'),
               ),
               /*Text(Translations.current.toDate(),
@@ -6872,9 +6822,9 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
                                                                 ? TileLayerOptions(
                                                                     tileProvider:
                                                                         NonCachingNetworkTileProvider(),
-                                                                    
-                                                                     urlTemplate:
-                                                                         'https://api.mapbox.com/styles/v1/rezand/ck7d3ul4c0k3w1ir0n2a419pd/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoicmV6YW5kIiwiYSI6ImNrNWNkdHg3djAwdDAzZnMwcTc1N2ZpY2YifQ.fl5LG72G5Uz6CLVfhbazNw',
+
+                                                                    urlTemplate:
+                                                                        'https://api.mapbox.com/styles/v1/rezand/ck7d3ul4c0k3w1ir0n2a419pd/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoicmV6YW5kIiwiYSI6ImNrNWNkdHg3djAwdDAzZnMwcTc1N2ZpY2YifQ.fl5LG72G5Uz6CLVfhbazNw',
                                                                     // additionalOptions: {
                                                                     //   'accessToken':
                                                                     //       'pk.eyJ1IjoicmV6YW5kIiwiYSI6ImNrNWNkdHg3djAwdDAzZnMwcTc1N2ZpY2YifQ.fl5LG72G5Uz6CLVfhbazNw',
@@ -7401,8 +7351,8 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
                                                             ? TileLayerOptions(
                                                                 tileProvider:
                                                                     NonCachingNetworkTileProvider(),
-                                                                   urlTemplate:
-                                                                     'https://api.mapbox.com/styles/v1/rezand/ck7d3ul4c0k3w1ir0n2a419pd/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoicmV6YW5kIiwiYSI6ImNrNWNkdHg3djAwdDAzZnMwcTc1N2ZpY2YifQ.fl5LG72G5Uz6CLVfhbazNw',
+                                                                urlTemplate:
+                                                                    'https://api.mapbox.com/styles/v1/rezand/ck7d3ul4c0k3w1ir0n2a419pd/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoicmV6YW5kIiwiYSI6ImNrNWNkdHg3djAwdDAzZnMwcTc1N2ZpY2YifQ.fl5LG72G5Uz6CLVfhbazNw',
                                                                 // additionalOptions: {
                                                                 //   'accessToken':
                                                                 //       'pk.eyJ1IjoicmV6YW5kIiwiYSI6ImNrNWNkdHg3djAwdDAzZnMwcTc1N2ZpY2YifQ.fl5LG72G5Uz6CLVfhbazNw',

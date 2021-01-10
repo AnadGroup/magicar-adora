@@ -75,7 +75,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart' show timeDilation;
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:sa_stateless_animation/sa_stateless_animation.dart';
+//import 'package:sa_stateless_animation/sa_stateless_animation.dart';
+import 'package:simple_animations/simple_animations.dart' as sma;
+import 'package:simple_animations/simple_animations.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'package:solid_bottom_sheet/solid_bottom_sheet.dart';
 import 'package:universal_platform/universal_platform.dart';
@@ -1047,22 +1049,22 @@ class HomeScreenState extends State<HomeScreen>
 
     super.initState();
     CenterRepository.getPeriodicUpdateTime().then((value) async {
-      if (!kIsWeb) {
+     // if (!kIsWeb) {
         periodicTimer = centerRepository.checkCarStatusPeriodic(
             CenterRepository.periodicUpdateTime, getStatusNoty);
         centerRepository
             .checkParkGPSStatusPeriodic(CenterRepository.periodicUpdateTime);
-      }
+     // }
     });
 
-    if (!kIsWeb) {
+    //if (!kIsWeb) {
       messageCountNoty
           .updateValue(Message(index: CenterRepository.messageCounts));
 
       Future.delayed(Duration(seconds: 3)).then((valu) {
         centerRepository.getCarStatusAtAppStarted(getStatusNoty);
       });
-    }
+   // }
   }
 
   _showCarStatusHistorySheet(BuildContext context) async {

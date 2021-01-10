@@ -17,6 +17,7 @@ import 'package:anad_magicar/repository/listener/listener_repository.dart';
 import 'package:anad_magicar/repository/pref_repository.dart';
 import 'package:anad_magicar/translation_strings.dart';
 import 'package:anad_magicar/ui/screen/home/engine_status_widgets.dart';
+import 'package:anad_magicar/ui/screen/home/home.dart';
 import 'package:anad_magicar/widgets/flash_bar/flash_helper.dart';
 import 'package:audioplayers/audio_cache.dart';
 import 'package:audioplayers/audioplayers.dart';
@@ -103,8 +104,8 @@ class _EngineStatusState extends State<EngineStatus>
   bool isEngineOff = true;
   Color _currentColor;
 
-  double iconSizeWidth = 48.0;
-  double iconSizeHeight = 48.0;
+  double iconSizeWidth = kIsWeb ? 28.0 : 48.0;
+  double iconSizeHeight = kIsWeb ? 28.0 : 48.0;
 
   registerRxBus() {
     RxBus.register<ChangeEvent>().listen((ChangeEvent event) {
@@ -697,18 +698,37 @@ class _EngineStatusState extends State<EngineStatus>
                                     child: (lock_status != null &&
                                             lock_status &&
                                             getStatusExecuted)
-                                        ? ImageNeonGlow(
-                                            imageUrl:
+                                        ? kIsWeb
+                                            ? Container(
+                                                width: 28,
+                                                height: 28,
+                                                child: ImageNeonGlow(
+                                                  imageUrl:
+                                                      'assets/images/lock_11.png',
+                                                  counter: _counter,
+                                                  color: _currentColor,
+                                                ))
+                                            : ImageNeonGlow(
+                                                imageUrl:
+                                                    'assets/images/lock_11.png',
+                                                counter: _counter,
+                                                color: _currentColor,
+                                                scale: 2.0,
+                                              )
+                                        : kIsWeb
+                                            ? Container(
+                                                width: 28,
+                                                height: 28,
+                                                child: Image.asset(
+                                                  'assets/images/lock_11.png',
+                                                  color: _currentColor,
+                                                ),
+                                              )
+                                            : Image.asset(
                                                 'assets/images/lock_11.png',
-                                            counter: _counter,
-                                            color: _currentColor,
-                                            scale: 2.0,
-                                          )
-                                        : Image.asset(
-                                            'assets/images/lock_11.png',
-                                            scale: 2.0,
-                                            color: _currentColor,
-                                          ),
+                                                scale: 2.0,
+                                                color: _currentColor,
+                                              ),
                                     // radius: 24.0,
                                   ),
                                 ),
