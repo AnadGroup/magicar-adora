@@ -53,7 +53,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:geopoint/geopoint.dart';
 import 'package:pedantic/pedantic.dart';
-import 'package:user_location/user_location.dart';
 
 import 'dart:math' as math;
 import '../../../translation_strings.dart';

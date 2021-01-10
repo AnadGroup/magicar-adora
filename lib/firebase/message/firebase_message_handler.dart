@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:anad_magicar/common/constants.dart';
 import 'package:anad_magicar/data/rxbus.dart';
 import 'package:anad_magicar/model/change_event.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+// import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/scheduler.dart';
@@ -59,7 +59,7 @@ abstract class FireBaseMessageHandler<T> {
   onResume(Map<String, dynamic> message);
   hasToken(bool hasToken, String token);
 
-  final Firestore _db = Firestore.instance;
+  // final Firestore _db = Firestore.instance;
   final FirebaseMessaging _fcm = FirebaseMessaging();
   StreamSubscription iosSubscription;
 
