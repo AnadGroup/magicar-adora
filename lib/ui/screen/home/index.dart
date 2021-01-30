@@ -10,9 +10,12 @@ import 'package:anad_magicar/bloc/values/notify_value.dart';
 import 'package:anad_magicar/common/actions_constants.dart';
 import 'package:anad_magicar/common/constants.dart';
 import 'package:anad_magicar/components/CircleImage.dart';
+import 'package:anad_magicar/components/bottomsheet/bottom_sheet_animated.dart';
 import 'package:anad_magicar/components/button.dart';
 import 'package:anad_magicar/components/circle_badge.dart';
 import 'package:anad_magicar/components/engine_status.dart';
+import 'package:anad_magicar/components/pull_refresh/pull_to_refresh.dart';
+import 'package:anad_magicar/components/pull_refresh/pull_to_refresh.dart';
 import 'package:anad_magicar/components/pull_refresh/pull_to_refresh.dart';
 import 'package:anad_magicar/data/database_helper.dart';
 import 'package:anad_magicar/data/rest_ds.dart';
@@ -32,6 +35,7 @@ import 'package:anad_magicar/model/viewmodel/car_info_vm.dart';
 import 'package:anad_magicar/model/viewmodel/car_page_vm.dart';
 import 'package:anad_magicar/model/viewmodel/car_state.dart';
 import 'package:anad_magicar/model/viewmodel/map_vm.dart';
+import 'package:anad_magicar/model/viewmodel/service_vm.dart';
 import 'package:anad_magicar/model/viewmodel/status_history_vm.dart';
 import 'package:anad_magicar/model/viewmodel/status_noti_vm.dart';
 import 'package:anad_magicar/notifiers/opacity.dart';
@@ -48,15 +52,19 @@ import 'package:anad_magicar/ui/screen/home/home.dart';
 import 'package:anad_magicar/ui/screen/login/login2.dart';
 import 'package:anad_magicar/ui/screen/login/logout_dialog.dart';
 import 'package:anad_magicar/ui/screen/message/message_history_screen.dart';
+import 'package:anad_magicar/ui/screen/payment/invoice_form.dart';
 import 'package:anad_magicar/ui/screen/profile/profile2.dart';
 import 'package:anad_magicar/ui/screen/register/register_screen.dart';
+import 'package:anad_magicar/ui/screen/service/main_service_page.dart';
 import 'package:anad_magicar/ui/screen/setting/native_settings_screen.dart';
 import 'package:anad_magicar/ui/screen/setting/security_screen.dart';
+import 'package:anad_magicar/ui/screen/user/user_access_detail.dart';
 import 'package:anad_magicar/ui/theme/app_themes.dart';
 import 'package:anad_magicar/utils/dart_helper.dart';
 import 'package:anad_magicar/utils/date_utils.dart';
 import 'package:anad_magicar/widgets/appbar_collapse.dart';
 import 'package:anad_magicar/widgets/bottom_sheet_custom.dart';
+import 'package:anad_magicar/widgets/flash_bar/flash.dart';
 import 'package:anad_magicar/widgets/flash_bar/flash_helper.dart';
 import 'package:audioplayers/audio_cache.dart';
 import 'package:audioplayers/audioplayers.dart';
@@ -65,20 +73,23 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart' show timeDilation;
+import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
+//import 'package:sa_stateless_animation/sa_stateless_animation.dart';
+import 'package:simple_animations/simple_animations.dart' as sma;
+import 'package:simple_animations/simple_animations.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'package:solid_bottom_sheet/solid_bottom_sheet.dart';
 import 'package:universal_platform/universal_platform.dart';
-import 'package:simple_animations/simple_animations.dart' as sma;
-// import 'package:sa_stateless_animation/sa_stateless_animation.dart';
+import 'package:supercharged/supercharged.dart';
 //import 'package:assets_audio_player/assets_audio_player.dart';
 
 class HomeScreen extends StatefulWidget {
   final GlobalKey<ScaffoldState> scaffoldKey;
-
   const HomeScreen({Key key, this.scaffoldKey}) : super(key: key);
 
   @override
-  HomeScreenState createState() => HomeScreenState();
+  HomeScreenState createState() => new HomeScreenState();
 }
 
 enum MaterialColor { RED, BLUE, GREEN, YELLOW, BLACK, WHITE, GREY }
@@ -97,8 +108,7 @@ class HomeScreenState extends State<HomeScreen>
   PageController pageController = PageController();
 
   RefreshController _refreshController =
-  RefreshController(initialRefresh: false);
-
+      RefreshController(initialRefresh: false);
   //final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   String userName = '';
@@ -113,14 +123,14 @@ class HomeScreenState extends State<HomeScreen>
   Timer periodicTimer;
   CarStateVM currentCarState;
   SolidController _solidBottomSheetController = SolidController();
-  List<ScreenHiddenDrawer> itens = List();
+  List<ScreenHiddenDrawer> itens = new List();
 
   Animation<double> containerGrowAnimation;
   AnimationController _screenController;
   AnimationController _buttonController;
   AnimationController animController;
   AnimationController animProgressController;
-  sma.CustomAnimationControl getStatusController = sma.CustomAnimationControl.STOP;
+  CustomAnimationControl getStatusController = CustomAnimationControl.STOP;
 
   Animation<double> buttonGrowAnimation;
   Animation<double> listTileWidth;
@@ -153,7 +163,7 @@ class HomeScreenState extends State<HomeScreen>
   final int myProgramsId = 50;
 
   OpacityNotifier opacityNotifier;
-  Server server = Server();
+  Server server = new Server();
   StreamSubscription<String> _subscription;
   String message = '';
   String bottomSheetMessage = '';
@@ -172,7 +182,6 @@ class HomeScreenState extends State<HomeScreen>
   List<AdminCarModel> newCarsList;
   int currentBottomNaviSelected = 2;
   var startEnginChangedNoty = NotyBloc<Message>();
-
   //var statusChangedNoty=new NotyBloc<CarStateVM>();
   var carPageChangedNoty = NotyBloc<Message>();
   var opacityChangedNoty = NotyBloc<Message>();
@@ -181,12 +190,10 @@ class HomeScreenState extends State<HomeScreen>
   var sendCommandNoty = NotyBloc<SendingCommandVM>();
 
   NotyBloc<Message> getStatusNoty = NotyBloc<Message>();
-
   //var valueNotyModelBloc=new NotyBloc<ChangeEvent>();
 
   var _currentColor = Colors.redAccent;
   int _currentCarId = 0;
-
   //cars
   final double _initFabHeight = 40.0;
   double _fabHeight;
@@ -194,7 +201,6 @@ class HomeScreenState extends State<HomeScreen>
   double _panelHeightClosed = 35.0;
   bool panelIsOpen = false;
   bool getStatusSucceed = false;
-
   //AssetsAudioPlayer _assetsAudioPlayer;
 
   AudioCache player = AudioCache();
@@ -206,44 +212,49 @@ class HomeScreenState extends State<HomeScreen>
 
   getAppTheme() async {
     int dark = await changeThemeBloc.getOption();
-    setState(() => isDark = (dark == 1));
+    setState(() {
+      if (dark == 1)
+        isDark = true;
+      else
+        isDark = false;
+    });
   }
 
   loadLoginedUserInfo(int userId) async {
     List<SaveUserModel> result =
-    await restDatasource.getUserInfo(userId.toString());
-    if (result != null && result.isNotEmpty) {
+        await restDatasource.getUserInfo(userId.toString());
+    if (result != null && result.length > 0) {
       SaveUserModel user = result.first;
-      await prefRepository.setLoginedPassword(user.Password);
-      await prefRepository.setLoginedFirstName(user.FirstName);
-      await prefRepository.setLoginedLastName(user.LastName);
-      await prefRepository.setLoginedMobile(user.MobileNo);
-      await prefRepository.setLoginedUserName(user.UserName);
+      prefRepository.setLoginedPassword(user.Password);
+      prefRepository.setLoginedFirstName(user.FirstName);
+      prefRepository.setLoginedLastName(user.LastName);
+      prefRepository.setLoginedMobile(user.MobileNo);
+      prefRepository.setLoginedUserName(user.UserName);
     }
   }
 
   getAdminCarsToUser() async {
-    List<AdminCarModel> cars = List();
-    List<AdminCarModel> carsInWaiting = List();
+    List<AdminCarModel> cars = new List();
+    List<AdminCarModel> carsInWaiting = new List();
 
-    RestDatasource restDS = RestDatasource();
+    RestDatasource restDS = new RestDatasource();
     cars = await restDS.getAllCarsToAdmin(userId);
-    if (cars != null && cars.isNotEmpty) {
+    if (cars != null && cars.length > 0) {
       carsInWaiting = cars
           .where((c) =>
-      c.CarToUserStatusConstId ==
-          Constants.CAR_TO_USER_STATUS_WAITING_TAG)
+              c.CarToUserStatusConstId ==
+              Constants.CAR_TO_USER_STATUS_WAITING_TAG)
           .toList();
-      if (carsInWaiting != null && carsInWaiting.isNotEmpty) {
-        await Navigator.pushNamed(context, '/carpage',
+      if (carsInWaiting != null && carsInWaiting.length > 0) {
+        Navigator.pushNamed(context, '/carpage',
             arguments:
-            CarPageVM(userId: userId, isSelf: false, carAddNoty: null));
+                new CarPageVM(userId: userId, isSelf: false, carAddNoty: null));
       }
     }
   }
 
   getCarCounts() async {
-    await prefRepository.getCarsCount().then((value) {
+    prefRepository.getCarsCount().then((value) {
       setState(() {
         carCount = value;
         if (carCount > maxCarCounts) carCount = maxCarCounts;
@@ -258,13 +269,13 @@ class HomeScreenState extends State<HomeScreen>
     userId = await prefRepository.getLoginedUserId();
     CenterRepository.setUserId(userId);
     centerRepository.setUserCached(
-      User(userName: userName, imageUrl: imageUrl, id: userId),
+      new User(userName: userName, imageUrl: imageUrl, id: userId),
     );
   }
 
   onCarPageTap() {
     Navigator.of(context).pushNamed('/carpage',
-        arguments: CarPageVM(
+        arguments: new CarPageVM(
             userId: userId, isSelf: true, carAddNoty: valueNotyModelBloc));
   }
 
@@ -276,18 +287,18 @@ class HomeScreenState extends State<HomeScreen>
         CurvedAnimation(parent: animationController, curve: Curves.ease));
 
     transformationAnim = BorderRadiusTween(
-        begin: BorderRadius.circular(150.0),
-        end: BorderRadius.circular(0.0))
+            begin: BorderRadius.circular(150.0),
+            end: BorderRadius.circular(0.0))
         .animate(
-        CurvedAnimation(parent: animationController, curve: Curves.ease));
+            CurvedAnimation(parent: animationController, curve: Curves.ease));
     //animationController.forward();
   }
 
   updateItemCounts(bool increment) {
     //setState(() {
-    if (increment) {
+    if (increment)
       this._counter = this._counter + 1;
-    } else if (this._counter > 0) this._counter = this._counter - 1;
+    else if (this._counter > 0) this._counter = this._counter - 1;
     //});
   }
 
@@ -295,47 +306,55 @@ class HomeScreenState extends State<HomeScreen>
     // opacityNotifier = OpacityNotifier(0.0);
     return Container(
       child:
-      // ChangeNotifierProvider<OpacityNotifier>(
-      //   create: (context) => OpacityNotifier(0.0),
-      //   child: Material(
-      //     child: Consumer<OpacityNotifier>(
-      //       builder: (context, opacity, child) {
+          // ChangeNotifierProvider<OpacityNotifier>(
+          //   create: (context) => OpacityNotifier(0.0),
+          //   child: Material(
+          //     child: Consumer<OpacityNotifier>(
+          //       builder: (context, opacity, child) {
 
-      //         return
-      Stack(
+          //         return
+          Stack(
         alignment: Alignment.bottomCenter,
         children: <Widget>[
-          SlidingUpPanel(
-            renderPanelSheet: false,
-            maxHeight: _panelHeightOpen,
-            minHeight: _panelHeightClosed,
-            parallaxEnabled: true,
-            parallaxOffset: 0.05,
-            defaultPanelState: PanelState.OPEN,
-            body: _carBody(menus, carIndex, opacityNotifier),
+          kIsWeb ? _carBody(menus, carIndex, opacityNotifier) : Container(),
+          kIsWeb
+              ? Positioned(
+                  bottom: 1.0,
+                  child: Padding(
+                      padding: EdgeInsets.all(10.0), child: _carPanel(menus)),
+                )
+              : SlidingUpPanel(
+                  renderPanelSheet: false,
+                  maxHeight: _panelHeightOpen,
+                  minHeight: _panelHeightClosed,
 
-            panel: _carPanel(menus),
-            collapsed: _floatingCollapsed(),
-            // padding: EdgeInsets.all(0.0),
-            // margin: EdgeInsets.all(0.0),
-            panelSnapping: true,
-            onPanelOpened: () {
-              panelIsOpen = true;
-              //opacityChangedNoty.updateValue(Message(value: 0.0));
-              // opacity.decrement();
-            },
-            onPanelClosed: () {
-              panelIsOpen = false;
-              opacityChangedNoty.updateValue(Message(value: 1.0));
-              //opacity.increment();
-            },
+                  parallaxEnabled: true,
+                  parallaxOffset: 0.05,
+                  defaultPanelState: PanelState.OPEN,
+                  body: _carBody(menus, carIndex, opacityNotifier),
 
-            onPanelSlide: (double pos) {
-              //setState(() {
-              _fabHeight = pos * (_panelHeightOpen - _panelHeightClosed) +
-                  _initFabHeight;
-            },
-          ),
+                  panel: _carPanel(menus),
+                  collapsed: _floatingCollapsed(),
+                  // padding: EdgeInsets.all(0.0),
+                  // margin: EdgeInsets.all(0.0),
+                  panelSnapping: true,
+                  onPanelOpened: () {
+                    panelIsOpen = true;
+                    //opacityChangedNoty.updateValue(Message(value: 0.0));
+                    // opacity.decrement();
+                  },
+                  onPanelClosed: () {
+                    panelIsOpen = false;
+                    opacityChangedNoty.updateValue(Message(value: 1.0));
+                    //opacity.increment();
+                  },
+
+                  onPanelSlide: (double pos) {
+                    //setState(() {
+                    _fabHeight = pos * (_panelHeightOpen - _panelHeightClosed) +
+                        _initFabHeight;
+                  },
+                ),
         ],
         // );
         //  ),
@@ -377,7 +396,7 @@ class HomeScreenState extends State<HomeScreen>
     return Container(
       //height: MediaQuery.of(context).size.height/2.0,
       decoration: BoxDecoration(
-        //color: Colors.greenAccent,
+          //color: Colors.greenAccent,
           border: Border.all(color: Colors.white10, width: 1.0),
           borderRadius: BorderRadius.all(Radius.circular(10.0)),
           boxShadow: [
@@ -450,7 +469,7 @@ class HomeScreenState extends State<HomeScreen>
   }
 
   List createHomeAllCarPages(int carCounts, List pages) {
-    List finalPages = List();
+    List finalPages = new List();
     finalPages = pages;
     return finalPages;
   }
@@ -490,13 +509,13 @@ class HomeScreenState extends State<HomeScreen>
         carStateVM: carStateVM,
         carStateNoty: statusChangedNoty,
         sendCommandNoty: sendCommandNoty,
-      ),
+      )
     ];
+
     return scrollContents;
   }
 
   Color clr = Colors.lightBlueAccent;
-
   _scrollListener() {
     if (_controller.offset > _controller.position.minScrollExtent &&
         !_controller.position.outOfRange) {
@@ -536,11 +555,10 @@ class HomeScreenState extends State<HomeScreen>
     _currentCarId = centerRepository.getCarIdByIndex(currentCarIndex);
     CenterRepository.setCurrentCarId(_currentCarId);
     final List<Container> pages = [];
-    for (int i = 0; i < carCount; i++) {
+    for (int i = 0; i < carCount; i++)
       pages
         ..add(createHomeCarPage(
             createHomeScrollList(startImagePath, i, true, opacityNotifier), i));
-    }
 
     return pages;
   }
@@ -555,14 +573,14 @@ class HomeScreenState extends State<HomeScreen>
   }
 
   Future<List<AdminCarModel>> refreshCars() async {
-    RestDatasource restDatasource = RestDatasource();
+    RestDatasource restDatasource = new RestDatasource();
     List<AdminCarModel> cars = await restDatasource.getAllCarsByUserId(userId);
-    if (cars != null && cars.isNotEmpty) {
+    if (cars != null && cars.length > 0) {
       centerRepository.setCarsToAdmin(cars);
       newCarsList = cars;
       getStatusNoty.updateValue(Message(type: 'GET_CAR_STATUS', status: false));
       int actionId =
-      ActionsCommand.actionCommandsMap[ActionsCommand.STATUS_CAR_TAG];
+          ActionsCommand.actionCommandsMap[ActionsCommand.STATUS_CAR_TAG];
       var result = await restDatasource.sendCommand(SendCommandModel(
           UserId: userId,
           ActionId: actionId,
@@ -592,12 +610,12 @@ class HomeScreenState extends State<HomeScreen>
         curve: Curves.ease,
       ),
     );
-    containerGrowAnimation = CurvedAnimation(
+    containerGrowAnimation = new CurvedAnimation(
       parent: _screenController,
       curve: Curves.easeIn,
     );
 
-    buttonGrowAnimation = CurvedAnimation(
+    buttonGrowAnimation = new CurvedAnimation(
       parent: _screenController,
       curve: Curves.easeOut,
     );
@@ -620,39 +638,39 @@ class HomeScreenState extends State<HomeScreen>
       ),
     );
 
-    listSlideAnimation = AlignmentTween(
+    listSlideAnimation = new AlignmentTween(
       begin: Alignment.topCenter,
       end: Alignment.bottomCenter,
     ).animate(
-      CurvedAnimation(
+      new CurvedAnimation(
         parent: _screenController,
-        curve: Interval(
+        curve: new Interval(
           0.325,
           0.700,
           curve: Curves.ease,
         ),
       ),
     );
-    buttonSwingAnimation = AlignmentTween(
+    buttonSwingAnimation = new AlignmentTween(
       begin: Alignment.topCenter,
       end: Alignment.bottomRight,
     ).animate(
-      CurvedAnimation(
+      new CurvedAnimation(
         parent: _screenController,
-        curve: Interval(
+        curve: new Interval(
           0.225,
           0.600,
           curve: Curves.ease,
         ),
       ),
     );
-    listSlidePosition = EdgeInsetsTween(
+    listSlidePosition = new EdgeInsetsTween(
       begin: const EdgeInsets.only(bottom: 16.0),
       end: const EdgeInsets.only(bottom: 80.0),
     ).animate(
-      CurvedAnimation(
+      new CurvedAnimation(
         parent: _screenController,
-        curve: Interval(
+        curve: new Interval(
           0.325,
           0.800,
           curve: Curves.ease,
@@ -681,21 +699,21 @@ class HomeScreenState extends State<HomeScreen>
     }
   }
 
-  // _showBottomSheetAccessableActions(
-  //     BuildContext cntext, AccessableActionVM vm) {
-  //   showModalBottomSheetCustom(
-  //       context: cntext,
-  //       builder: (BuildContext context) {
-  //         return  UserAccessPage(
-  //           accessableActionVM: vm,
-  //         );
-  //       }, mHeight: null);
-  // }
+  _showBottomSheetAccessableActions(
+      BuildContext cntext, AccessableActionVM vm) {
+    showModalBottomSheetCustom(
+        context: cntext,
+        builder: (BuildContext context) {
+          return new UserAccessPage(
+            accessableActionVM: vm,
+          );
+        });
+  }
 
   _showBottomSheetCurrentCarInfo(
       BuildContext cntext, int carId, int userId) async {
     CarInfoVM carInfoVM = await centerRepository.getCarInfo(userId, carId);
-    await showModalBottomSheetCustom(
+    showModalBottomSheetCustom(
         context: cntext,
         mHeight: 0.90,
         builder: (BuildContext context) {
@@ -703,9 +721,9 @@ class HomeScreenState extends State<HomeScreen>
           String desc = DartHelper.isNullOrEmptyString(carInfoVM.Description);
           String carId = carInfoVM.carId.toString();
           String modelTitle =
-          DartHelper.isNullOrEmptyString(carInfoVM.modelTitle);
+              DartHelper.isNullOrEmptyString(carInfoVM.modelTitle);
           String detailTitle =
-          DartHelper.isNullOrEmptyString(carInfoVM.modelDetailTitle);
+              DartHelper.isNullOrEmptyString(carInfoVM.modelDetailTitle);
           String fromDate = DartHelper.isNullOrEmptyString(carInfoVM.fromDate);
           String pelak = DartHelper.isNullOrEmptyString(carInfoVM.pelak);
           String colortitle = DartHelper.isNullOrEmptyString(carInfoVM.color);
@@ -724,15 +742,16 @@ class HomeScreenState extends State<HomeScreen>
                 ListTile(
                     title: Card(
                       color: Colors.black12.withOpacity(0.0),
-                      margin: EdgeInsets.only(
+                      margin: new EdgeInsets.only(
                           left: 2.0, right: 2.0, top: 5.0, bottom: 5.0),
                       shape: RoundedRectangleBorder(
                         side: BorderSide(color: Colors.white, width: 0.0),
-                        borderRadius: BorderRadius.all(Radius.circular(5.0)),
+                        borderRadius:
+                            new BorderRadius.all(Radius.circular(5.0)),
                       ),
                       // color: Color(0xfffefefe),
                       elevation: 0.0,
-                      child: Column(
+                      child: new Column(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: <Widget>[
                           Padding(
@@ -742,13 +761,13 @@ class HomeScreenState extends State<HomeScreen>
                               children: <Widget>[
                                 Padding(
                                   padding:
-                                  EdgeInsets.only(right: 5.0, left: 5.0),
+                                      EdgeInsets.only(right: 5.0, left: 5.0),
                                   child: Text(Translations.current.carId(),
                                       style: TextStyle(fontSize: 18.0)),
                                 ),
                                 Padding(
                                   padding:
-                                  EdgeInsets.only(right: 5.0, left: 5.0),
+                                      EdgeInsets.only(right: 5.0, left: 5.0),
                                   child: Text(carId,
                                       style: TextStyle(fontSize: 20.0)),
                                 ),
@@ -882,13 +901,13 @@ class HomeScreenState extends State<HomeScreen>
         });
   }
 
-  // void _showCarControl() {
-  //   showModalBottomSheet<void>(
-  //       context: context,
-  //       builder: (BuildContext context) {
-  //         return  BS();
-  //       });
-  // }
+  void _showCarControl() {
+    showModalBottomSheet<void>(
+        context: context,
+        builder: (BuildContext context) {
+          return new BS();
+        });
+  }
 
   void registerBus() {
     RxBus.register<ChangeEvent>().listen((ChangeEvent event) {
@@ -903,9 +922,8 @@ class HomeScreenState extends State<HomeScreen>
       }
       if (event.type == 'LOGIN_FAIED') {
         bottomSheetMessage = event.message;
-        if (_solidBottomSheetController.isOpened) {
+        if (_solidBottomSheetController.isOpened)
           _solidBottomSheetController.hide();
-        }
         _solidBottomSheetController.show();
       }
 
@@ -920,18 +938,18 @@ class HomeScreenState extends State<HomeScreen>
           /*sendCommandNoty.updateValue(
                  new SendingCommandVM(sending: false,
                      sent: true, hasError: false));*/
-          RxBus.post(ChangeEvent(
+          RxBus.post(new ChangeEvent(
               type: 'COMMAND_SUCCESS', id: int.tryParse(commandCode)));
         }
         String newFCM = msg.substring(2, msg.length);
         Uint8List fcmBody = base64Decode(newFCM); //.toString();
-
+        //centerRepository.showFancyToast(newFCM,true);
         NotiAnalyze notiAnalyze =
-        NotiAnalyze(noti: null, carId: carId, data: fcmBody);
+            new NotiAnalyze(noti: null, carId: carId, data: fcmBody);
         StatusNotiVM status = notiAnalyze.analyzeStatusNoti();
         if (status != null) {
           CarStateVM carStateVMForThisCarId =
-          centerRepository.getCarStateVMByCarId(carId);
+              centerRepository.getCarStateVMByCarId(carId);
           if (carStateVMForThisCarId != null) {
             carStateVMForThisCarId.fillStatusNotiData(
                 status, statusChangedNoty);
@@ -946,6 +964,7 @@ class HomeScreenState extends State<HomeScreen>
               DateTimeUtils.getDateJalali(), DateTimeUtils.getTimeNow(), false);
         }
       } else if (event.type == 'FCM') {
+        // centerRepository.showFancyToast(event.message,true);
         FlashHelper.successBar(context, message: event.message);
         int carId = NotiAnalyze.getCarIdFromNoty(event.message);
         CarStateVM carStateVM = centerRepository.getCarStateVMByCarId(carId);
@@ -993,11 +1012,11 @@ class HomeScreenState extends State<HomeScreen>
     getStatusNoty = NotyBloc<Message>();
 
     //statusChangedNoty=new NotyBloc<CarStateVM>();
-    sendCommandNoty = NotyBloc<SendingCommandVM>();
-    valueNotyModelBloc = NotyBloc<ChangeEvent>();
-    _solidBottomSheetController = SolidController();
+    sendCommandNoty = new NotyBloc<SendingCommandVM>();
+    valueNotyModelBloc = new NotyBloc<ChangeEvent>();
+    _solidBottomSheetController = new SolidController();
     player = AudioCache();
-    advancedPlayer = AudioPlayer();
+    advancedPlayer = new AudioPlayer();
 
     //getStatusController = AnimationController(duration: const Duration(milliseconds: 1000), vsync: this);
 
@@ -1040,34 +1059,34 @@ class HomeScreenState extends State<HomeScreen>
 
     super.initState();
     CenterRepository.getPeriodicUpdateTime().then((value) async {
-      if (!kIsWeb) {
-        periodicTimer = centerRepository.checkCarStatusPeriodic(
-            CenterRepository.periodicUpdateTime, getStatusNoty);
-        centerRepository
-            .checkParkGPSStatusPeriodic(CenterRepository.periodicUpdateTime);
-      }
+      // if (!kIsWeb) {
+      periodicTimer = centerRepository.checkCarStatusPeriodic(
+          CenterRepository.periodicUpdateTime, getStatusNoty);
+      centerRepository
+          .checkParkGPSStatusPeriodic(CenterRepository.periodicUpdateTime);
+      // }
     });
 
-    if (!kIsWeb) {
-      messageCountNoty
-          .updateValue(Message(index: CenterRepository.messageCounts));
+    //if (!kIsWeb) {
+    messageCountNoty
+        .updateValue(Message(index: CenterRepository.messageCounts));
 
-      Future.delayed(Duration(seconds: 3)).then((valu) {
-        centerRepository.getCarStatusAtAppStarted(getStatusNoty);
-      });
-    }
+    Future.delayed(Duration(seconds: 3)).then((valu) {
+      centerRepository.getCarStatusAtAppStarted(getStatusNoty);
+    });
+    // }
   }
 
   _showCarStatusHistorySheet(BuildContext context) async {
     String status = 'بروزرسانی وضعیت موفقیت آمیز بوده است';
-    StatusHistoryVM statusHistoryVM = StatusHistoryVM();
+    StatusHistoryVM statusHistoryVM = new StatusHistoryVM();
     statusHistoryVM = await prefRepository.geteStatusDateTime();
     if (!statusHistoryVM.state) status = 'بروزرسانی وضعیت ناموفق بوده است';
-    await showModalBottomSheetCustom(
+    showModalBottomSheetCustom(
         context: context,
         mHeight: 0.50,
         builder: (BuildContext context) {
-          return Container(
+          return new Container(
             height: 250.0,
             width: MediaQuery.of(context).size.width * 0.85,
             child: Padding(
@@ -1127,25 +1146,25 @@ class HomeScreenState extends State<HomeScreen>
     super.dispose();
   }
 
-  // Future<bool> _onWillPop(BuildContext ctx) {
-  //   return showDialog(
-  //         context: ctx,
-  //         child: AlertDialog(
-  //           title:  Text(Translations.current.areYouSureToExit()),
-  //           actions: <Widget>[
-  //              FlatButton(
-  //               onPressed: () => Navigator.of(ctx).pop(false),
-  //               child:  Text(Translations.current.no()),
-  //             ),
-  //              FlatButton(
-  //               onPressed: () => SystemNavigator.pop(),
-  //               child:  Text(Translations.current.yes()),
-  //             ),
-  //           ],
-  //         ),
-  //       ) ??
-  //       false;
-  // }
+  Future<bool> _onWillPop(BuildContext ctx) {
+    return showDialog(
+          context: ctx,
+          child: new AlertDialog(
+            title: new Text(Translations.current.areYouSureToExit()),
+            actions: <Widget>[
+              new FlatButton(
+                onPressed: () => Navigator.of(ctx).pop(false),
+                child: new Text(Translations.current.no()),
+              ),
+              new FlatButton(
+                onPressed: () => SystemNavigator.pop(),
+                child: new Text(Translations.current.yes()),
+              ),
+            ],
+          ),
+        ) ??
+        false;
+  }
 
   Widget createHomeWidget() {
     return Stack(
@@ -1208,7 +1227,7 @@ class HomeScreenState extends State<HomeScreen>
                           alignment: Alignment(1, -1),
                           child: GestureDetector(
                             onTap: () {},
-                            child: StreamBuilder(
+                            child: StreamBuilder<Message>(
                               stream: getStatusNoty.noty,
                               initialData: null,
                               builder: (BuildContext c,
@@ -1219,29 +1238,27 @@ class HomeScreenState extends State<HomeScreen>
                                   if (msg.type == 'GET_CAR_STATUS') {
                                     if (msg.status == true) {
                                       if (getStatusController ==
-                                          sma.CustomAnimationControl.MIRROR) {
+                                          CustomAnimationControl.MIRROR)
                                         getStatusController =
-                                            sma.CustomAnimationControl.STOP;
-                                      }
+                                            CustomAnimationControl.STOP;
                                       getStatusSucceed = true;
                                     } else if (msg.status == false) {
                                       getStatusSucceed = false;
                                       if (getStatusController ==
-                                          sma.CustomAnimationControl.STOP) {
+                                          CustomAnimationControl.STOP) {
                                         getStatusController =
-                                            sma.CustomAnimationControl.MIRROR;
+                                            CustomAnimationControl.MIRROR;
                                       }
                                     }
-                                    if (msg.text == 'NO_RESULT') {
+                                    if (msg.text == 'NO_RESULT')
                                       hasResult = false;
-                                    } else {
+                                    else
                                       hasResult = true;
-                                    }
                                   }
                                 } else {}
                                 return Padding(
                                   padding: EdgeInsets.only(top: 5),
-                                  child: Container(
+                                  child: new Container(
                                     width: 24.0,
                                     height: 24.0,
                                     child: Container(
@@ -1251,61 +1268,62 @@ class HomeScreenState extends State<HomeScreen>
                                           onTap: () {
                                             centerRepository
                                                 .getCarStatusAtAppStarted(
-                                                getStatusNoty);
+                                                    getStatusNoty);
                                             centerRepository
                                                 .checkParkGPSStatusPeriodic(
-                                                CenterRepository
-                                                    .periodicUpdateTime);
+                                                    CenterRepository
+                                                        .periodicUpdateTime);
                                             _showCarStatusHistorySheet(context);
                                           },
                                           child: getStatusSucceed
                                               ? Image.asset(
-                                            'assets/images/status_succeed.png',
-                                            color: hasResult
-                                                ? Colors.blueAccent
-                                                : Colors.amber,
-                                            width: 24,
-                                            height: 24,
-                                          )
-                                              : sma.CustomAnimation<double>(
-                                            control: getStatusController,
-                                            animationStatusListener:
-                                                (status) {
-                                              Future.delayed(Duration(
-                                                  milliseconds: 7000))
-                                                  .then((data) {
-                                                if (getStatusSucceed ==
-                                                    false) {
-                                                  getStatusSucceed = true;
-                                                  getStatusNoty
-                                                      .updateValue(Message(
-                                                      type:
-                                                      'GET_CAR_STATUS',
-                                                      status: true,
-                                                      text:
-                                                      'NO_RESULT'));
-                                                }
-                                              });
-                                            },
-                                            tween: Tween(begin: -90.0, end: 90.0),
-
-                                            builder:
-                                                (context, child, value) {
-                                              return Transform.rotate(
-                                                angle:
-                                                value * (3.14 / 180),
-                                                child: Image.asset(
-                                                  'assets/images/status.png',
+                                                  'assets/images/status_succeed.png',
+                                                  color: hasResult
+                                                      ? Colors.blueAccent
+                                                      : Colors.amber,
                                                   width: 24,
                                                   height: 24,
-                                                  color:
-                                                  Colors.pinkAccent,
-                                                ),
-                                              );
-                                            },
-                                            duration: Duration(seconds: 2),
-                                            delay: Duration(seconds: 1), // <-- add delay
-                                          )) /*;
+                                                )
+                                              : CustomAnimation<double>(
+                                                  control: getStatusController,
+                                                  animationStatusListener:
+                                                      (status) {
+                                                    Future.delayed(new Duration(
+                                                            milliseconds: 7000))
+                                                        .then((data) {
+                                                      if (getStatusSucceed ==
+                                                          false) {
+                                                        getStatusSucceed = true;
+                                                        getStatusNoty.updateValue(
+                                                            new Message(
+                                                                type:
+                                                                    'GET_CAR_STATUS',
+                                                                status: true,
+                                                                text:
+                                                                    'NO_RESULT'));
+                                                      }
+                                                    });
+                                                  },
+                                                  tween: (-90.0).tweenTo(90.0),
+
+                                                  builder:
+                                                      (context, child, value) {
+                                                    return Transform.rotate(
+                                                      angle:
+                                                          value * (3.14 / 180),
+                                                      child: Image.asset(
+                                                        'assets/images/status.png',
+                                                        width: 24,
+                                                        height: 24,
+                                                        color:
+                                                            Colors.pinkAccent,
+                                                      ),
+                                                    );
+                                                  },
+                                                  duration: 2.seconds,
+                                                  delay: 1
+                                                      .seconds, // <-- add delay
+                                                )) /*;
                                                 new Image.asset(
                                                   'assets/images/status.png',
                                                   width: 24,
@@ -1327,11 +1345,11 @@ class HomeScreenState extends State<HomeScreen>
                           alignment: Alignment(1, -1),
                           child: GestureDetector(
                             onTap: () {
-                              RxBus.post(ChangeEvent(
+                              RxBus.post(new ChangeEvent(
                                   type: 'NEW_PAGE',
                                   message: 'GO_TO_MESSAGE_HISTORY'));
                             },
-                            child: StreamBuilder(
+                            child: StreamBuilder<Message>(
                               stream: messageCountNoty.noty,
                               initialData: null,
                               builder: (BuildContext c,
@@ -1342,7 +1360,7 @@ class HomeScreenState extends State<HomeScreen>
                                   messageCounts =
                                       CenterRepository.messageCounts;
                                 }
-                                return Container(
+                                return new Container(
                                   width: 58.0,
                                   height: 58.0,
                                   child: Stack(
@@ -1358,9 +1376,9 @@ class HomeScreenState extends State<HomeScreen>
                                               top: 0.0),
                                           child: messageCounts > 0
                                               ? CircleBadge(
-                                            number:
-                                            messageCounts.toString(),
-                                          )
+                                                  number:
+                                                      messageCounts.toString(),
+                                                )
                                               : Container(),
                                         ),
                                       ),
@@ -1370,7 +1388,7 @@ class HomeScreenState extends State<HomeScreen>
                                         child: Container(
                                           width: 28.0,
                                           height: 28.0,
-                                          child: Image.asset(
+                                          child: new Image.asset(
                                             'assets/images/message.png',
                                             color: Colors.blueAccent,
                                           ),
@@ -1392,24 +1410,24 @@ class HomeScreenState extends State<HomeScreen>
                             onTap: () {
                               // getAdminCarsToUser();
                               AccessableActionVM accessableActionVM =
-                              AccessableActionVM(
-                                  userModel: ApiRelatedUserModel(
-                                      userId: userId,
-                                      userName: null,
-                                      roleTitle: null,
-                                      roleId: null),
-                                  carId: _currentCarId,
-                                  carStateVM: null,
-                                  sendingCommandVM: null,
-                                  sendCommandModel: null,
-                                  isFromMainAppForCommand: true,
-                                  carStateNoty: statusChangedNoty,
-                                  sendingCommandNoty: sendCommandNoty);
+                                  AccessableActionVM(
+                                      userModel: ApiRelatedUserModel(
+                                          userId: userId,
+                                          userName: null,
+                                          roleTitle: null,
+                                          roleId: null),
+                                      carId: _currentCarId,
+                                      carStateVM: null,
+                                      sendingCommandVM: null,
+                                      sendCommandModel: null,
+                                      isFromMainAppForCommand: true,
+                                      carStateNoty: statusChangedNoty,
+                                      sendingCommandNoty: sendCommandNoty);
 
                               _showBottomSheetCurrentCarInfo(
                                   context, _currentCarId, userId);
                             },
-                            child: Container(
+                            child: new Container(
                               width: 24.0,
                               height: 24.0,
                               child: Image.asset(
@@ -1422,106 +1440,106 @@ class HomeScreenState extends State<HomeScreen>
                       ),
                       sendingCommand
                           ? Align(
-                        alignment: Alignment(1, -1),
-                        child: Column(
-                          children: <Widget>[
-                            LinearProgressIndicator(
-                              value: progressIndicatorController != null
-                                  ? _progressAnimation.value
-                                  : null,
-                              backgroundColor:
-                              progressIndicatorBackgroundColor,
-                              valueColor: progressIndicatorValueColor,
-                            ),
-                            Text(
-                              Translations.current.sendingCommand(),
-                              style: TextStyle(
-                                  color: Colors.redAccent,
-                                  fontSize: 10.0),
+                              alignment: Alignment(1, -1),
+                              child: Column(
+                                children: <Widget>[
+                                  LinearProgressIndicator(
+                                    value: progressIndicatorController != null
+                                        ? _progressAnimation.value
+                                        : null,
+                                    backgroundColor:
+                                        progressIndicatorBackgroundColor,
+                                    valueColor: progressIndicatorValueColor,
+                                  ),
+                                  Text(
+                                    Translations.current.sendingCommand(),
+                                    style: TextStyle(
+                                        color: Colors.redAccent,
+                                        fontSize: 10.0),
+                                  )
+                                ],
+                              ),
                             )
-                          ],
-                        ),
-                      )
                           : sentCommand
-                          ? Align(
-                        alignment: Alignment(1, -1),
-                        child: Column(
-                          children: <Widget>[
-                            LinearProgressIndicator(
-                              value:
-                              progressIndicatorController != null
-                                  ? _progressAnimation.value
-                                  : null,
-                              backgroundColor:
-                              progressIndicatorBackgroundColor,
-                              valueColor: progressIndicatorValueColor,
-                            ),
-                            //  new Text(Translations.current.sentCommand(),style: TextStyle(color: Colors.redAccent,fontSize:10.0))
-                          ],
-                        ),
-                      )
-                          : sentCommandHasError
-                          ? Align(
-                        alignment: Alignment(1, -1),
-                        child: Column(
-                          children: <Widget>[
-                            LinearProgressIndicator(
-                              value:
-                              progressIndicatorController !=
-                                  null
-                                  ? _progressAnimation.value
-                                  : null,
-                              backgroundColor:
-                              progressIndicatorBackgroundColor,
-                              valueColor:
-                              progressIndicatorValueColor,
-                            ),
-                            Icon(Icons.error_outline,
-                                size: 20.0, color: Colors.red),
-                          ],
-                        ),
-                      )
-                          : Container(
-                        width: 0,
-                        height: 0,
-                      ),
+                              ? Align(
+                                  alignment: Alignment(1, -1),
+                                  child: Column(
+                                    children: <Widget>[
+                                      LinearProgressIndicator(
+                                        value:
+                                            progressIndicatorController != null
+                                                ? _progressAnimation.value
+                                                : null,
+                                        backgroundColor:
+                                            progressIndicatorBackgroundColor,
+                                        valueColor: progressIndicatorValueColor,
+                                      ),
+                                      //  new Text(Translations.current.sentCommand(),style: TextStyle(color: Colors.redAccent,fontSize:10.0))
+                                    ],
+                                  ),
+                                )
+                              : sentCommandHasError
+                                  ? Align(
+                                      alignment: Alignment(1, -1),
+                                      child: Column(
+                                        children: <Widget>[
+                                          LinearProgressIndicator(
+                                            value:
+                                                progressIndicatorController !=
+                                                        null
+                                                    ? _progressAnimation.value
+                                                    : null,
+                                            backgroundColor:
+                                                progressIndicatorBackgroundColor,
+                                            valueColor:
+                                                progressIndicatorValueColor,
+                                          ),
+                                          Icon(Icons.error_outline,
+                                              size: 20.0, color: Colors.red),
+                                        ],
+                                      ),
+                                    )
+                                  : Container(
+                                      width: 0,
+                                      height: 0,
+                                    ),
 
                       (sendingCommand || sentCommand || sentCommandHasError)
                           ? Container(
-                        width: 0.0,
-                        height: 0.0,
-                      )
+                              width: 0.0,
+                              height: 0.0,
+                            )
                           : Positioned(
-                        child: Padding(
-                          padding: EdgeInsets.only(
-                              left: 40, right: 80.0, top: 20.0),
-                          child: Container(
-                            width:
-                            MediaQuery.of(context).size.width * 0.40,
-                            child: Image.asset(
-                              'assets/images/i26.png',
-                              color: Colors.indigoAccent,
-                              scale: 1,
+                              child: Padding(
+                                padding: EdgeInsets.only(
+                                    left: 40, right: 80.0, top: 20.0),
+                                child: Container(
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.40,
+                                  child: Image.asset(
+                                    'assets/images/i26.png',
+                                    color: Colors.indigoAccent,
+                                    scale: 1,
+                                  ),
+                                  alignment: Alignment(-10, 0.5),
+                                ),
+                              ),
+                              left: -1.0,
                             ),
-                            alignment: Alignment(-10, 0.5),
-                          ),
-                        ),
-                        left: -1.0,
-                      ),
                       hasInternet
                           ? Container(
-                        width: 0.0,
-                        height: 0.0,
-                      )
+                              width: 0.0,
+                              height: 0.0,
+                            )
                           : Align(
-                        alignment: Alignment(1, 0),
-                        child: Container(
-                          width: 48.0,
-                          height: 48.0,
-                          child: Image.asset(
-                              'assets/images/no_internet.png'),
-                        ),
-                      ),
+                              alignment: Alignment(1, 0),
+                              child: Container(
+                                width: 48.0,
+                                height: 48.0,
+                                child: Image.asset(
+                                    'assets/images/no_internet.png'),
+                              ),
+                            ),
                     ],
                     // ),
                   );
@@ -1551,22 +1569,20 @@ class HomeScreenState extends State<HomeScreen>
 
                 var result = await refreshCars();
                 // if (mounted) setState(() {});
-                if (result == null) {
+                if (result == null)
                   _refreshController.refreshFailed();
-                } else {
+                else
                   _refreshController.refreshCompleted();
-                }
               },
               onLoading: () async {
                 //monitor fetch data from network
                 await Future.delayed(Duration(milliseconds: 1000));
                 var result = await refreshCars();
                 // if (mounted) setState(() {});
-                if (result == null) {
+                if (result == null)
                   _refreshController.loadFailed();
-                } else {
+                else
                   _refreshController.loadComplete();
-                }
               },
               child: ListView.builder(
                 padding: EdgeInsets.only(top: 1.0), //kMaterialListPadding,
@@ -1596,10 +1612,10 @@ class HomeScreenState extends State<HomeScreen>
   @override
   Widget build(BuildContext context) {
     timeDilation = 0.3;
-    // Size screenSize = MediaQuery.of(context).size;
+    Size screenSize = MediaQuery.of(context).size;
     _panelHeightOpen = MediaQuery.of(context).size.height * 0.40;
     return
-      /*new WillPopScope(
+        /*new WillPopScope(
             onWillPop: () async {
               return _onWillPop(context);
             },
@@ -1616,124 +1632,151 @@ class HomeScreenState extends State<HomeScreen>
                 return child;
               },
               child:*/
-      Scaffold(
-        // key: widget.scaffoldKey,
-        appBar: null,
-        /*drawer: AppDrawer(
+        Scaffold(
+      // key: widget.scaffoldKey,
+      appBar: null,
+      /*drawer: AppDrawer(
                   userName: userName,
                   currentRoute: route,
                   imageUrl: imageUrl,
                   carPageTap: onCarPageTap,
                   carId: _currentCarId,),*/
-        body: createHomeWidget(),
+      body: StreamBuilder<Message>(
+          stream: fcmNoty.noty,
+          builder: (context, snapshot) {
+            if (snapshot.hasData && snapshot.data != null) {
+              getStatusNoty
+                  .updateValue(Message(type: 'GET_CAR_STATUS', status: true));
+              Message data = snapshot.data;
+              String msg = data.text;
+              int carId = data.id;
+              String commandCode = msg.substring(0, 2);
+              int commandCodeValue = int.tryParse(commandCode);
+              if (commandCodeValue != ActionsCommand.Check_Status_Car) {
+                /*sendCommandNoty.updateValue(
+                 new SendingCommandVM(sending: false,
+                     sent: true, hasError: false));*/
+                RxBus.post(ChangeEvent(
+                    type: 'COMMAND_SUCCESS', id: int.tryParse(commandCode)));
+              }
+              String newFCM = msg.substring(2, msg.length);
+              Uint8List fcmBody = base64Decode(newFCM); //.toString();
 
-        // ),
-        //),
-      );
+              NotiAnalyze notiAnalyze =
+                  new NotiAnalyze(noti: null, carId: carId, data: fcmBody);
+              StatusNotiVM status = notiAnalyze.analyzeStatusNoti();
+              if (status != null) {
+                CarStateVM carStateVMForThisCarId =
+                    centerRepository.getCarStateVMByCarId(carId);
+                if (carStateVMForThisCarId != null) {
+                  carStateVMForThisCarId.fillStatusNotiData(
+                      status, statusChangedNoty);
+                  if (status.siren) {
+                    //centerRepository.vibrateOnStatus(true);
+                  }
+                }
+                prefRepository.setStatusDateTime(DateTimeUtils.getDateJalali(),
+                    DateTimeUtils.getTimeNow(), true);
+              } else {
+                prefRepository.setStatusDateTime(DateTimeUtils.getDateJalali(),
+                    DateTimeUtils.getTimeNow(), false);
+              }
+            }
+            return createHomeWidget();
+          }),
+      //),
+    );
   }
 
   Widget addSettingsIcon() {
-    if (isAdmin) {
-      return Align(
-        alignment: Alignment.centerRight,
-        child: Padding(
-          padding: EdgeInsets.only(left: 10.0),
-          child: IconButton(
-            onPressed: () {
-              Navigator.pushNamed(context, '/settings', arguments: true);
-            },
-            icon:
-            //Icon(Icons.shopping_cart, color: Colors.white, size: 32,semanticLabel: "Cart",),
-            Stack(
-              children: <Widget>[
-                Icon(
-                  Icons.settings,
-                  color: Colors.white,
-                  size: 24,
-                  semanticLabel: "Settings",
+    return isAdmin
+        ? Align(
+            alignment: Alignment.centerRight,
+            child: Padding(
+              padding: EdgeInsets.only(left: 10.0),
+              child: IconButton(
+                onPressed: () {
+                  Navigator.pushNamed(context, '/settings', arguments: true);
+                },
+                icon:
+                    //Icon(Icons.shopping_cart, color: Colors.white, size: 32,semanticLabel: "Cart",),
+                    new Stack(
+                  children: <Widget>[
+                    new Icon(
+                      Icons.settings,
+                      color: Colors.white,
+                      size: 24,
+                      semanticLabel: "Settings",
+                    ),
+                  ],
                 ),
-              ],
+              ),
+              // },)
             ),
-          ),
-          // },)
-        ),
-      );
-    } else {
-      return Text('');
-    }
+          )
+        : new Text('');
   }
 
   loaduser() async {
     return await databaseHelper.getUserInfo();
   }
 
-  // Widget createServiceWidget() {
-  //   Car car = centerRepository.getCarByCarId(_currentCarId);
-  //   return MainPageService(
-  //     serviceVM: ServiceVM(
-  //         car: car,
-  //         carId: _currentCarId,
-  //         editMode: null,
-  //         service: null,
-  //         refresh: false),
-  //   );
-  // }
+  Widget createServiceWidget() {
+    Car car = centerRepository.getCarByCarId(_currentCarId);
+    return MainPageService(
+      serviceVM: new ServiceVM(
+          car: car,
+          carId: _currentCarId,
+          editMode: null,
+          service: null,
+          refresh: false),
+    );
+  }
 
   Widget createPlansWidget() {
-    // return InvoiceForm();
+    return new InvoiceForm();
   }
 
   Widget createMapPageWidget() {
-    return MapPage(
-      mapVM: MapVM(
+    return new MapPage(
+      mapVM: new MapVM(
         carId: _currentCarId,
         carCounts: centerRepository.getCarsToAdmin().length,
         cars: centerRepository.getCarsToAdmin(),
-        fromDate: null,
-        toDate: null,
-        forReport: null,
       ),
-      carCounts: null,
-      carsToUser: [],
-      scaffoldKey: null,
-      carId: null,
     );
   }
 
   Widget createMessagesWidget() {
-    return MessageHistoryScreen(
+    return new MessageHistoryScreen(
       carId: _currentCarId,
     );
   }
 
   void onNavButtonTap(int index) {
     currentBottomNaviSelected = index;
-    // if (index == 4) {
-    //   Navigator.of(context).pushNamed('/plans');
-    // } else if (index == 0) {
-    //   Car car = centerRepository.getCarByCarId(_currentCarId);
-    //   Navigator.pushNamed(context, '/servicepage',
-    //       arguments: new ServiceVM(
-    //           car: car,
-    //           carId: _currentCarId,
-    //           editMode: null,
-    //           service: null,
-    //           refresh: false));
-    // } else
-    if (index == 0) {
+    if (index == 4) {
+      Navigator.of(context).pushNamed('/plans');
+    } else if (index == 0) {
+      Car car = centerRepository.getCarByCarId(_currentCarId);
+      Navigator.pushNamed(context, '/servicepage',
+          arguments: new ServiceVM(
+              car: car,
+              carId: _currentCarId,
+              editMode: null,
+              service: null,
+              refresh: false));
+    } else if (index == 1) {
       Navigator.of(context).pushNamed('/mappage',
-          arguments: MapVM(
+          arguments: new MapVM(
             carId: _currentCarId,
             carCounts: centerRepository.getCarsToAdmin().length,
             cars: centerRepository.getCarsToAdmin(),
-            forReport: null,
-            toDate: null,
-            fromDate: null,
           ));
-    } else if (index == 1) {
+    } else if (index == 2) {
       Navigator.pushReplacementNamed(context, '/home');
       // _showCarControl();
-    } else if (index == 2) {
+    } else if (index == 3) {
       Navigator.pushNamed(context, '/messages', arguments: _currentCarId);
     }
   }
@@ -1747,7 +1790,7 @@ class HomeScreenState extends State<HomeScreen>
         list.add(ListTile(
           title: Text(name),
           subtitle:
-          Text(' # ' + Translations.current.carpelak() + ' : ' + name),
+              Text(' # ' + Translations.current.carpelak() + ' : ' + name),
           trailing: FlatButton(
             padding: EdgeInsets.only(left: 0, right: 0),
             child: Icon(Icons.directions_car, size: 28.0, color: Colors.red),
@@ -1761,13 +1804,13 @@ class HomeScreenState extends State<HomeScreen>
 
   Future<void> _handleRefresh() async {
     final Completer<void> completer = Completer<void>();
-    List<AdminCarModel> carsToAdmin = List();
+    List<AdminCarModel> carsToAdmin = new List();
     carsToAdmin = await restDatasource.getAllCarsByUserId(userId);
     if (carsToAdmin != null) {
       centerRepository.setCarsToAdmin(carsToAdmin);
-      await prefRepository.setCarsCount(carsToAdmin.length);
+      prefRepository.setCarsCount(carsToAdmin.length);
     } else {
-      await prefRepository.setCarsCount(0);
+      prefRepository.setCarsCount(0);
     }
     Timer(const Duration(seconds: 3), () {
       completer.complete();
@@ -1785,21 +1828,21 @@ class HomeScreenState extends State<HomeScreen>
 
   void createMenuContent(BuildContext context) {
     CarStateVM carStateVM;
-    itens.add(ScreenHiddenDrawer(
-      ItemHiddenMenu(
+    itens.add(new ScreenHiddenDrawer(
+      new ItemHiddenMenu(
         name: DartHelper.isNullOrEmptyString(
             centerRepository.getUserInfo() != null
                 ? centerRepository.getUserInfo().UserName
                 : userName),
         colorLineSelected: Colors.teal,
         baseStyle:
-        TextStyle(color: Colors.black.withOpacity(0.8), fontSize: 25.0),
+            TextStyle(color: Colors.black.withOpacity(0.8), fontSize: 25.0),
         selectedStyle: TextStyle(color: Colors.teal),
         content: Row(
           children: <Widget>[
             Padding(
               padding: const EdgeInsets.only(right: 16, left: 5.0),
-              child: CircleImage(
+              child: new CircleImage(
                 imageUrl: imageUrl,
                 isLocal: true,
                 width: 48.0,
@@ -1826,7 +1869,7 @@ class HomeScreenState extends State<HomeScreen>
       StreamBuilder(
           initialData: Message(text: startImagePath, type: '', status: false),
           stream:
-          BlocProvider.of<GlobalBloc>(context).messageBloc.messageStream,
+              BlocProvider.of<GlobalBloc>(context).messageBloc.messageStream,
           builder: (context, snapshot) {
             if (snapshot != null && snapshot.hasData) {
               Message message = snapshot.data;
@@ -1910,22 +1953,20 @@ class HomeScreenState extends State<HomeScreen>
 
                   var result = await refreshCars();
                   if (mounted) setState(() {});
-                  if (result == null) {
+                  if (result == null)
                     _refreshController.refreshFailed();
-                  } else {
+                  else
                     _refreshController.refreshCompleted();
-                  }
                 },
                 onLoading: () async {
                   //monitor fetch data from network
                   await Future.delayed(Duration(milliseconds: 1000));
                   var result = await refreshCars();
                   if (mounted) setState(() {});
-                  if (result == null) {
+                  if (result == null)
                     _refreshController.loadFailed();
-                  } else {
+                  else
                     _refreshController.loadComplete();
-                  }
                 },
                 child: ListView.builder(
                   padding: kMaterialListPadding,
@@ -1950,13 +1991,12 @@ class HomeScreenState extends State<HomeScreen>
           }),
     ));
 
-    itens.add(ScreenHiddenDrawer(
-        ItemHiddenMenu(
+    itens.add(new ScreenHiddenDrawer(
+        new ItemHiddenMenu(
           name: Translations.of(context).register(),
           colorLineSelected: Colors.orange,
           baseStyle: TextStyle(
-            /*color: Colors.black.withOpacity(0.8),*/
-              fontSize: 25.0),
+              /*color: Colors.black.withOpacity(0.8),*/ fontSize: 25.0),
           selectedStyle: TextStyle(color: Colors.orange),
           content: ListTile(
             onTap: () {
@@ -1974,14 +2014,14 @@ class HomeScreenState extends State<HomeScreen>
                     fontWeight: FontWeight.bold)),
           ),
         ),
-        /*isLoginned ? new LogoutDialog() : */ RegisterScreen()));
+        /*isLoginned ? new LogoutDialog() : */ new RegisterScreen()));
 
-    itens.add(ScreenHiddenDrawer(
-      ItemHiddenMenu(
+    itens.add(new ScreenHiddenDrawer(
+      new ItemHiddenMenu(
         name: Translations.of(context).car(),
         colorLineSelected: Colors.orange,
         baseStyle:
-        TextStyle(/*color: Colors.black.withOpacity(0.8),*/ fontSize: 25.0),
+            TextStyle(/*color: Colors.black.withOpacity(0.8),*/ fontSize: 25.0),
         selectedStyle: TextStyle(color: Colors.orange),
         content: Container(
           margin: EdgeInsets.all(10.0),
@@ -1992,7 +2032,7 @@ class HomeScreenState extends State<HomeScreen>
           child: ListTile(
             onTap: () {
               Navigator.of(context).pushNamed('/carpage',
-                  arguments: CarPageVM(
+                  arguments: new CarPageVM(
                       userId: userId,
                       isSelf: true,
                       carAddNoty: valueNotyModelBloc));
@@ -2002,26 +2042,26 @@ class HomeScreenState extends State<HomeScreen>
               color: Theme.of(context).iconTheme.color,
               size: 20,
             ),
-            title: Text(Translations.of(context).car(),
+            title: new Text(Translations.of(context).car(),
                 style: TextStyle(
                     fontSize: 14,
                     //color: Colors.black,
                     fontWeight: FontWeight.bold)),
-            subtitle: Text(Translations.current.cars() + " ",
+            subtitle: new Text(Translations.current.cars() + " ",
                 style: Theme.of(context).textTheme.headline),
           ),
         ),
       ),
-      CarPage(
-          carPageVM: CarPageVM(
+      new CarPage(
+          carPageVM: new CarPageVM(
               userId: userId, isSelf: true, carAddNoty: valueNotyModelBloc)),
     ));
-    itens.add(ScreenHiddenDrawer(
-      ItemHiddenMenu(
+    itens.add(new ScreenHiddenDrawer(
+      new ItemHiddenMenu(
         name: Translations.of(context).security(),
         colorLineSelected: Colors.orange,
         baseStyle:
-        TextStyle(/*color: Colors.black.withOpacity(0.8),*/ fontSize: 25.0),
+            TextStyle(/*color: Colors.black.withOpacity(0.8),*/ fontSize: 25.0),
         selectedStyle: TextStyle(color: Colors.orange),
         content: ListTile(
           leading: Icon(
@@ -2036,14 +2076,11 @@ class HomeScreenState extends State<HomeScreen>
                   fontWeight: FontWeight.bold)),
         ),
       ),
-      SecuritySettingsScreen(
-        fromMain: null,
-        scaffoldKey: null,
-      ),
+      new SecuritySettingsScreen(),
     ));
 
-    itens.add(ScreenHiddenDrawer(
-        ItemHiddenMenu(
+    itens.add(new ScreenHiddenDrawer(
+        new ItemHiddenMenu(
           name: !isLoginned
               ? Translations.of(context).settings()
               : Translations.of(context).exit(),
@@ -2065,16 +2102,16 @@ class HomeScreenState extends State<HomeScreen>
         Container(
           color: Colors.orange,
           child: Center(
-            child: SettingsScreen(),
+            child: new SettingsScreen(),
           ),
         )));
 
-    itens.add(ScreenHiddenDrawer(
-      ItemHiddenMenu(
+    itens.add(new ScreenHiddenDrawer(
+      new ItemHiddenMenu(
         name: Translations.of(context).profile(),
         colorLineSelected: Colors.orange,
         baseStyle:
-        TextStyle(color: Colors.black.withOpacity(0.8), fontSize: 25.0),
+            TextStyle(color: Colors.black.withOpacity(0.8), fontSize: 25.0),
         selectedStyle: TextStyle(color: Colors.orange),
         content: ListTile(
           leading: Icon(
@@ -2090,16 +2127,16 @@ class HomeScreenState extends State<HomeScreen>
         ),
       ),
       isLoginned
-          ? ProfileTwoPage(user: centerRepository.getUserInfo())
-          : LoginTwoPage(),
+          ? new ProfileTwoPage(user: centerRepository.getUserInfo())
+          : new LoginTwoPage(),
     ));
 
-    itens.add(ScreenHiddenDrawer(
-      ItemHiddenMenu(
+    itens.add(new ScreenHiddenDrawer(
+      new ItemHiddenMenu(
         name: Translations.of(context).support(),
         colorLineSelected: Colors.orange,
         baseStyle:
-        TextStyle(color: Colors.black.withOpacity(0.8), fontSize: 20.0),
+            TextStyle(color: Colors.black.withOpacity(0.8), fontSize: 20.0),
         selectedStyle: TextStyle(color: Colors.orange),
         content: ListTile(
           leading: Icon(
@@ -2114,7 +2151,7 @@ class HomeScreenState extends State<HomeScreen>
                   fontWeight: FontWeight.bold)),
         ),
       ),
-      isLoginned ? LogoutDialog() : LoginTwoPage(),
+      isLoginned ? new LogoutDialog() : new LoginTwoPage(),
     ));
   }
 
@@ -2132,7 +2169,6 @@ class HomeScreenState extends State<HomeScreen>
     ];
     return options;
   }
-
   /* _modalBottomSheet(Customer user){
       return showModalBottomSheet(
         context: context,
@@ -2158,7 +2194,6 @@ class MenuItem {
   String title;
   IconData icon;
   BuildContext context;
-
   MenuItem(this.icon, this.title, this.context, this.id);
 }
 
@@ -2199,10 +2234,12 @@ class _MenuState extends State<Menu> {
   }
 }
 
-NotyBloc<Message> messageCountNoty = NotyBloc<Message>();
+NotyBloc<Message> messageCountNoty = new NotyBloc<Message>();
+NotyBloc<Message> fcmNoty = new NotyBloc<Message>();
+
 //NotyBloc<Message> startEnginChangedNoty=new NotyBloc<Message>();
-NotyBloc<CarStateVM> statusChangedNoty = NotyBloc<CarStateVM>();
+NotyBloc<CarStateVM> statusChangedNoty = new NotyBloc<CarStateVM>();
 /*NotyBloc<Message> carPageChangedNoty=new NotyBloc<Message>();
 NotyBloc<Message> carLockPanelNoty=new NotyBloc<Message>();
 NotyBloc<SendingCommandVM> sendCommandNoty=new NotyBloc<SendingCommandVM>();*/
-NotyBloc<ChangeEvent> valueNotyModelBloc = NotyBloc<ChangeEvent>();
+NotyBloc<ChangeEvent> valueNotyModelBloc = new NotyBloc<ChangeEvent>();

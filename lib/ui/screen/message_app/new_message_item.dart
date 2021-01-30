@@ -99,34 +99,35 @@ class _NewMessageItemState extends State<NewMessageItem> {
               }
               if (msg.type == 'DELETED_SUCCEED') {}
             }
-            return new Padding(
-              padding: EdgeInsets.only(top: 5.0, right: 10.0, left: 10.0),
-              child: new Column(
+            return Padding(
+              padding: EdgeInsets.only(top: 5.0, right: 1.0, left: 1.0),
+              child: Column(
                 //mainAxisAlignment: MainAxisAlignment.end,
                 children: <Widget>[
-                  new Padding(
-                    padding:
-                        EdgeInsets.only(top: 30.0, bottom: 20.0, left: 0.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        new Padding(
-                          padding: EdgeInsets.only(
-                              top: 0.0, bottom: 0.0, left: 10.0, right: 10),
-                          child: Container(
-                            width: 28,
-                            height: 28.0,
-                            child: FlatButton(
-                              onPressed: () {
-                                Navigator.pop(context);
-                              },
-                              child: Icon(
-                                Icons.arrow_back,
-                                color: Colors.indigoAccent,
-                              ),
-                            ),
-                          ),
-                        ),
+                  Container(
+                    height: 70.0,
+                    child: AppBar(
+                      centerTitle: true,
+                      automaticallyImplyLeading: true,
+                      iconTheme: IconThemeData(color: Colors.indigoAccent),
+                      title: null,
+                      backgroundColor: Colors.transparent,
+                      elevation: 0.0,
+                      actions: <Widget>[
+                        Padding(
+                            padding: EdgeInsets.all(5.0),
+                            child: Container(
+                                width: 32.0,
+                                height: 32.0,
+                                child: IconButton(
+                                  icon: Icon(
+                                    Icons.arrow_forward,
+                                    color: Colors.indigoAccent,
+                                  ),
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                ))),
                         hasSelected
                             ? Container(
                                 width: 28,
@@ -160,7 +161,7 @@ class _NewMessageItemState extends State<NewMessageItem> {
                                         Message msg = Message(
                                             type: 'DELETED_SUCCEED',
                                             id: widget.detailVM.senderId);
-                                        msg.Ids=List()..addAll(selectedIds);
+                                        msg.Ids = List()..addAll(selectedIds);
                                         updateListMessageNoty.updateValue(msg);
                                       }
                                       selectedIds..clear();

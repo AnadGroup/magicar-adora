@@ -36,6 +36,7 @@ import 'package:anad_magicar/ui/map/geojson/geojson.dart';
 //import 'package:mapbox_gl/mapbox_gl.dart' as mbox;
 //import 'package:location/location.dart' as mboxLoc;
 import 'package:anad_magicar/ui/map/openmapstreet/pages/location_data.dart';
+import 'package:anad_magicar/ui/map/openmapstreet/pages/show_marker.dart';
 import 'package:anad_magicar/ui/screen/home/index.dart';
 import 'package:anad_magicar/ui/screen/setting/native_settings_screen.dart';
 import 'package:anad_magicar/ui/theme/app_themes.dart';
@@ -2369,9 +2370,10 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
   }
 
   showSpeedDialog(int speed) async {
+    String body = ' سرعت خودرو در این نقطه :' + speed.toString() + 'km/h';
     FlashHelper.informationBar2(context,
-        message: ' سرعت خودرو در این نقطه :' + speed.toString() + 'km/h',
-        duration: new Duration(milliseconds: 5000));
+        message: body,
+        duration:  Duration(milliseconds: 2000));
   }
 
   Future<List<Polyline>> processLineData(
@@ -2507,8 +2509,8 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
               builder: (ctx) {
                 return GestureDetector(
                   onTap: () {
-                    _showInfoPopUp = true;
-                    showSpeedDialog(0);
+                    //_showInfoPopUp = true;
+                   // showSpeedDialog(0);
                   },
                   child: Container(
                       width: markerSize + 28,
@@ -3061,8 +3063,8 @@ class MapPageState extends State<MapPage> with AutomaticKeepAliveClientMixin {
             builder: (ctx) {
               return GestureDetector(
                 onTap: () {
-                  _showInfoPopUp = true;
-                  showSpeedDialog(0);
+                 // _showInfoPopUp = true;
+                 // showSpeedDialog(0);
                 },
                 child: Container(
                     width: markerSize + 28,

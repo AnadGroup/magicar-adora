@@ -24,16 +24,20 @@
 
   <title>Magicar</title>
   <link rel="manifest" href="manifest.json">
-  
+  <script  src="https://www.gstatic.com/firebasejs/8.2.4/firebase-app.js"></script>
+  <script  src="https://www.gstatic.com/firebasejs/8.2.4/firebase-messaging.js"></script>
+
+  <script src="https://cdn.by.wonderpush.com/sdk/1.1/wonderpush-loader.min.js" async></script>
+<script>
+window.WonderPush = window.WonderPush || [];
+WonderPush.push(["init", {
+    webKey: "7d6b255f0da3f38474d24af96427f768275ba66b250fc95f19971e65452d8429",
+}]);
+</script>
 </head>
 <body>
   <!-- <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDYkYRHC3WArW9vjchXNs5HlRxW4Dfm618"></script> -->
 <!-- The core Firebase JS SDK is always required and must be listed first -->
-<script src="https://www.gstatic.com/firebasejs/8.2.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.2.0/firebase-database.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.2.0/firebase-firestore.js"></script>
-<script defer src="https://www.gstatic.com/firebasejs/8.2.0/firebase-messaging.js"></script>
-
 
 
 <!-- TODO: Add SDKs for Firebase products that you want to use
@@ -50,7 +54,6 @@
         storageBucket: "anadmagicar.appspot.com",
         messagingSenderId: "611322359852",
         appId: "1:611322359852:web:e29d692156c486173b6189",
-        measurementId: "G-TRQNPKLH6E"
       };
       // Initialize Firebase
       firebase.initializeApp(firebaseConfig);
@@ -78,7 +81,10 @@
        https://developers.google.com/web/fundamentals/primers/service-workers -->
   
   
-
+       <script src="//cdnjs.cloudflare.com/ajax/libs/pdf.js/2.4.456/pdf.min.js"></script>
+       <script type="text/javascript">
+         pdfjsLib.GlobalWorkerOptions.workerSrc = "//cdnjs.cloudflare.com/ajax/libs/pdf.js/2.4.456/pdf.worker.min.js";
+       </script>
   
   
   <!-- <script defer src="page.dart.js"></script> -->

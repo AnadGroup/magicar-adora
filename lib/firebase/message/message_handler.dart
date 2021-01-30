@@ -9,7 +9,7 @@ class MessageHandler extends FireBaseMessageHandler<dynamic> {
   BuildContext context;
   Function sendMessage;
 
-  MessageHandler({@required this.context, @required this.sendMessage});
+  MessageHandler({ this.context, @required this.sendMessage});
 
   final List<CustomDialog> customDialogList = [
     AndroidAlertDialog(),

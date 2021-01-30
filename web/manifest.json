@@ -4,9 +4,9 @@
     "start_url": ".",
     "display": "standalone",
     "background_color": "#514ABD7A",
-    "theme_color": "#514ABD7A",
     "description": "Magicar",
     "orientation": "portrait-primary",
+    "gcm_sender_id": "611322359852",
     "prefer_related_applications": false,
     "icons": [
         {

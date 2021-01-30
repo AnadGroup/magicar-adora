@@ -412,6 +412,12 @@ Widget buildCarRow(
     int counter) {
   kIsWeb = UniversalPlatform.isWeb;
   double angle = CenterRepository.APP_TYPE_ADORA ? 1.57 : 1.57;
+  double wid = kIsWeb
+      ? MediaQuery.of(context).size.width * 0.65
+      : MediaQuery.of(context).size.width * 0.70;
+  double heit = kIsWeb
+      ? MediaQuery.of(context).size.height * 0.40
+      : MediaQuery.of(context).size.height * 0.45;
   return FutureBuilder<bool>(
     initialData: false,
     future: getAppTheme(),
@@ -445,8 +451,8 @@ Widget buildCarRow(
             child: Container(
               margin: EdgeInsets.all(0.0),
               alignment: Alignment.topCenter,
-              width: MediaQuery.of(context).size.width * 0.70,
-              height: MediaQuery.of(context).size.height * 0.45,
+              width: wid,
+              height: heit,
               key: ValueKey(counter),
               //color: Color(0xff757575),
               child: Stack(
@@ -534,13 +540,16 @@ buildStatusRow(
     bool shockStatus,
     bool powerStatus,
     AnimationController animController) {
-  kIsWeb = UniversalPlatform.isWeb;
+  kIsWeb = true; //UniversalPlatform.isWeb;
   // double w = MediaQuery.of(context).size.width / 8.0;
   var _currentColorRow = carStateVM.getCurrentColor();
-  double i_w = 46.0;
-  double i_h = 46.0;
+  double i_w = 42.0;
+  double i_h = 42.0;
   double m_top = 10.0;
   double m_bot = 10.0;
+  bool valet = false;
+  bool pass_mode = false;
+  bool turbo = false;
   return FutureBuilder<bool>(
     initialData: false,
     future: getAppTheme(),
@@ -580,14 +589,15 @@ buildStatusRow(
                 trunk_status = carState.isTraunkOpen;
                 power_status =
                     carState.isPowerOn != null ? carState.isPowerOn : false;
+                
               }
               return Container(
                 margin: EdgeInsets.only(right: 1.0, top: 1.0),
                 width: kIsWeb
-                    ? MediaQuery.of(context).size.width * 0.15
-                    : MediaQuery.of(context).size.width * 0.15,
+                    ? MediaQuery.of(context).size.width * 0.12
+                    : MediaQuery.of(context).size.width * 0.12,
                 height: kIsWeb
-                    ? MediaQuery.of(context).size.height * 0.60
+                    ? MediaQuery.of(context).size.height * 0.40
                     : MediaQuery.of(context).size.height * 0.60,
                 child: kIsWeb
                     ? Padding(
@@ -595,6 +605,7 @@ buildStatusRow(
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisSize: MainAxisSize.min,
                           children: <Widget>[
                             Container(
                               margin: EdgeInsets.only(top: 1, bottom: 1),
@@ -662,7 +673,7 @@ buildStatusRow(
                                           imageUrl:
                                               'assets/images/unlock_22.png',
                                           counter: 0,
-                                          scale: 0.5,
+                                         // scale: 0.5,
                                           color: _currentColorRow,
                                         )
 
@@ -671,7 +682,7 @@ buildStatusRow(
                                       // )
                                       : Image.asset(
                                           'assets/images/lock_11.png',
-                                          scale: 0.5,
+                                         // scale: 0.5,
                                           fit: BoxFit.cover,
                                           color:
                                               _currentColorRow.withOpacity(0.5),
@@ -747,7 +758,7 @@ buildStatusRow(
                                       /* BounceAnimationBuilder(
                 child:*/
                                       Image.asset('assets/images/horn.png',
-                                          scale: 0.5,
+                                        
                                           fit: BoxFit.cover,
                                           color: _currentColorRow
                                               .withOpacity(opacityValue)),
@@ -832,6 +843,7 @@ buildStatusRow(
                                 ),
                               ),
                             ),
+                            
                           ],
                         ))
                     : Padding(
@@ -1090,7 +1102,7 @@ buildStatusRow(
 
 buildLockPanelRow(
     BuildContext context, int carIndex, NotyBloc<Message> carLockNoty) {
-  kIsWeb = UniversalPlatform.isWeb;
+  kIsWeb =true;// UniversalPlatform.isWeb;
   bool lockPanelStatus = false;
   return FutureBuilder<bool>(
     initialData: false,
@@ -1166,7 +1178,7 @@ buildBottomRow(
   NotyBloc<CarStateVM> statusChangedNoty,
 ) {
   var _currentColorRow = carStateVM.getCurrentColor();
-  kIsWeb = UniversalPlatform.isWeb;
+  kIsWeb = true;//UniversalPlatform.isWeb;
   bool valet = false;
   bool pass_mode = false;
   bool turbo = false;
@@ -1219,7 +1231,7 @@ buildBottomRow(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
-                new Align(
+                Align(
                   alignment: Alignment.center,
                   child: Container(
                     margin: EdgeInsets.only(top: m_top, bottom: m_bot),
@@ -1344,7 +1356,7 @@ buildArrowRow(
     NotyBloc<Message> opacityNotifier) {
   var _currentColorRow = carStateVM.getCurrentColor();
   double opacityValue = 0.0;
-  kIsWeb = UniversalPlatform.isWeb;
+  kIsWeb =true;// UniversalPlatform.isWeb;
   return FutureBuilder<bool>(
     initialData: false,
     future: getAppTheme(),
@@ -1476,9 +1488,9 @@ buildMapRow(
     NotyBloc<CarStateVM> carStateNoty,
     AnimationController animController) {
   var _currentColorRow = carStateVM.getCurrentColor();
-  kIsWeb = UniversalPlatform.isWeb;
-  double i_w = 32.0;
-  double i_h = 32.0;
+  kIsWeb =true;// UniversalPlatform.isWeb;
+  double i_w = 24.0;
+  double i_h = 24.0;
   double m_top = 10.0;
   double m_bot = 10.0;
   int temp = carStateVM.tempreture;
@@ -1503,17 +1515,17 @@ buildMapRow(
         stream: carPageChangedNoty.noty,
         initialData: null,
         builder: (BuildContext c, AsyncSnapshot<Message> data) {
-          if (data.data != null && data.hasData) {
+          if (data != null && data.hasData) {
             Message msg = data.data;
             if (msg.type == 'CARPAGE') {
-              _currebtCarIndex = msg.index;
+             // _currebtCarIndex = msg.index;
               // _currentColor = colors[msg.index];
 
             }
           }
           return StreamBuilder<CarStateVM>(
             stream: carStateNoty.noty,
-            initialData: null,
+            initialData: carStateVM,
             builder: (BuildContext c, AsyncSnapshot<CarStateVM> data) {
               if (data.data != null && data.hasData) {
                 getStatusExecuted = true;
@@ -1529,7 +1541,7 @@ buildMapRow(
                     ? MediaQuery.of(context).size.width * 0.12
                     : MediaQuery.of(context).size.width * 0.12,
                 height: kIsWeb
-                    ? MediaQuery.of(context).size.height * 0.60
+                    ? MediaQuery.of(context).size.height * 0.40
                     : MediaQuery.of(context).size.height * 0.60,
                 child: kIsWeb
                     ? Padding(
@@ -1537,6 +1549,7 @@ buildMapRow(
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisSize: MainAxisSize.min,
                           children: <Widget>[
                             Stack(
                               children: <Widget>[
@@ -1653,7 +1666,7 @@ buildMapRow(
                             ),
                             Container(
                               margin:
-                                  EdgeInsets.only(top: m_top, bottom: m_bot),
+                                  EdgeInsets.only(top: m_top, bottom: 1),
                               //color: Colors.white,
                               alignment: Alignment.center,
                               height: i_h,
@@ -1737,7 +1750,7 @@ buildMapRow(
                                 children: <Widget>[
                                   Padding(
                                     padding: EdgeInsets.only(top: 0.0),
-                                    child: new Align(
+                                    child:  Align(
                                       alignment: Alignment.center,
                                       child: Container(
                                         //color: Colors.white,
@@ -1764,7 +1777,7 @@ buildMapRow(
                                     ),
                                   ),
                                   Padding(
-                                    padding: EdgeInsets.only(top: 32.0),
+                                    padding: EdgeInsets.only(top: 26.0),
                                     child: Container(
                                       height: 22.0,
                                       child: Center(
@@ -1775,7 +1788,7 @@ buildMapRow(
                                           ),
                                           textAlign: TextAlign.center,
                                           style: TextStyle(
-                                              fontSize: 12.0,
+                                              fontSize: 10.0,
                                               color: _currentColorRow),
                                         ),
                                       ),
@@ -1821,7 +1834,7 @@ buildMapRow(
                                     ),
                                   ),
                                   Padding(
-                                    padding: EdgeInsets.only(top: 35.0),
+                                    padding: EdgeInsets.only(top: 26.0),
                                     child: Container(
                                       height: 15.0,
                                       child: Center(
@@ -1830,7 +1843,7 @@ buildMapRow(
                                                 temp_str),
                                             textAlign: TextAlign.center,
                                             style: TextStyle(
-                                                fontSize: 12.0,
+                                                fontSize: 10.0,
                                                 color: _currentColorRow)),
                                       ),
                                     ),

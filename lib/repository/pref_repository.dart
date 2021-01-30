@@ -4,21 +4,26 @@ import 'package:anad_magicar/application.dart';
 import 'package:anad_magicar/model/user/user_data.dart';
 import 'package:anad_magicar/model/viewmodel/status_history_vm.dart';
 import 'package:anad_magicar/repository/center_repository.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+//import 'package:shared_preferences_web/shared_preferences_web.dart' as spweb;
 
 enum LoginType { PASWWORD, FINGERPRINT, PATTERN }
 
 class PrefRepository {
-  static final PrefRepository prefRepository =  PrefRepository._internal();
+  static final PrefRepository prefRepository = PrefRepository._internal();
+
+  Future<SharedPreferences> _prefs;
+  //Future<spweb.SharedPreferencesPlugin> _prefsWeb;
 
   SharedPreferences prefs;
-
   PrefRepository._internal();
 
-  Future<SharedPreferences> getPrefs() async {
-    prefs = await SharedPreferences.getInstance();
-    return Future.value(prefs);
+  Future<SharedPreferences> getPrefs() {
+  //  Completer<SharedPreferences> completer = Completer();
+      _prefs =  SharedPreferences.getInstance();
+    return _prefs;
   }
 
   factory PrefRepository() {
@@ -28,7 +33,7 @@ class PrefRepository {
   Future<bool> setProfileImagePath(String path) async {
     prefs = await SharedPreferences.getInstance();
     if (prefs != null) {
-      await prefs.setString(CenterRepository.ProfileImagePath_TAG, path);
+      prefs.setString(CenterRepository.ProfileImagePath_TAG, path);
       return true;
     }
     return false;
@@ -37,7 +42,7 @@ class PrefRepository {
   Future<String> getMobileLoggedIn() async {
     prefs = await SharedPreferences.getInstance();
     if (prefs != null) {
-      String result = await prefs.getString(CenterRepository.USERNAME_TAG);
+      String result = prefs.getString(CenterRepository.USERNAME_TAG);
       return result == null ? result : result;
     }
     return null;
@@ -46,8 +51,7 @@ class PrefRepository {
   Future<String> getProfileImagePath() async {
     prefs = await SharedPreferences.getInstance();
     if (prefs != null) {
-      String result =
-          await prefs.getString(CenterRepository.ProfileImagePath_TAG);
+      String result = prefs.getString(CenterRepository.ProfileImagePath_TAG);
       return result == null ? result : result;
     }
     return null;
@@ -56,8 +60,8 @@ class PrefRepository {
   Future<bool> setLoginedToken(String token, String clientId) async {
     prefs = await SharedPreferences.getInstance();
     if (prefs != null) {
-      await prefs.setString(CenterRepository.VISION_AUTH_TAG, token);
-      await prefs.setString(CenterRepository.ClientID_TAG, clientId);
+      prefs.setString(CenterRepository.VISION_AUTH_TAG, token);
+      prefs.setString(CenterRepository.ClientID_TAG, clientId);
 
       return true;
     }
@@ -69,7 +73,7 @@ class PrefRepository {
   ) async {
     prefs = await SharedPreferences.getInstance();
     if (prefs != null) {
-      await prefs.setString(CenterRepository.FCM_TOKEN_TAG, token);
+      prefs.setString(CenterRepository.FCM_TOKEN_TAG, token);
       return true;
     }
     return false;
@@ -78,7 +82,7 @@ class PrefRepository {
   Future<String> getFCMToken() async {
     prefs = await SharedPreferences.getInstance();
     if (prefs != null) {
-      String token = await prefs.getString(CenterRepository.FCM_TOKEN_TAG);
+      String token = prefs.getString(CenterRepository.FCM_TOKEN_TAG);
       if (token != null) return token;
     }
     return '';
@@ -87,7 +91,7 @@ class PrefRepository {
   Future<String> getLoginedToken() async {
     prefs = await SharedPreferences.getInstance();
     if (prefs != null) {
-      String token = await prefs.getString(CenterRepository.VISION_AUTH_TAG);
+      String token = prefs.getString(CenterRepository.VISION_AUTH_TAG);
       if (token != null) return token;
     }
     return '';
@@ -96,7 +100,7 @@ class PrefRepository {
   Future<String> getLoginedClientID() async {
     prefs = await SharedPreferences.getInstance();
     if (prefs != null) {
-      String token = await prefs.getString(CenterRepository.ClientID_TAG);
+      String token = prefs.getString(CenterRepository.ClientID_TAG);
       if (token != null) return token;
     }
     return '';
@@ -105,7 +109,7 @@ class PrefRepository {
   Future<bool> setMinMaxSpeed(String tag, int value) async {
     prefs = await SharedPreferences.getInstance();
     if (prefs != null) {
-      await prefs.setInt(tag, value);
+      prefs.setInt(tag, value);
       return true;
     }
     return false;
@@ -114,7 +118,7 @@ class PrefRepository {
   Future<bool> setRoutingType(String tag, int value) async {
     prefs = await SharedPreferences.getInstance();
     if (prefs != null) {
-      await prefs.setInt(tag, value);
+      prefs.setInt(tag, value);
       return true;
     }
     return false;
@@ -123,7 +127,7 @@ class PrefRepository {
   Future<bool> setPeriodicTime(String tag, int value) async {
     prefs = await SharedPreferences.getInstance();
     if (prefs != null) {
-      await prefs.setInt(tag, value);
+      prefs.setInt(tag, value);
       return true;
     }
     return false;
@@ -132,7 +136,7 @@ class PrefRepository {
   Future<bool> setPeriodicUpdate(String tag, int value) async {
     prefs = await SharedPreferences.getInstance();
     if (prefs != null) {
-      await prefs.setInt(tag, value);
+      prefs.setInt(tag, value);
       return true;
     }
     return false;
@@ -141,7 +145,7 @@ class PrefRepository {
   Future<bool> setLoginedUserName(String userName) async {
     prefs = await SharedPreferences.getInstance();
     if (prefs != null) {
-      await prefs.setString(CenterRepository.USERNAME_TAG, userName);
+      prefs.setString(CenterRepository.USERNAME_TAG, userName);
       return true;
     }
     return false;
@@ -150,7 +154,7 @@ class PrefRepository {
   Future<bool> setLoginedFirstName(String userName) async {
     prefs = await SharedPreferences.getInstance();
     if (prefs != null) {
-      await prefs.setString(CenterRepository.FIRSTNAME_TAG, userName);
+      prefs.setString(CenterRepository.FIRSTNAME_TAG, userName);
       return true;
     }
     return false;
@@ -159,7 +163,7 @@ class PrefRepository {
   Future<bool> setLoginedLastName(String userName) async {
     prefs = await SharedPreferences.getInstance();
     if (prefs != null) {
-      await prefs.setString(CenterRepository.LASTNAME_TAG, userName);
+      prefs.setString(CenterRepository.LASTNAME_TAG, userName);
       return true;
     }
     return false;
@@ -168,7 +172,7 @@ class PrefRepository {
   Future<bool> setLoginedMobile(String userName) async {
     prefs = await SharedPreferences.getInstance();
     if (prefs != null) {
-      await prefs.setString(CenterRepository.MOBILE_TAG, userName);
+      prefs.setString(CenterRepository.MOBILE_TAG, userName);
       return true;
     }
     return false;
@@ -177,7 +181,7 @@ class PrefRepository {
   Future<bool> setUserRoleId(int roleId) async {
     prefs = await SharedPreferences.getInstance();
     if (prefs != null) {
-      await prefs.setInt(CenterRepository.ROLEID_TAG, roleId);
+      prefs.setInt(CenterRepository.ROLEID_TAG, roleId);
       return true;
     }
     return false;
@@ -186,7 +190,7 @@ class PrefRepository {
   Future<bool> setLoginedPassword(String userName) async {
     prefs = await SharedPreferences.getInstance();
     if (prefs != null) {
-      await prefs.setString(CenterRepository.PASSWORD_TAG, userName);
+      prefs.setString(CenterRepository.PASSWORD_TAG, userName);
       return true;
     }
     return false;
@@ -195,7 +199,7 @@ class PrefRepository {
   Future<bool> setLoginedIsAdmin(bool isAdmin) async {
     prefs = await SharedPreferences.getInstance();
     if (prefs != null) {
-      await prefs.setBool(CenterRepository.ISADMIN_TAG, isAdmin);
+      prefs.setBool(CenterRepository.ISADMIN_TAG, isAdmin);
       return true;
     }
     return false;
@@ -204,7 +208,7 @@ class PrefRepository {
   Future<int> getMinMaxSpeed(String tag) async {
     prefs = await SharedPreferences.getInstance();
     if (prefs != null) {
-      int minMax = await prefs.getInt(tag);
+      int minMax = prefs.getInt(tag);
       if (minMax != null) return minMax;
     }
     return 0;
@@ -213,7 +217,7 @@ class PrefRepository {
   Future<int> getRoutingType(String tag) async {
     prefs = await SharedPreferences.getInstance();
     if (prefs != null) {
-      int minMax = await prefs.getInt(tag);
+      int minMax = prefs.getInt(tag);
       if (minMax != null) return minMax;
     }
     return 0;
@@ -222,7 +226,7 @@ class PrefRepository {
   Future<int> getPeriodicTime(String tag) async {
     prefs = await SharedPreferences.getInstance();
     if (prefs != null) {
-      int periodic = await prefs.getInt(tag);
+      int periodic = prefs.getInt(tag);
       if (periodic != null) return periodic;
     }
     return 0;
@@ -231,7 +235,7 @@ class PrefRepository {
   Future<int> getPeriodicUpdate(String tag) async {
     prefs = await SharedPreferences.getInstance();
     if (prefs != null) {
-      int periodic = await prefs.getInt(tag);
+      int periodic = prefs.getInt(tag);
       if (periodic != null) return periodic;
     }
     return 0;
@@ -240,7 +244,7 @@ class PrefRepository {
   Future<bool> getLoginedIsAdmin() async {
     prefs = await SharedPreferences.getInstance();
     if (prefs != null) {
-      bool isAdmin = await prefs.getBool(CenterRepository.ISADMIN_TAG);
+      bool isAdmin = prefs.getBool(CenterRepository.ISADMIN_TAG);
       if (isAdmin != null) return isAdmin;
     }
     return false;
@@ -249,7 +253,7 @@ class PrefRepository {
   Future<int> getUserRoleId() async {
     prefs = await SharedPreferences.getInstance();
     if (prefs != null) {
-      int roleId = await prefs.getInt(CenterRepository.ROLEID_TAG);
+      int roleId = prefs.getInt(CenterRepository.ROLEID_TAG);
       if (roleId != null) return roleId;
     }
     return 0;
@@ -258,7 +262,7 @@ class PrefRepository {
   Future<String> getLoginedUserName() async {
     prefs = await SharedPreferences.getInstance();
     if (prefs != null) {
-      String userName = await prefs.getString(CenterRepository.USERNAME_TAG);
+      String userName = prefs.getString(CenterRepository.USERNAME_TAG);
       if (userName != null) return userName;
     }
     return '';
@@ -267,7 +271,7 @@ class PrefRepository {
   Future<String> getLoginedFirstName() async {
     prefs = await SharedPreferences.getInstance();
     if (prefs != null) {
-      String userName = await prefs.getString(CenterRepository.FIRSTNAME_TAG);
+      String userName = prefs.getString(CenterRepository.FIRSTNAME_TAG);
       if (userName != null) return userName;
     }
     return '';
@@ -276,7 +280,7 @@ class PrefRepository {
   Future<String> getLoginedLastName() async {
     prefs = await SharedPreferences.getInstance();
     if (prefs != null) {
-      String userName = await prefs.getString(CenterRepository.LASTNAME_TAG);
+      String userName = prefs.getString(CenterRepository.LASTNAME_TAG);
       if (userName != null) return userName;
     }
     return '';
@@ -285,7 +289,7 @@ class PrefRepository {
   Future<String> getLoginedMobile() async {
     prefs = await SharedPreferences.getInstance();
     if (prefs != null) {
-      String userName = await prefs.getString(CenterRepository.MOBILE_TAG);
+      String userName = prefs.getString(CenterRepository.MOBILE_TAG);
       if (userName != null) return userName;
     }
     return '';
@@ -294,7 +298,7 @@ class PrefRepository {
   Future<String> getLoginedPassword() async {
     prefs = await SharedPreferences.getInstance();
     if (prefs != null) {
-      String userName = await prefs.getString(CenterRepository.PASSWORD_TAG);
+      String userName = prefs.getString(CenterRepository.PASSWORD_TAG);
       if (userName != null) return userName;
     }
     return '';
@@ -303,7 +307,7 @@ class PrefRepository {
   Future<bool> setLoginedUserId(int id) async {
     prefs = await SharedPreferences.getInstance();
     if (prefs != null) {
-      await prefs.setInt(CenterRepository.USERID_TAG, id);
+      prefs.setInt(CenterRepository.USERID_TAG, id);
       // prefs.commit();
       return true;
     }
@@ -313,7 +317,7 @@ class PrefRepository {
   Future<bool> setCarsCount(int count) async {
     prefs = await SharedPreferences.getInstance();
     if (prefs != null) {
-      await prefs.setInt(CenterRepository.CarsCount_TAG, count);
+      prefs.setInt(CenterRepository.CarsCount_TAG, count);
       return true;
     }
     return false;
@@ -322,7 +326,7 @@ class PrefRepository {
   Future<bool> setCarId(int carId) async {
     prefs = await SharedPreferences.getInstance();
     if (prefs != null) {
-      await prefs.setInt('CARID', carId);
+      prefs.setInt('CARID', carId);
       return true;
     }
     return false;
@@ -331,7 +335,7 @@ class PrefRepository {
   Future<int> getCarId() async {
     prefs = await SharedPreferences.getInstance();
     if (prefs != null) {
-      int res = await prefs.getInt('CARID');
+      int res = prefs.getInt('CARID');
       return res != null ? res : 0;
     }
     return 0;
@@ -341,7 +345,7 @@ class PrefRepository {
     prefs = await SharedPreferences.getInstance();
     if (prefs != null) {
       int count = await getCarsCount();
-      await prefs.setInt(CenterRepository.CarsCount_TAG, (count + 1));
+      prefs.setInt(CenterRepository.CarsCount_TAG, (count + 1));
       return true;
     }
     return false;
@@ -351,13 +355,12 @@ class PrefRepository {
     prefs = await SharedPreferences.getInstance();
     if (prefs != null) {
       if (data != null) {
-        await prefs.setInt(UserLoginedInfo.CARCOUNTS_TAG, data.carCounts);
-        await prefs.setInt(UserLoginedInfo.USERID_TAG, data.userId);
-        await prefs.setInt(UserLoginedInfo.USERCOUNTS_TAG, data.userCounts);
-        await prefs.setString(UserLoginedInfo.USERNAME_TAG, data.userName);
-        await prefs.setString(UserLoginedInfo.AUTH_TOKEN_TAG, data.auth_token);
-        await prefs.setString(
-            UserLoginedInfo.LOGINED_DATE_TAG, data.logined_date);
+        prefs.setInt(UserLoginedInfo.CARCOUNTS_TAG, data.carCounts);
+        prefs.setInt(UserLoginedInfo.USERID_TAG, data.userId);
+        prefs.setInt(UserLoginedInfo.USERCOUNTS_TAG, data.userCounts);
+        prefs.setString(UserLoginedInfo.USERNAME_TAG, data.userName);
+        prefs.setString(UserLoginedInfo.AUTH_TOKEN_TAG, data.auth_token);
+        prefs.setString(UserLoginedInfo.LOGINED_DATE_TAG, data.logined_date);
 
         return true;
       }
@@ -368,13 +371,12 @@ class PrefRepository {
   Future<UserLoginedInfo> getUserLoginedInfo() async {
     prefs = await SharedPreferences.getInstance();
     if (prefs != null) {
-      int carCounts = await prefs.getInt(UserLoginedInfo.CARCOUNTS_TAG);
-      int userCounts = await prefs.getInt(UserLoginedInfo.USERCOUNTS_TAG);
-      int userId = await prefs.getInt(UserLoginedInfo.USERID_TAG);
-      String auth_token = await prefs.getString(UserLoginedInfo.AUTH_TOKEN_TAG);
-      String logined_date =
-          await prefs.getString(UserLoginedInfo.LOGINED_DATE_TAG);
-      String userName = await prefs.getString(UserLoginedInfo.USERNAME_TAG);
+      int carCounts = prefs.getInt(UserLoginedInfo.CARCOUNTS_TAG);
+      int userCounts = prefs.getInt(UserLoginedInfo.USERCOUNTS_TAG);
+      int userId = prefs.getInt(UserLoginedInfo.USERID_TAG);
+      String auth_token = prefs.getString(UserLoginedInfo.AUTH_TOKEN_TAG);
+      String logined_date = prefs.getString(UserLoginedInfo.LOGINED_DATE_TAG);
+      String userName = prefs.getString(UserLoginedInfo.USERNAME_TAG);
 
       UserLoginedInfo data = UserLoginedInfo(
           userName: userName,
@@ -392,7 +394,7 @@ class PrefRepository {
   Future<int> getCarsCount() async {
     prefs = await SharedPreferences.getInstance();
     if (prefs != null) {
-      int id = await prefs.getInt(CenterRepository.CarsCount_TAG);
+      int id = prefs.getInt(CenterRepository.CarsCount_TAG);
       if (id != null && id > 0) return id;
     }
     return 0;
@@ -401,7 +403,7 @@ class PrefRepository {
   Future<int> getLoginedUserId() async {
     prefs = await SharedPreferences.getInstance();
     if (prefs != null) {
-      int id = await prefs.getInt(CenterRepository.USERID_TAG);
+      int id = prefs.getInt(CenterRepository.USERID_TAG);
       if (id != null && id > 0) return id;
     }
     return 0;
@@ -410,7 +412,7 @@ class PrefRepository {
   Future<bool> isLoggined() async {
     prefs = await SharedPreferences.getInstance();
     if (prefs != null) {
-      bool result = await prefs.getBool('LOGINSTATUS');
+      bool result = prefs.getBool('LOGINSTATUS');
       return result == null ? false : result;
     }
     return false;
@@ -419,7 +421,7 @@ class PrefRepository {
   Future<int> getLoginStatusTypeAtAppStarted() async {
     prefs = await SharedPreferences.getInstance();
     if (prefs != null) {
-      int result = await prefs.getInt('STATUS_LOGIN_TYPE_ON_APPSTARTED');
+      int result = prefs.getInt('STATUS_LOGIN_TYPE_ON_APPSTARTED');
       return result == null ? 0 : result;
     }
     return 0;
@@ -428,7 +430,7 @@ class PrefRepository {
   Future<bool> getLoginStatusAtAppStarted() async {
     prefs = await SharedPreferences.getInstance();
     if (prefs != null) {
-      bool result = await prefs.getBool('STATUS_LOGIN_ON_APPSTARTED');
+      bool result = prefs.getBool('STATUS_LOGIN_ON_APPSTARTED');
       return result == null ? null : result;
     }
     return null;
@@ -437,7 +439,7 @@ class PrefRepository {
   Future<bool> setLoggedOut() async {
     prefs = await SharedPreferences.getInstance();
     if (prefs != null) {
-      await prefs.setBool('LOGINSTATUS', false);
+      prefs.setBool('LOGINSTATUS', false);
       return true;
     }
     return false;
@@ -446,7 +448,7 @@ class PrefRepository {
   Future<bool> setStartEngineStatus() async {
     prefs = await SharedPreferences.getInstance();
     if (prefs != null) {
-      bool status = await prefs.getBool('ENGINESTATUS');
+      bool status = prefs.getBool('ENGINESTATUS');
       if (status != null) {
         if (status)
           status = false;
@@ -455,7 +457,7 @@ class PrefRepository {
       } else {
         status = true;
       }
-      await prefs.setBool('ENGINESTATUS', status);
+      prefs.setBool('ENGINESTATUS', status);
       return status;
     }
     return false;
@@ -464,7 +466,7 @@ class PrefRepository {
   Future<bool> setEngineStatus(bool status) async {
     prefs = await SharedPreferences.getInstance();
     if (prefs != null) {
-      await prefs.setBool('ENGINESTATUS', status);
+      prefs.setBool('ENGINESTATUS', status);
       return status;
     }
     return false;
@@ -473,7 +475,7 @@ class PrefRepository {
   Future<bool> getStartEngineStatus() async {
     prefs = await SharedPreferences.getInstance();
     if (prefs != null) {
-      bool status = await prefs.getBool('ENGINESTATUS');
+      bool status = prefs.getBool('ENGINESTATUS');
       if (status != null) {
         //prefs.setBool('ENGINESTATUS', status);
         return status;
@@ -486,7 +488,7 @@ class PrefRepository {
   Future<bool> setLockStatus(bool status) async {
     prefs = await SharedPreferences.getInstance();
     if (prefs != null) {
-      await prefs.setBool('LOCKSTATUS', status);
+      prefs.setBool('LOCKSTATUS', status);
       return status;
     }
     return false;
@@ -495,7 +497,7 @@ class PrefRepository {
   Future<bool> setPowerStatus(bool status) async {
     prefs = await SharedPreferences.getInstance();
     if (prefs != null) {
-      await prefs.setBool('POWERSTATUS', status);
+      prefs.setBool('POWERSTATUS', status);
       return status;
     }
     return false;
@@ -504,7 +506,7 @@ class PrefRepository {
   Future<bool> setTrunkStatus(bool status) async {
     prefs = await SharedPreferences.getInstance();
     if (prefs != null) {
-      await prefs.setBool('TRUNKSTATUS', status);
+      prefs.setBool('TRUNKSTATUS', status);
       return status;
     }
     return false;
@@ -513,7 +515,7 @@ class PrefRepository {
   Future<bool> getLockStatus() async {
     prefs = await SharedPreferences.getInstance();
     if (prefs != null) {
-      bool status = await prefs.getBool('LOCKSTATUS');
+      bool status = prefs.getBool('LOCKSTATUS');
       if (status != null) {
         return status;
       } else
@@ -525,7 +527,7 @@ class PrefRepository {
   Future<bool> getTrunkStatus() async {
     prefs = await SharedPreferences.getInstance();
     if (prefs != null) {
-      bool status = await prefs.getBool('TRUNKSTATUS');
+      bool status = prefs.getBool('TRUNKSTATUS');
       if (status != null) {
         return status;
       } else
@@ -537,7 +539,7 @@ class PrefRepository {
   Future<bool> getPowerStatus() async {
     prefs = await SharedPreferences.getInstance();
     if (prefs != null) {
-      bool status = await prefs.getBool('POWERSTATUS');
+      bool status = prefs.getBool('POWERSTATUS');
       if (status != null) {
         return status;
       } else
@@ -549,8 +551,8 @@ class PrefRepository {
   Future<bool> setLoggedIn(bool status) async {
     prefs = await SharedPreferences.getInstance();
     if (prefs != null) {
-      await prefs.setBool('LOGINSTATUS', true);
-      await prefs.setBool('STATUS_LOGIN_ON_APPSTARTED', status);
+      prefs.setBool('LOGINSTATUS', true);
+      prefs.setBool('STATUS_LOGIN_ON_APPSTARTED', status);
       return true;
     }
     return false;
@@ -560,13 +562,13 @@ class PrefRepository {
     prefs = await SharedPreferences.getInstance();
     if (prefs != null) {
       // prefs.setBool('LOGINSTATUS', true);
-      await prefs.setBool('STATUS_LOGIN_ON_APPSTARTED', status);
+      prefs.setBool('STATUS_LOGIN_ON_APPSTARTED', status);
       return true;
     }
     return false;
   }
 /*  Future<bool> setLoginTypeStatus(bool status) async {
-    prefs = await SharedPreferences.getInstance();
+    prefs =await  SharedPreferences.getInstance();
     if(prefs!=null) {
       // prefs.setBool('LOGINSTATUS', true);
       prefs.setBool('STATUS_LOGIN_TYPE_ON_APPSTARTED', status);
@@ -604,24 +606,24 @@ class PrefRepository {
   setLocale(String lang_code, String contry_code) async {
     var prefs = await SharedPreferences.getInstance();
 
-    await prefs.setString('language_code', lang_code);
-    await prefs.setString('country_code', contry_code);
+    prefs.setString('language_code', lang_code);
+    prefs.setString('country_code', contry_code);
   }
 
   setStatusDateTime(String date, String time, bool status) async {
     var prefs = await SharedPreferences.getInstance();
 
-    await prefs.setString('STATUS_DATE', date);
-    await prefs.setString('STATUS_TIME', time);
-    await prefs.setBool('STATUS_STATE', status);
+    prefs.setString('STATUS_DATE', date);
+    prefs.setString('STATUS_TIME', time);
+    prefs.setBool('STATUS_STATE', status);
   }
 
   Future<StatusHistoryVM> geteStatusDateTime() async {
     var prefs = await SharedPreferences.getInstance();
 
     String ddate = await prefs.getString('STATUS_DATE');
-    String ttime = await prefs.getString('STATUS_TIME');
-    bool sstate = await prefs.getBool('STATUS_STATE');
+    String ttime =await prefs.getString('STATUS_TIME');
+    bool sstate =await prefs.getBool('STATUS_STATE');
 
     if (ddate == null) ddate = '';
     if (ttime == null) ttime = '';

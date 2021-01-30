@@ -57,10 +57,12 @@ import 'package:anad_magicar/repository/fake_server.dart';
 import 'package:anad_magicar/repository/pref_repository.dart';
 import 'package:anad_magicar/service/network_checker.dart';
 import 'package:anad_magicar/translation_strings.dart';
+import 'package:anad_magicar/ui/screen/car/car_page.dart';
 import 'package:anad_magicar/ui/screen/home/index.dart';
 import 'package:anad_magicar/ui/screen/setting/native_settings_screen.dart';
 import 'package:anad_magicar/utils/date_utils.dart';
 import 'package:anad_magicar/widgets/animated_dialog_box.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_money_formatter/flutter_money_formatter.dart';
@@ -118,7 +120,7 @@ class CenterRepository {
   static CarModelDetaillDS carModelDetaillDS;
 
 //مربوط به اپ آدورا میباشد درصورت درست بودن خروجی آدورا میشود
-  static bool APP_TYPE_ADORA = true;
+  static bool APP_TYPE_ADORA = false;
   int carId = 0;
   static int userId;
   static int currentCarId = 0;
@@ -454,9 +456,13 @@ class CenterRepository {
   }
 
   static onCarPageTap(BuildContext context, int userId) {
-    Navigator.of(context).popAndPushNamed('/carpage',
-        arguments: new CarPageVM(
-            userId: userId, isSelf: true, carAddNoty: valueNotyModelBloc));
+    Navigator.push(context,
+    CupertinoPageRoute(
+      fullscreenDialog: true,
+      
+      builder: (context)=>
+       CarPage(carPageVM:  CarPageVM(
+            userId: userId, isSelf: true, carAddNoty: valueNotyModelBloc), ) ) );
   }
 
   String toRials(double amount) {

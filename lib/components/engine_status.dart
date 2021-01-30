@@ -412,6 +412,19 @@ class _EngineStatusState extends State<EngineStatus>
     }
   }
 
+onUnlockTap() {
+                            showWaitingFlash();
+                            Future.delayed(Duration(seconds: 3)).then((value) {
+                              if (!onTapRaised) {
+                                widget.carStateVM.isDoorOpen = true;
+                                sendCommand(
+                                    ActionsCommand.UnlockAndDisArm_Nano_CODE);
+                                onTapRaised = true;
+                                releaseTapRaised(onTapRaised);
+                              }
+                            });
+                          }
+
   Widget buildControlRow(BuildContext context, String startImgPath,
       NotyBloc<Message> noty, bool engineStatus, bool lockStatus) {
     lock_status = widget.carStateVM.arm;
@@ -498,17 +511,7 @@ class _EngineStatusState extends State<EngineStatus>
                           height: h,
                           isEngine: false,
                           width: 0,
-                          onTap: () {
-                            showWaitingFlash();
-                            Future.delayed(Duration(seconds: 3)).then((value) {
-                              if (!onTapRaised) {
-                                sendCommand(
-                                    ActionsCommand.UnlockAndDisArm_Nano_CODE);
-                                onTapRaised = true;
-                                releaseTapRaised(onTapRaised);
-                              }
-                            });
-                          },
+                          onTap: onUnlockTap,
                         ),
                         // Row(
                         //   mainAxisAlignment: MainAxisAlignment.spaceBetween,

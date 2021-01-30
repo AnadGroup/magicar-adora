@@ -132,7 +132,7 @@ class MessageAppPageState extends MainPage<MessageAppPage> {
   @override
   bool showBack() {
     // TODO: implement showBack
-    return false;
+    return true;
   }
 
   @override
