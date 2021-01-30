@@ -54,7 +54,7 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^0.1.3
   scoped_model: ^1.0.1
-  dwds: any
+  #dwds: any
 
   url_launcher_web: ^0.1.2
 
@@ -88,9 +88,9 @@ dependencies:
   bloc: ^2.0.0
   flutter_bloc: ^2.1.1
   equatable: ^1.0.1
-  rxdart: ^0.16.0
+  rxdart: ^0.25.0
 
-  #f_orm_m8: ^0.8.0+3
+    #f_orm_m8: ^0.8.0+3
 
   cached_network_image: ^2.0.0
   transparent_image: ^1.0.0
@@ -102,7 +102,8 @@ dependencies:
   build_runner: ^1.0.0
   #jaguar_orm_gen: ^2.2.27
   #jaguar_query_sqflite: ^2.2.10
-  shared_preferences_web: ^0.1.0
+  shared_preferences_web: ^0.1.2+7
+  shared_preferences: ^0.5.12+4
   #flutter_uploader: ^1.2.0
   fluttertoast: ^7.1.4
   progress_dialog: ^1.2.0
@@ -117,9 +118,9 @@ dependencies:
   avatar_glow: ^1.1.0
   flutter_spinkit: ^4.1.1+1
   #sider_bar: ^0.1.1
-  location: ^3.0.2
+  #location: ^3.0.2
   #mapbox_gl:
-  #path: ./flutter-mapbox-gl
+    #path: ./flutter-mapbox-gl
   liquid_swipe: ^1.3.0
   simple_animations: ^2.4.2
   sliding_up_panel: ^0.3.6
@@ -143,9 +144,9 @@ dependencies:
   speech_bubble: ^0.0.6
   requests: ^3.3.0
   #flutter_datetime_picker: ^1.3.1
-  firebase_core: ^0.4.4+3
-  firebase_messaging: ^6.0.15
-  firebase_auth: ^0.16.0
+  #firebase_core: ^0.4.4+3
+  #firebase_messaging: ^6.0.15
+  #firebase_auth: ^0.16.0
   #cloud_firestore: ^0.13.5
   #slide_button: ^0.2.8
   #flutter_local_notifications: ^0.8.4
@@ -176,7 +177,7 @@ dependencies:
   vibration: ^1.2.4
   flutter_full_pdf_viewer: ^1.0.6
   maps_toolkit: ^1.0.1+3
-  #sa_stateless_animation: ^1.1.0
+  #sa_stateless_animation: ^1.0.0
   flutter_keyboard_visibility: ^2.0.0
   #screen_state: ^0.1.1
   #flutter_svg: any
@@ -195,6 +196,13 @@ dependencies:
   flutter_svg: ^0.19.1
   worker_manager: ^3.1.6
   great_circle_distance: any
+  #firebase: ^7.3.3
+  #http: '>=0.11.3 <0.13.0'
+  #http_parser: ^3.0.0
+  #js: ^0.6.0
+  js: ^0.6.2
+  firebase_core: "^0.7.0"
+  firebase_messaging: "^8.0.0-dev.14"
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -203,24 +211,29 @@ dev_dependencies:
   flutter_launcher_icons: ^0.7.2
   simple_animations: ^2.4.2
 
-  #flutter_web: any
-  #flutter_web_ui: any
-  #google_maps: ">=3.0.0 <4.0.0"
+  #flutter_web: any  
+  #flutter_web_ui: any  
+  #google_maps: ">=3.0.0 <4.0.0"  
   #build_runner: ^1.6.2
   #map_launcher: any
 
   # mapbox_gl:
   #   path: flutter-mapbox-gl
-
+  pdf: ^2.0.0
+  native_pdf_view: any
+  #firebase_cloud_messaging_interop: ^2.0.1
+  #firebase_cloud_messaging_interop: ^2.0.1
 flutter_icons:
   android: true
   ios: true
 
 dependency_overrides:
   #analyzer: ^0.38.4
-  rxdart: ^0.23.1
+  rxdart: ^0.25.0
   intl: ^0.16.0
   dio: ^3.0.7
+  js: ^0.6.2
+  #firebase: ^8.0.0
   #map_controller: ^0.8.0
   flutter_map: ^0.10.1+1
   #flutter_advanced_networkimage: ^0.7.0
@@ -230,7 +243,7 @@ dependency_overrides:
   location: ^3.0.2
   #flutter_svg: ^0.19.2+1
   provider: ^3.2.0
-  # mapbox_gl_platform_interface:
+  # mapbox_gl_platform_interface: 
   #   path: flutter-mapbox-gl/mapbox_gl_platform_interface
   # mapbox_gl_web:
   #   path: flutter-mapbox-gl/mapbox_gl_web
