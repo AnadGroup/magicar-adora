@@ -9,8 +9,8 @@ import 'package:anad_magicar/utils/network_util.dart';
 
 abstract class BaseRestDS<T> extends RestDatasource {
   NetworkUtil netUtil = new NetworkUtil();
-  static final BASE_URL = "http://130.185.74.186:8083/main";
-  static final BASE_URL_FOR_LOGIN = "130.185.74.186:8083";
+  static final BASE_URL = "https://ws1.anadgps.com:4433/main";
+  static final BASE_URL_FOR_LOGIN = "ws1.anadgps.com:4433";
 
   static final BASE_USER_URL = "/user";
   static final BASE_CAR_URL = "/car";

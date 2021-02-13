@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:anad_magicar/repository/user/user_repo.dart';
 import 'package:anad_magicar/translation_strings.dart';
@@ -9,8 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:universal_io/io.dart' as uhttp;
 import 'package:universal_platform/universal_platform.dart';
-//برای خروجی غیر وب میبایست حتما کامنت شود
-//import 'dart:html' as htp;
+import 'dart:html' as htp;
 
 class ResponseUniversal {
   String responseBody;
@@ -18,6 +18,15 @@ class ResponseUniversal {
   Map<String, String> headers;
 
   ResponseUniversal({this.responseBody, this.statusCode, this.headers});
+}
+
+class MyHttpOverrides extends HttpOverrides {
+  @override
+  HttpClient createHttpClient(SecurityContext context) {
+    return super.createHttpClient(context)
+      ..badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
+  }
 }
 
 class NetworkUtil {
@@ -149,10 +158,12 @@ class NetworkUtil {
     /*if(token==null || token.isEmpty)
       return defaultAdminToken;*/
     return prefix_clientid + v_clientId + ";" + prefix_token + vision_auth;
+    //return  prefix_token + vision_auth;
   }
 
   String getCookie() {
     return prefix_clientid + clientId + ";" + prefix_token + token;
+    //return  prefix_token + token;
   }
 
   Future<ResponseUniversal> doFetch(Uri uri, String url,
@@ -164,22 +175,22 @@ class NetworkUtil {
 
     bool isWeb = UniversalPlatform.isWeb;
 
-    //برای خروجی غیر وب میبایست کامنت شود
     if (isWeb != null && isWeb) {
-      /*var oReq1 = await htp.HttpRequest.request(url,
+      var oReq1 = await htp.HttpRequest.request(url,
           method: metod == null ? "GET" : metod,
           withCredentials: true,
           sendData: (metod != null && metod == 'POST') ? bodyy : null,
           onProgress: (_) => null,
           //responseType: content,
+
           requestHeaders: head);
 
       String body = await oReq1.responseText.toString();
       int statusCode = await oReq1.status;
       var headers = await oReq1.responseHeaders;
-      var rs = await oReq1.response.toString();*/
-      ResponseUniversal responseUniversal;//= ResponseUniversal(
-      // responseBody: body, statusCode: statusCode, headers: headers);
+      var rs = await oReq1.response.toString();
+      ResponseUniversal responseUniversal = ResponseUniversal(
+          responseBody: body, statusCode: statusCode, headers: headers);
       return responseUniversal;
     } else {
       if (metod == null || metod == 'GET') {
@@ -534,12 +545,12 @@ class NetworkUtil {
         .send(bhttp.Request('POST', url, headers: fheaders, body: mbody));
     final textContent = await rs.readAsString();*/
 
-    // return http
-    //     .post(url, body: mbody, headers: fheaders, encoding: encoding)
-    //     .then((http.Response response) {
-    response = await doFetch(null, url, fheaders, 'POST', mbody);
-    final String res = response.responseBody.toString();
-    final int statusCode = response.statusCode;
+    var response2 = await http.post(url,
+        body: mbody, headers: fheaders, encoding: encoding);
+
+    //response = await doFetch(null, url, fheaders, 'POST', mbody);
+    final String res = response2.body; //response.responseBody.toString();
+    final int statusCode = response2.statusCode;
 
     if (statusCode < 200 || statusCode > 400 || json == null) {
       throw Exception("Error while fetching data");

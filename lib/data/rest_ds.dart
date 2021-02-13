@@ -38,11 +38,11 @@ import 'package:flutter/services.dart' show rootBundle;
 
 class RestDatasource extends BaseRest {
   NetworkUtil _netUtil = new NetworkUtil();
-  static final BASE_URL = "http://130.185.74.186:8083/main";
-  static final BASE_URL_FOR_LOGIN = "http://130.185.74.186:8083";
-  static final BASE_URL_NO_MAIN_PATH = "http://130.185.74.186:8083";
-  static final BASE_URL_FOR_CAR_TO_ADMIN = "130.185.74.186:8083";
-  static final BASE_URL_GET_WITH_URI = "130.185.74.186:8083";
+  static final BASE_URL = "https://ws1.anadgps.com:4433/main";
+  static final BASE_URL_FOR_LOGIN = "https://ws1.anadgps.com:4433";
+  static final BASE_URL_NO_MAIN_PATH = "https://ws1.anadgps.com:4433";
+  static final BASE_URL_FOR_CAR_TO_ADMIN = "ws1.anadgps.com:4433";
+  static final BASE_URL_GET_WITH_URI = "ws1.anadgps.com:4433";
   static final BASE_OPEN_ROUTE_SERVICE_URL =
       'https://api.openrouteservice.org/v2/directions/driving-car/geojson';
   static final BASE_USER_URL = "/user";
@@ -568,7 +568,7 @@ class RestDatasource extends BaseRest {
       "userId": userId.toString(),
     };
     /*Uri uri =
-        Uri.http(BASE_URL_GET_WITH_URI, GET_ADMIN_CARS_BY_USERID_URL, params);
+        Uri.https(BASE_URL_GET_WITH_URI, GET_ADMIN_CARS_BY_USERID_URL, params);
     */
     String uri = BASE_URL_GET_WITH_URI +
         GET_ADMIN_CARS_BY_USERID_URL +
