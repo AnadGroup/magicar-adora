@@ -720,10 +720,11 @@ class _LoginCardState extends State<_LoginCard> with TickerProviderStateMixin {
   Widget _buildPasswordField(double width, LoginMessages messages) {
     final auth = Provider.of<Auth>(context);
 
-    return AnimatedPasswordTextFormField(
-      keyboardType: TextInputType.text ,
+    return AnimatedTextFormField(
+      //keyboardType: TextInputType. ,
       enabled: auth.isLogin,
-      animatedWidth: width,
+      //animatedWidth: width,
+      width: width,
       loadingController: _loadingController,
       interval: _passTextFieldLoadingAnimationInterval,
       labelText: messages.passwordHint,

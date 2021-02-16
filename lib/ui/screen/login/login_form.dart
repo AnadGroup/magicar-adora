@@ -20,13 +20,13 @@ import 'package:anad_magicar/service/locator.dart';
 import 'package:anad_magicar/translation_strings.dart';
 import 'package:anad_magicar/ui/screen/loading_screen.dart';
 import 'package:anad_magicar/ui/screen/login/fancy_login/src/models/login_data.dart'
-as logData;
+    as logData;
 import 'package:anad_magicar/ui/screen/login/fancy_login/src/widgets/animated_text_form_field.dart';
 import 'package:anad_magicar/ui/screen/login/fancy_login_form.dart';
 import 'package:anad_magicar/ui/screen/login/finger_print_auth.dart';
 import 'package:anad_magicar/ui/screen/login/register/fancy_register_form.dart';
 import 'package:anad_magicar/ui/screen/login/register/src/models/login_data.dart'
-as regData;
+    as regData;
 import 'package:anad_magicar/widgets/animated_dialog_box.dart';
 import 'package:anad_magicar/widgets/bottom_sheet_custom.dart';
 import 'package:anad_magicar/widgets/flash_bar/flash_helper.dart';
@@ -45,7 +45,6 @@ class LoginForm extends StatefulWidget {
   final bool showUserName;
   FireBaseMessageHandler messageHandler;
   GlobalKey<NavigatorState> navigatorKey;
-
   LoginForm({
     Key key,
     @required this.loginBloc,
@@ -69,8 +68,7 @@ class _LoginFormState extends BaseState<LoginForm> //State<LoginForm>
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   var _pvController = PageController(initialPage: 0);
   final LocalAuthenticationService _localAuth =
-  locator<LocalAuthenticationService>();
-
+      locator<LocalAuthenticationService>();
   LoginBloc get _loginBloc => _widget.loginBloc;
   AnimationController formAnimationController;
   List<Animation> formAnimations;
@@ -157,14 +155,14 @@ class _LoginFormState extends BaseState<LoginForm> //State<LoginForm>
     double duration = 0.6;
     double end = duration + start;
     formAnimations = [
-      Tween<double>(begin: 800.0, end: 0.0).animate(CurvedAnimation(
+      new Tween<double>(begin: 800.0, end: 0.0).animate(new CurvedAnimation(
           parent: formAnimationController,
-          curve: Interval(start, end, curve: Curves.decelerate))),
-      Tween<double>(begin: 800.0, end: 0.0).animate(CurvedAnimation(
+          curve: new Interval(start, end, curve: Curves.decelerate))),
+      new Tween<double>(begin: 800.0, end: 0.0).animate(new CurvedAnimation(
           parent: formAnimationController,
-          curve: Interval(start * 2, end, curve: Curves.decelerate)))
+          curve: new Interval(start * 2, end, curve: Curves.decelerate)))
     ];
-    buttonAnimation = CurvedAnimation(
+    buttonAnimation = new CurvedAnimation(
         parent: formAnimationController,
         curve: Interval(0.7, 1.0, curve: Curves.decelerate));
 
@@ -191,11 +189,11 @@ class _LoginFormState extends BaseState<LoginForm> //State<LoginForm>
       final text = _securityCodeTextEditController.text.toLowerCase();
       _securityCodeTextEditController.value =
           _securityCodeTextEditController.value.copyWith(
-            text: text,
-            selection:
+        text: text,
+        selection:
             TextSelection(baseOffset: text.length, extentOffset: text.length),
-            composing: TextRange.empty,
-          );
+        composing: TextRange.empty,
+      );
     });
   }
 
@@ -205,92 +203,92 @@ class _LoginFormState extends BaseState<LoginForm> //State<LoginForm>
     super.dispose();
   }
 
-  // _buildFingerPrintLogin() {
-  //   return SlideTransition(
-  //       position: pulseAnimation,
-  //       child: IconButton(
-  //         padding: EdgeInsets.all(10.0),
-  //         onPressed: () {
-  //           isLoginDisabled = true;
-  //         },
-  //         icon: Icon(
-  //           Icons.fingerprint,
-  //           color: Colors.redAccent,
-  //           size: 68.0,
-  //         ),
-  //         alignment: Alignment.center,
-  //       ));
-  // }
-  //
-  // _buildPatternLogin() {
-  //   return SlideTransition(
-  //     position: pulseAnimation,
-  //     child: IconButton(
-  //       padding: EdgeInsets.all(10.0),
-  //       onPressed: () {
-  //         isLoginDisabled = true;
-  //       },
-  //
-  //       icon: Icon(
-  //         Icons.touch_app,
-  //         color: Colors.redAccent,
-  //         size: 68.0,
-  //       ),
-  //       alignment: Alignment.center,
-  //       //color: Colors.transparent,
-  //       // ),
-  //       // ),
-  //       // ),
-  //     ),
-  //   );
-  // }
-  //
-  // _buildLogin() {
-  //   return SlideTransition(
-  //       position: pulseAnimation,
-  //       child: Container(
-  //         margin: EdgeInsets.only(bottom: 2.0, left: 5.0, right: 5.0),
-  //         height: 38,
-  //         width: MediaQuery.of(context).size.width / 4.0,
-  //         decoration: BoxDecoration(
-  //             //borderRadius: BorderRadius.circular(50),
-  //             boxShadow: [
-  //               BoxShadow(
-  //                 color: Color(0xFF76ff03).withAlpha(60),
-  //                 blurRadius: 6.0,
-  //                 spreadRadius: 0.0,
-  //                 offset: Offset(
-  //                   0.0,
-  //                   3.0,
-  //                 ),
-  //               ),
-  //             ],
-  //             border: Border.all(
-  //                 color: Colors.blueAccent[100],
-  //                 style: BorderStyle.solid,
-  //                 width: 0.5),
-  //             gradient: LinearGradient(
-  //               colors: [Colors.transparent, Colors.transparent],
-  //             ),
-  //             borderRadius: BorderRadius.all(Radius.circular(25.0))),
-  //         child: Center(
-  //           child: RaisedButton(
-  //             onPressed: () {
-  //               _loginBloc.add(new LoginButtonPressed(
-  //                   username: userName, password: password));
-  //               // myProgressDialog.showProgressDialog();
-  //               isLoginDisabled = true;
-  //             },
-  //             elevation: 0,
-  //             shape: RoundedRectangleBorder(
-  //                 borderRadius: BorderRadius.circular(25.0)),
-  //             child: Text(Translations.of(context).login(),
-  //                 style: TextStyle(color: Colors.blueAccent)),
-  //             color: Colors.transparent,
-  //           ),
-  //         ),
-  //       ));
-  // }
+  _buildFingerPrintLogin() {
+    return SlideTransition(
+        position: pulseAnimation,
+        child: IconButton(
+          padding: EdgeInsets.all(10.0),
+          onPressed: () {
+            isLoginDisabled = true;
+          },
+          icon: Icon(
+            Icons.fingerprint,
+            color: Colors.redAccent,
+            size: 68.0,
+          ),
+          alignment: Alignment.center,
+        ));
+  }
+
+  _buildPatternLogin() {
+    return SlideTransition(
+      position: pulseAnimation,
+      child: IconButton(
+        padding: EdgeInsets.all(10.0),
+        onPressed: () {
+          isLoginDisabled = true;
+        },
+
+        icon: Icon(
+          Icons.touch_app,
+          color: Colors.redAccent,
+          size: 68.0,
+        ),
+        alignment: Alignment.center,
+        //color: Colors.transparent,
+        // ),
+        // ),
+        // ),
+      ),
+    );
+  }
+
+  _buildLogin() {
+    return SlideTransition(
+        position: pulseAnimation,
+        child: Container(
+          margin: EdgeInsets.only(bottom: 2.0, left: 5.0, right: 5.0),
+          height: 38,
+          width: MediaQuery.of(context).size.width / 4.0,
+          decoration: BoxDecoration(
+              //borderRadius: BorderRadius.circular(50),
+              boxShadow: [
+                BoxShadow(
+                  color: Color(0xFF76ff03).withAlpha(60),
+                  blurRadius: 6.0,
+                  spreadRadius: 0.0,
+                  offset: Offset(
+                    0.0,
+                    3.0,
+                  ),
+                ),
+              ],
+              border: Border.all(
+                  color: Colors.blueAccent[100],
+                  style: BorderStyle.solid,
+                  width: 0.5),
+              gradient: LinearGradient(
+                colors: [Colors.transparent, Colors.transparent],
+              ),
+              borderRadius: BorderRadius.all(Radius.circular(25.0))),
+          child: Center(
+            child: RaisedButton(
+              onPressed: () {
+                _loginBloc.add(new LoginButtonPressed(
+                    username: userName, password: password));
+                // myProgressDialog.showProgressDialog();
+                isLoginDisabled = true;
+              },
+              elevation: 0,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(25.0)),
+              child: Text(Translations.of(context).login(),
+                  style: TextStyle(color: Colors.blueAccent)),
+              color: Colors.transparent,
+            ),
+          ),
+        ));
+  }
 
   _buildConfirmSecurityCode(String code) {
     return SlideTransition(
@@ -300,7 +298,7 @@ class _LoginFormState extends BaseState<LoginForm> //State<LoginForm>
           height: 38,
           width: MediaQuery.of(context).size.width / 2.0,
           decoration: BoxDecoration(
-            //borderRadius: BorderRadius.circular(50),
+              //borderRadius: BorderRadius.circular(50),
               boxShadow: [
                 BoxShadow(
                   color: Color(0xFF76ff03).withAlpha(60),
@@ -352,7 +350,7 @@ class _LoginFormState extends BaseState<LoginForm> //State<LoginForm>
           height: 38,
           width: MediaQuery.of(context).size.width / 2.0,
           decoration: BoxDecoration(
-            //borderRadius: BorderRadius.circular(50),
+              //borderRadius: BorderRadius.circular(50),
               boxShadow: [
                 BoxShadow(
                   color: Color(0xFF76ff03).withAlpha(60),
@@ -376,7 +374,7 @@ class _LoginFormState extends BaseState<LoginForm> //State<LoginForm>
             child: RaisedButton(
               onPressed: () {
                 reSendSecurityCode = true;
-                _loginBloc.add(ReSignUpButtonPressed(mobile: mobil));
+                _loginBloc.add(new ReSignUpButtonPressed(mobile: mobil));
               },
               elevation: 0,
               shape: RoundedRectangleBorder(
@@ -477,42 +475,42 @@ class _LoginFormState extends BaseState<LoginForm> //State<LoginForm>
     );
   }
 
-  // _buildUsername() {
-  //   return SlideTransition(
-  //     position: pulseAnimation,
-  //     child: Container(
-  //       width: MediaQuery.of(context).size.width / 1.2,
-  //       height: 45,
-  //       padding: EdgeInsets.only(top: 4, left: 16, right: 16, bottom: 4),
-  //       decoration: BoxDecoration(
-  //           border: Border.all(
-  //               color: Colors.blueAccent[100],
-  //               style: BorderStyle.solid,
-  //               width: 0.5),
-  //           borderRadius: BorderRadius.all(Radius.circular(10)),
-  //           color: Colors.white,
-  //           boxShadow: [BoxShadow(color: Colors.transparent, blurRadius: 0.0)]),
-  //       child: TextField(
-  //         decoration: InputDecoration(
-  //           contentPadding: EdgeInsets.only(
-  //             top: 4.0,
-  //             bottom: 0.0,
-  //           ),
-  //           border: InputBorder.none,
-  //           icon: Icon(
-  //             Icons.person_pin,
-  //             color: Colors.blueAccent[100],
-  //           ),
-  //           hintStyle: TextStyle(color: Colors.pinkAccent[100]),
-  //           hintText: Translations.of(context).userName(),
-  //         ),
-  //         onChanged: (value) {
-  //           this.userName = value;
-  //         },
-  //       ),
-  //     ),
-  //   );
-  // }
+  _buildUsername() {
+    return SlideTransition(
+      position: pulseAnimation,
+      child: Container(
+        width: MediaQuery.of(context).size.width / 1.2,
+        height: 45,
+        padding: EdgeInsets.only(top: 4, left: 16, right: 16, bottom: 4),
+        decoration: BoxDecoration(
+            border: Border.all(
+                color: Colors.blueAccent[100],
+                style: BorderStyle.solid,
+                width: 0.5),
+            borderRadius: BorderRadius.all(Radius.circular(10)),
+            color: Colors.white,
+            boxShadow: [BoxShadow(color: Colors.transparent, blurRadius: 0.0)]),
+        child: TextField(
+          decoration: InputDecoration(
+            contentPadding: EdgeInsets.only(
+              top: 4.0,
+              bottom: 0.0,
+            ),
+            border: InputBorder.none,
+            icon: Icon(
+              Icons.person_pin,
+              color: Colors.blueAccent[100],
+            ),
+            hintStyle: TextStyle(color: Colors.pinkAccent[100]),
+            hintText: Translations.of(context).userName(),
+          ),
+          onChanged: (value) {
+            this.userName = value;
+          },
+        ),
+      ),
+    );
+  }
 
   _buildSecurityCode(String code) {
     return SlideTransition(
@@ -553,41 +551,41 @@ class _LoginFormState extends BaseState<LoginForm> //State<LoginForm>
     );
   }
 
-  // _buildPassword() {
-  //   return SlideTransition(
-  //     position: pulseAnimation,
-  //     child: Container(
-  //       width: MediaQuery.of(context).size.width / 1.2,
-  //       height: 45,
-  //       margin: EdgeInsets.only(top: 12),
-  //       padding: EdgeInsets.only(top: 4, left: 16, right: 16, bottom: 4),
-  //       decoration: BoxDecoration(
-  //           border: Border.all(
-  //               color: Colors.blueAccent[100],
-  //               style: BorderStyle.solid,
-  //               width: 0.5),
-  //           borderRadius: BorderRadius.all(Radius.circular(10)),
-  //           color: Colors.white,
-  //           boxShadow: [BoxShadow(color: Colors.transparent, blurRadius: 0.0)]),
-  //       child: TextField(
-  //         textAlign: TextAlign.start,
-  //         decoration: InputDecoration(
-  //           contentPadding: EdgeInsets.only(
-  //             top: 4.0,
-  //             bottom: 0.0,
-  //           ),
-  //           border: InputBorder.none,
-  //           icon: Icon(
-  //             Icons.vpn_key,
-  //             color: Colors.blueAccent[100],
-  //           ),
-  //           hintStyle: TextStyle(color: Colors.pinkAccent[100]),
-  //           hintText: Translations.of(context).password(),
-  //         ),
-  //       ),
-  //     ),
-  //   );
-  // }
+  _buildPassword() {
+    return SlideTransition(
+      position: pulseAnimation,
+      child: Container(
+        width: MediaQuery.of(context).size.width / 1.2,
+        height: 45,
+        margin: EdgeInsets.only(top: 12),
+        padding: EdgeInsets.only(top: 4, left: 16, right: 16, bottom: 4),
+        decoration: BoxDecoration(
+            border: Border.all(
+                color: Colors.blueAccent[100],
+                style: BorderStyle.solid,
+                width: 0.5),
+            borderRadius: BorderRadius.all(Radius.circular(10)),
+            color: Colors.white,
+            boxShadow: [BoxShadow(color: Colors.transparent, blurRadius: 0.0)]),
+        child: TextField(
+          textAlign: TextAlign.start,
+          decoration: InputDecoration(
+            contentPadding: EdgeInsets.only(
+              top: 4.0,
+              bottom: 0.0,
+            ),
+            border: InputBorder.none,
+            icon: Icon(
+              Icons.vpn_key,
+              color: Colors.blueAccent[100],
+            ),
+            hintStyle: TextStyle(color: Colors.pinkAccent[100]),
+            hintText: Translations.of(context).password(),
+          ),
+        ),
+      ),
+    );
+  }
 
   showValidateCode() async {
     await animated_dialog_box.showScaleAlertBox(
@@ -633,8 +631,8 @@ class _LoginFormState extends BaseState<LoginForm> //State<LoginForm>
   final GlobalKey<FormState> _formKey = GlobalKey();
 
   Widget _buildConfirmSecurityCode2(
-      double width,
-      ) {
+    double width,
+  ) {
     return Form(
       key: _formKey,
       child: Column(
@@ -655,27 +653,26 @@ class _LoginFormState extends BaseState<LoginForm> //State<LoginForm>
                   FocusScope.of(context).requestFocus(_passwordFocusNode);
                 },
                 validator: (value) {
-                  if (value == null || value.isEmpty) {
+                  if (value == null || value.isEmpty)
                     return Translations.current.allFieldsRequired();
-                  }
                   return null;
                 },
                 onSaved: (value) async {
                   var result;
                   try {
                     result =
-                    await restDatasource.validateSMSCode(mobileNo, value);
+                        await restDatasource.validateSMSCode(mobileNo, value);
                   } catch (ex) {
                     //FlashHelper.informationBar(context, message: ex.toString());
                     //showValidateCode();
                   }
                   if ((result != null &&
                       result) /*|| (result==null || !result)*/) {
-                    await FlashHelper.informationBar(context,
+                    FlashHelper.informationBar(context,
                         message: Translations.current.passwordHasChanged());
                     showValidateCode();
                   } else {
-                    await FlashHelper.errorBar(context,
+                    FlashHelper.errorBar(context,
                         message: Translations.current.changePasswordError());
                   }
                 }),
@@ -704,8 +701,8 @@ class _LoginFormState extends BaseState<LoginForm> //State<LoginForm>
   }
 
   _showBottomSheetConfirmCode(
-      BuildContext cntext,
-      ) {
+    BuildContext cntext,
+  ) {
     double wid = MediaQuery.of(context).size.width * 0.80;
     showModalBottomSheetCustom(
         context: cntext,
@@ -718,19 +715,12 @@ class _LoginFormState extends BaseState<LoginForm> //State<LoginForm>
   }
 
   Future<String> _recoverFunc(String data) async {
-    return Future.delayed(Duration(microseconds: 100)).then((_) {
+    return Future.delayed(new Duration(microseconds: 100)).then((_) {
       if (data != null) {
         if (isOnline) {
           mobileNo = data;
-          SaveUserModel userModel = SaveUserModel(
-              MobileNo: data,
-              UserId: 0,
-              FirstName: null,
-              SimCard: null,
-              UserName: null,
-              roles: [],
-              LastName: null,
-              Password: null);
+          SaveUserModel userModel =
+              new SaveUserModel(MobileNo: data, UserId: 0);
           centerRepository.showProgressDialog(
               context, Translations.current.send());
           var result = restDatasource.forgotPassword(userModel);
@@ -799,21 +789,21 @@ class _LoginFormState extends BaseState<LoginForm> //State<LoginForm>
       connection = checkInternet.checkInternet();
     }
     if (connection) {
-      return Future.delayed(Duration(microseconds: 100)).then((_) {
+      return Future.delayed(new Duration(microseconds: 100)).then((_) {
         if (data != null &&
             data.name != null &&
             data.password != null &&
             data.name.isNotEmpty &&
             data.password.isNotEmpty) {
           if (isOnline) {
-            _loginBloc.add(LoginButtonPressed(
+            _loginBloc.add(new LoginButtonPressed(
                 username: data.name /*userName*/,
                 password: data.password /*password*/));
             isLoginDisabled = true;
           } else {
             //showSnackLogin(context, Translations.current.noConnection(), false);
-            _loginBloc.add(
-                LoginFailed(errorMessage: Translations.current.noConnection()));
+            _loginBloc.add(new LoginFailed(
+                errorMessage: Translations.current.noConnection()));
             return Translations.current.noConnection();
           }
         } else {
@@ -830,13 +820,13 @@ class _LoginFormState extends BaseState<LoginForm> //State<LoginForm>
       connection = checkInternet.checkInternet();
     }
     if (connection) {
-      return Future.delayed(Duration(microseconds: 100)).then((_) {
+      return Future.delayed(new Duration(microseconds: 100)).then((_) {
         if (data != null && data.mobile != null && data.mobile.isNotEmpty) {
           if (isOnline) {
             this.mobile = data.mobile;
-            _loginBloc.add(SignUpButtonPressed(mobile: data.mobile));
+            _loginBloc.add(new SignUpButtonPressed(mobile: data.mobile));
           } else {
-            _loginBloc.add(SignUpFailed(
+            _loginBloc.add(new SignUpFailed(
                 errorMessage: Translations.current.noConnection()));
             return Translations.current.noConnection();
           }
@@ -857,10 +847,10 @@ class _LoginFormState extends BaseState<LoginForm> //State<LoginForm>
     }
 
     if (connection) {
-      return Future.delayed(Duration(microseconds: 100)).then((_) {
+      return Future.delayed(new Duration(microseconds: 100)).then((_) {
         if (data != null && data.mobile != null && data.mobile.isNotEmpty) {
           this.mobile = data.mobile;
-          _loginBloc.add(SignUpButtonPressed(mobile: data.mobile));
+          _loginBloc.add(new SignUpButtonPressed(mobile: data.mobile));
         } else {
           return Translations.current.allLoginFieldsRequired();
         }
@@ -869,35 +859,35 @@ class _LoginFormState extends BaseState<LoginForm> //State<LoginForm>
     } else {}
   }
 
-  // _fingerFunc() {
-  //   if (fingerprintSupport) _localAuth.authenticate();
-  // }
-  //
-  // _patternFunc() {}
+  _fingerFunc() {
+    if (fingerprintSupport) _localAuth.authenticate();
+  }
+
+  _patternFunc() {}
 
   showSnackLogin(BuildContext context, String message, bool isLoading) {
     _scaffoldKey.currentState.hideCurrentSnackBar();
-    _scaffoldKey.currentState.showSnackBar(SnackBar(
-      duration: Duration(seconds: 6),
+    _scaffoldKey.currentState.showSnackBar(new SnackBar(
+      duration: new Duration(seconds: 6),
       backgroundColor: Colors.amber,
       elevation: 0.8,
       content: Container(
         height: MediaQuery.of(context).size.height / 4.3,
-        child: Column(
+        child: new Column(
           children: <Widget>[
             isLoading
                 ? Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  CircularProgressIndicator(),
-                  // new Text(message,style: TextStyle(fontFamily: 'IranSans',fontSize: 20.0),)
-                ])
-                : Icon(
-              Icons.error_outline,
-              color: Colors.black,
-            ),
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                        new CircularProgressIndicator(),
+                        // new Text(message,style: TextStyle(fontFamily: 'IranSans',fontSize: 20.0),)
+                      ])
+                : new Icon(
+                    Icons.error_outline,
+                    color: Colors.black,
+                  ),
             Expanded(
-              child: Text(
+              child: new Text(
                 message,
                 style: TextStyle(fontFamily: 'IranSans', fontSize: 20.0),
               ),
@@ -917,7 +907,7 @@ class _LoginFormState extends BaseState<LoginForm> //State<LoginForm>
       title: Translations.current.confirmrecievecode(),
       content: Translations.current.plzEnterRecievedSecurityCode(),
       actions: [
-        Column(
+        new Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
             Container(
@@ -929,7 +919,7 @@ class _LoginFormState extends BaseState<LoginForm> //State<LoginForm>
             popup.button(
               label: Translations.current.resendSecurityCode(),
               onPressed: () {
-                _loginBloc.add(ReSignUpButtonPressed(mobile: mobile));
+                _loginBloc.add(new ReSignUpButtonPressed(mobile: mobile));
               },
             ),
             popup.button(
@@ -947,22 +937,22 @@ class _LoginFormState extends BaseState<LoginForm> //State<LoginForm>
 
   Future<bool> _onWillPop(BuildContext ctx) {
     return showDialog(
-      context: ctx,
-      child: AlertDialog(
-        title:
-        Text(Translations.current.areYouSureToExitForBackTouchCancel()),
-        actions: <Widget>[
-          FlatButton(
-            onPressed: () => Navigator.of(ctx).pop(false),
-            child: Text(Translations.current.no()),
+          context: ctx,
+          child: new AlertDialog(
+            title: new Text(
+                Translations.current.areYouSureToExitForBackTouchCancel()),
+            actions: <Widget>[
+              new FlatButton(
+                onPressed: () => Navigator.of(ctx).pop(false),
+                child: new Text(Translations.current.no()),
+              ),
+              new FlatButton(
+                onPressed: () => SystemNavigator.pop(),
+                child: new Text(Translations.current.yes()),
+              ),
+            ],
           ),
-          FlatButton(
-            onPressed: () => SystemNavigator.pop(),
-            child: Text(Translations.current.yes()),
-          ),
-        ],
-      ),
-    ) ??
+        ) ??
         false;
   }
 
@@ -1001,9 +991,9 @@ class _LoginFormState extends BaseState<LoginForm> //State<LoginForm>
       child: BlocBuilder<LoginBloc, LoginState>(
           bloc: _loginBloc,
           builder: (
-              BuildContext context,
-              LoginState state,
-              ) {
+            BuildContext context,
+            LoginState state,
+          ) {
             if (state is LoginInitial) {
               isLoginDisabled = false;
             } else if (state is SignUpLoading) {
@@ -1065,23 +1055,22 @@ class _LoginFormState extends BaseState<LoginForm> //State<LoginForm>
                   height: h * 0.3,
                   decoration: BoxDecoration(
                       borderRadius:
-                      BorderRadius.only(bottomLeft: Radius.circular(80))),
+                          BorderRadius.only(bottomLeft: Radius.circular(80))),
                   child: ClipRRect(
                     borderRadius:
-                    BorderRadius.only(bottomLeft: Radius.circular(50.0)),
+                        BorderRadius.only(bottomLeft: Radius.circular(50.0)),
                     child: CenterRepository.APP_TYPE_ADORA
-                        ?  Image(
-                      fit: BoxFit.fill,
-                      image: AssetImage('assets/images/login_back_adora.jpg'),
-                      width: w,
-                      height: h * 0.29,
-                    )
+                        ? Container(
+                            color: Colors.deepOrange,
+                            width: w,
+                            height: h * 0.29,
+                          )
                         : Image(
-                      fit: BoxFit.fill,
-                      image: AssetImage('assets/images/login_back.jpg'),
-                      width: w,
-                      height: h * 0.29,
-                    ),
+                            fit: BoxFit.fill,
+                            image: AssetImage('assets/images/login_back.jpg'),
+                            width: w,
+                            height: h * 0.29,
+                          ),
                   ),
                 ),
                 Container(
@@ -1106,19 +1095,19 @@ class _LoginFormState extends BaseState<LoginForm> //State<LoginForm>
                               Container(
                                 width: MediaQuery.of(context).size.width / 1.5,
                                 height:
-                                MediaQuery.of(context).size.height / 6.5,
+                                    MediaQuery.of(context).size.height / 6.5,
                                 child: Align(
                                   alignment: Alignment.center,
                                   child: CenterRepository.APP_TYPE_ADORA
-                                      ? Image.asset('assets/images/i7_adora.png')
+                                      ? Container(color: Colors.deepOrange)
                                       : Image.asset(
-                                      'assets/images/i26.png'), //Icon(Icons.person,
+                                          'assets/images/i26.png'), //Icon(Icons.person,
                                 ),
                               ),
                               Spacer(),
                               Row(
                                 mainAxisAlignment:
-                                MainAxisAlignment.spaceEvenly,
+                                    MainAxisAlignment.spaceEvenly,
                                 children: <Widget>[
                                   Align(
                                     alignment: Alignment.bottomLeft,
@@ -1126,8 +1115,8 @@ class _LoginFormState extends BaseState<LoginForm> //State<LoginForm>
                                       padding: EdgeInsets.only(
                                           bottom: 32,
                                           right: MediaQuery.of(context)
-                                              .size
-                                              .width *
+                                                  .size
+                                                  .width *
                                               0.55),
                                       child: Container(
                                         width: 100.0,
@@ -1138,7 +1127,7 @@ class _LoginFormState extends BaseState<LoginForm> //State<LoginForm>
                                           withSpring: false,
                                           showIcon: false,
                                           leftImage:
-                                          'assets/images/english.png',
+                                              'assets/images/english.png',
                                           rightImage: 'assets/images/iran.png',
                                           leftTitle: 'En',
                                           rightTitle: 'Fa',
@@ -1173,36 +1162,36 @@ class _LoginFormState extends BaseState<LoginForm> //State<LoginForm>
                               signUpDone
                                   ? showConfirmBox(recCode)
                                   : (widget.loginType == LoginType.PASWWORD ||
-                                  widget.loginType == LoginType.PATTERN)
-                                  ? FancyLoginForm(
-                                //isSignUp: false,
-                                showUserName: widget.showUserName,
-                                authUser: _loginFunc,
-                                onSignup: _signUpFunc,
-                                recoverPassword: _recoverFunc,
-                                onSubmit: () {
-                                  /*Navigator.of(context).pushReplacementNamed('/loadingscreen');*/
-                                },
-                              )
-                                  : widget.loginType ==
-                                  LoginType.FINGERPRINT
-                                  ? TouchID()
-                                  : FancyLoginForm(
-                                //isSignUp: false,
-                                authUser: _loginFunc,
-                                onSignup: _signUpFunc,
-                                recoverPassword: _recoverFunc,
-                                onSubmit: () {},
-                              ),
+                                          widget.loginType == LoginType.PATTERN)
+                                      ? FancyLoginForm(
+                                          //isSignUp: false,
+                                          showUserName: widget.showUserName,
+                                          authUser: _loginFunc,
+                                          onSignup: _signUpFunc,
+                                          recoverPassword: _recoverFunc,
+                                          onSubmit: () {
+                                            /*Navigator.of(context).pushReplacementNamed('/loadingscreen');*/
+                                          },
+                                        )
+                                      : widget.loginType ==
+                                              LoginType.FINGERPRINT
+                                          ? TouchID()
+                                          : FancyLoginForm(
+                                              //isSignUp: false,
+                                              authUser: _loginFunc,
+                                              onSignup: _signUpFunc,
+                                              recoverPassword: _recoverFunc,
+                                              onSubmit: () {},
+                                            ),
                               signUpDone
                                   ? showConfirmBox(recCode)
                                   : FancyRegisterForm(
-                                isSignUp: true,
-                                authUser: _loginFuncForRegForm,
-                                onSignup: _signUpFuncForRegister,
-                                recoverPassword: null,
-                                onSubmit: () {},
-                              ),
+                                      isSignUp: true,
+                                      authUser: _loginFuncForRegForm,
+                                      onSignup: _signUpFuncForRegister,
+                                      recoverPassword: null,
+                                      onSubmit: () {},
+                                    ),
                             ],
                           ),
                         ),
