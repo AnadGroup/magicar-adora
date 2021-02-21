@@ -313,7 +313,7 @@ class CenterRepository {
     }
   }
 
-  static sendCarStatusCommand() async {
+  sendCarStatusCommand() async {
     int actionId =
         ActionsCommand.actionCommandsMap[ActionsCommand.STATUS_CAR_TAG];
     var result = await restDatasource.sendCommand(SendCommandModel(
@@ -321,7 +321,9 @@ class CenterRepository {
         ActionId: actionId,
         CarId: currentCarId,
         Command: null));
-    if (result != null) {}
+    if (result != null) {
+      Future.delayed(Duration(seconds: 3)).then((value) => fetchGPSStatus());
+    }
   }
 
   Timer checkCarStatusPeriodic(int min, NotyBloc<Message> statusNoty) {
@@ -456,13 +458,16 @@ class CenterRepository {
   }
 
   static onCarPageTap(BuildContext context, int userId) {
-    Navigator.push(context,
-    CupertinoPageRoute(
-      fullscreenDialog: true,
-      
-      builder: (context)=>
-       CarPage(carPageVM:  CarPageVM(
-            userId: userId, isSelf: true, carAddNoty: valueNotyModelBloc), ) ) );
+    Navigator.push(
+        context,
+        CupertinoPageRoute(
+            fullscreenDialog: true,
+            builder: (context) => CarPage(
+                  carPageVM: CarPageVM(
+                      userId: userId,
+                      isSelf: true,
+                      carAddNoty: valueNotyModelBloc),
+                )));
   }
 
   String toRials(double amount) {
@@ -921,6 +926,19 @@ class CenterRepository {
   int getCarIdByIndex(int index) {
     if (this.carsToAdmin != null && this.carsToAdmin.length > 0) {
       int carId = this.carsToAdmin[index].CarId;
+      return carId;
+    }
+    return 0;
+  }
+
+  int getCarIdByDeviceId(int dId) {
+    if (this.cars != null && this.cars.isNotEmpty) {
+      int carId = 0;
+      var founds = this.cars
+        ..where((element) => element.deviceId == dId).toList();
+      if (founds != null && founds.isNotEmpty) {
+        carId = founds.first.carId;
+      }
       return carId;
     }
     return 0;

@@ -20,6 +20,7 @@ import 'package:anad_magicar/model/apis/api_user_role.dart';
 import 'package:anad_magicar/model/apis/car_action_log.dart';
 import 'package:anad_magicar/model/apis/current_user_accessable_action.dart';
 import 'package:anad_magicar/model/apis/device_model.dart';
+import 'package:anad_magicar/model/apis/notification_model.dart';
 import 'package:anad_magicar/model/apis/paired_car.dart';
 import 'package:anad_magicar/model/apis/save_user_result.dart';
 import 'package:anad_magicar/model/apis/service_result.dart';
@@ -207,6 +208,7 @@ class RestDatasource extends BaseRest {
       BASE_URL + BASE_ALARM_TYPE_TOUSER_URL + '/GetUserAlarmAssign';
   static final SaveUser_ALARM_URL =
       BASE_URL + BASE_ALARM_TYPE_TOUSER_URL + '/SaveUserAlarm';
+  static final GET_NOTIFICATION = BASE_URL + '/Notification' + '/GetByDeviceId';
 
   RestDatasource();
 
@@ -398,6 +400,19 @@ class RestDatasource extends BaseRest {
         return ServiceResult.fromJson(res);
       else
         return null;
+    });
+  }
+
+  Future<List<NotificationModelApi>> getNotificationByDeviceId(
+      String deviceId) {
+    String url = GET_NOTIFICATION + '?' + 'DeviceId=' + deviceId;
+    return _netUtil.get(url).then((res) {
+      if (res != null && res.isNotEmpty) {
+        return res
+            .map<NotificationModelApi>((n) => NotificationModelApi.fromJson(n))
+            .toList();
+      }
+      return null;
     });
   }
 

@@ -83,6 +83,7 @@ import 'package:solid_bottom_sheet/solid_bottom_sheet.dart';
 import 'package:universal_platform/universal_platform.dart';
 import 'package:supercharged/supercharged.dart';
 //import 'package:assets_audio_player/assets_audio_player.dart';
+import 'package:anad_magicar/model/apis/notification_model.dart';
 
 class HomeScreen extends StatefulWidget {
   final GlobalKey<ScaffoldState> scaffoldKey;
@@ -189,7 +190,6 @@ class HomeScreenState extends State<HomeScreen>
   var carLockPanelNoty = NotyBloc<Message>();
   var sendCommandNoty = NotyBloc<SendingCommandVM>();
 
-  NotyBloc<Message> getStatusNoty = NotyBloc<Message>();
   //var valueNotyModelBloc=new NotyBloc<ChangeEvent>();
 
   var _currentColor = Colors.redAccent;
@@ -249,6 +249,45 @@ class HomeScreenState extends State<HomeScreen>
         Navigator.pushNamed(context, '/carpage',
             arguments:
                 new CarPageVM(userId: userId, isSelf: false, carAddNoty: null));
+      }
+    }
+  }
+
+  setCarStatusFromLastPos(int deviceId) async {
+    centerRepository.showFancyToast('Has NOTI', true);
+    List<NotificationModelApi> notif =
+        await restDatasource.getNotificationByDeviceId(deviceId.toString());
+    if (notif != null && notif.isNotEmpty) {
+      String msg = notif.last.Status;
+      int carId = centerRepository.getCarIdByDeviceId(notif.last.DeviceId);
+      centerRepository.showFancyToast(carId.toString(), true);
+
+      String commandCode = msg.substring(0, 2);
+      int commandCodeValue = int.tryParse(commandCode);
+      if (commandCodeValue != ActionsCommand.Check_Status_Car) {
+        RxBus.post(ChangeEvent(
+            type: 'COMMAND_SUCCESS', id: int.tryParse(commandCode)));
+      }
+      String newFCM = msg.substring(2, msg.length);
+      centerRepository.showFancyToast(newFCM, true);
+
+      Uint8List fcmBody = base64Decode(newFCM);
+
+      NotiAnalyze notiAnalyze =
+          NotiAnalyze(noti: null, carId: carId, data: fcmBody);
+      StatusNotiVM status = notiAnalyze.analyzeStatusNoti();
+      if (status != null) {
+        CarStateVM carStateVMForThisCarId =
+            centerRepository.getCarStateVMByCarId(carId);
+        if (carStateVMForThisCarId != null) {
+          carStateVMForThisCarId.fillStatusNotiData(status, statusChangedNoty);
+          if (status.siren) {}
+        }
+        prefRepository.setStatusDateTime(
+            DateTimeUtils.getDateJalali(), DateTimeUtils.getTimeNow(), true);
+      } else {
+        prefRepository.setStatusDateTime(
+            DateTimeUtils.getDateJalali(), DateTimeUtils.getTimeNow(), false);
       }
     }
   }
@@ -321,7 +360,7 @@ class HomeScreenState extends State<HomeScreen>
               ? Positioned(
                   bottom: 1.0,
                   child: Padding(
-                      padding: EdgeInsets.all(10.0), child: _carPanel(menus)),
+                      padding: EdgeInsets.all(30.0), child: _carPanel(menus)),
                 )
               : SlidingUpPanel(
                   renderPanelSheet: false,
@@ -586,7 +625,11 @@ class HomeScreenState extends State<HomeScreen>
           ActionId: actionId,
           CarId: _currentCarId,
           Command: null));
-      if (result != null) {}
+      if (result != null) {
+        Future.delayed(Duration(seconds: 3)).then((value) {
+          centerRepository.fetchGPSStatus();
+        });
+      }
       return cars;
     }
     return null;
@@ -938,19 +981,21 @@ class HomeScreenState extends State<HomeScreen>
           /*sendCommandNoty.updateValue(
                  new SendingCommandVM(sending: false,
                      sent: true, hasError: false));*/
-          RxBus.post(new ChangeEvent(
+          RxBus.post(ChangeEvent(
               type: 'COMMAND_SUCCESS', id: int.tryParse(commandCode)));
         }
         String newFCM = msg.substring(2, msg.length);
         Uint8List fcmBody = base64Decode(newFCM); //.toString();
-        //centerRepository.showFancyToast(newFCM,true);
+        // centerRepository.showFancyToast(newFCM, true);
         NotiAnalyze notiAnalyze =
-            new NotiAnalyze(noti: null, carId: carId, data: fcmBody);
+            NotiAnalyze(noti: null, carId: carId, data: fcmBody);
         StatusNotiVM status = notiAnalyze.analyzeStatusNoti();
         if (status != null) {
+          // centerRepository.showFancyToast('STATE1', true);
           CarStateVM carStateVMForThisCarId =
               centerRepository.getCarStateVMByCarId(carId);
           if (carStateVMForThisCarId != null) {
+            // centerRepository.showFancyToast('STATE2', true);
             carStateVMForThisCarId.fillStatusNotiData(
                 status, statusChangedNoty);
             if (status.siren) {
@@ -1228,114 +1273,124 @@ class HomeScreenState extends State<HomeScreen>
                           child: GestureDetector(
                             onTap: () {},
                             child: StreamBuilder<Message>(
-                              stream: getStatusNoty.noty,
-                              initialData: null,
-                              builder: (BuildContext c,
-                                  AsyncSnapshot<Message> snapshot) {
-                                bool hasResult = true;
-                                if (snapshot.hasData && snapshot.data != null) {
-                                  Message msg = snapshot.data;
-                                  if (msg.type == 'GET_CAR_STATUS') {
-                                    if (msg.status == true) {
-                                      if (getStatusController ==
-                                          CustomAnimationControl.MIRROR)
-                                        getStatusController =
-                                            CustomAnimationControl.STOP;
-                                      getStatusSucceed = true;
-                                    } else if (msg.status == false) {
-                                      getStatusSucceed = false;
-                                      if (getStatusController ==
-                                          CustomAnimationControl.STOP) {
-                                        getStatusController =
-                                            CustomAnimationControl.MIRROR;
+                                stream: getStatusNoty.noty,
+                                initialData: null,
+                                builder: (BuildContext c,
+                                    AsyncSnapshot<Message> snapshot) {
+                                  bool hasResult = true;
+                                  if (snapshot.hasData &&
+                                      snapshot.data != null) {
+                                    Message msg = snapshot.data;
+                                    if (msg.type == 'GET_CAR_STATUS') {
+                                      if (msg.status == true) {
+                                        if (getStatusController ==
+                                            CustomAnimationControl.MIRROR)
+                                          getStatusController =
+                                              CustomAnimationControl.STOP;
+                                        getStatusSucceed = true;
+                                      } else if (msg.status == false) {
+                                        getStatusSucceed = false;
+                                        if (getStatusController ==
+                                            CustomAnimationControl.STOP) {
+                                          getStatusController =
+                                              CustomAnimationControl.MIRROR;
+                                        }
                                       }
-                                    }
-                                    if (msg.text == 'NO_RESULT')
-                                      hasResult = false;
-                                    else
-                                      hasResult = true;
+                                      if (msg.text == 'NO_RESULT')
+                                        hasResult = false;
+                                      else
+                                        hasResult = true;
+
+                                      if (msg.text == 'FROM_LAST_POS') {
+                                        // setCarStatusFromLastPos(msg.id);
+                                      }
+                                    } else {}
                                   }
-                                } else {}
-                                return Padding(
-                                  padding: EdgeInsets.only(top: 5),
-                                  child: new Container(
-                                    width: 24.0,
-                                    height: 24.0,
-                                    child: Container(
+                                  return Padding(
+                                    padding: EdgeInsets.only(top: 5),
+                                    child: new Container(
                                       width: 24.0,
                                       height: 24.0,
-                                      child: GestureDetector(
-                                          onTap: () {
-                                            centerRepository
-                                                .getCarStatusAtAppStarted(
-                                                    getStatusNoty);
-                                            centerRepository
-                                                .checkParkGPSStatusPeriodic(
-                                                    CenterRepository
-                                                        .periodicUpdateTime);
-                                            _showCarStatusHistorySheet(context);
-                                          },
-                                          child: getStatusSucceed
-                                              ? Image.asset(
-                                                  'assets/images/status_succeed.png',
-                                                  color: hasResult
-                                                      ? Colors.blueAccent
-                                                      : Colors.amber,
-                                                  width: 24,
-                                                  height: 24,
-                                                )
-                                              : CustomAnimation<double>(
-                                                  control: getStatusController,
-                                                  animationStatusListener:
-                                                      (status) {
-                                                    Future.delayed(new Duration(
-                                                            milliseconds: 7000))
-                                                        .then((data) {
-                                                      if (getStatusSucceed ==
-                                                          false) {
-                                                        getStatusSucceed = true;
-                                                        getStatusNoty.updateValue(
-                                                            new Message(
-                                                                type:
-                                                                    'GET_CAR_STATUS',
-                                                                status: true,
-                                                                text:
-                                                                    'NO_RESULT'));
-                                                      }
-                                                    });
-                                                  },
-                                                  tween: (-90.0).tweenTo(90.0),
+                                      child: Container(
+                                        width: 24.0,
+                                        height: 24.0,
+                                        child: GestureDetector(
+                                            onTap: () {
+                                              centerRepository
+                                                  .getCarStatusAtAppStarted(
+                                                      getStatusNoty);
+                                              centerRepository
+                                                  .checkParkGPSStatusPeriodic(
+                                                      CenterRepository
+                                                          .periodicUpdateTime);
+                                              _showCarStatusHistorySheet(
+                                                  context);
+                                            },
+                                            child: getStatusSucceed
+                                                ? Image.asset(
+                                                    'assets/images/status_succeed.png',
+                                                    color: hasResult
+                                                        ? Colors.blueAccent
+                                                        : Colors.amber,
+                                                    width: 24,
+                                                    height: 24,
+                                                  )
+                                                : CustomAnimation<double>(
+                                                    control:
+                                                        getStatusController,
+                                                    animationStatusListener:
+                                                        (status) {
+                                                      Future.delayed(
+                                                              new Duration(
+                                                                  milliseconds:
+                                                                      7000))
+                                                          .then((data) {
+                                                        if (getStatusSucceed ==
+                                                            false) {
+                                                          getStatusSucceed =
+                                                              true;
+                                                          getStatusNoty.updateValue(
+                                                              new Message(
+                                                                  type:
+                                                                      'GET_CAR_STATUS',
+                                                                  status: true,
+                                                                  text:
+                                                                      'NO_RESULT'));
+                                                        }
+                                                      });
+                                                    },
+                                                    tween:
+                                                        (-90.0).tweenTo(90.0),
 
-                                                  builder:
-                                                      (context, child, value) {
-                                                    return Transform.rotate(
-                                                      angle:
-                                                          value * (3.14 / 180),
-                                                      child: Image.asset(
-                                                        'assets/images/status.png',
-                                                        width: 24,
-                                                        height: 24,
-                                                        color:
-                                                            Colors.pinkAccent,
-                                                      ),
-                                                    );
-                                                  },
-                                                  duration: 2.seconds,
-                                                  delay: 1
-                                                      .seconds, // <-- add delay
-                                                )) /*;
+                                                    builder: (context, child,
+                                                        value) {
+                                                      return Transform.rotate(
+                                                        angle: value *
+                                                            (3.14 / 180),
+                                                        child: Image.asset(
+                                                          'assets/images/status.png',
+                                                          width: 24,
+                                                          height: 24,
+                                                          color:
+                                                              Colors.pinkAccent,
+                                                        ),
+                                                      );
+                                                    },
+                                                    duration: 2.seconds,
+                                                    delay: 1
+                                                        .seconds, // <-- add delay
+                                                  )) /*;
                                                 new Image.asset(
                                                   'assets/images/status.png',
                                                   width: 24,
                                                   height: 24,
                                                   color: getStatusAnimation.value,
                                                   )*/
-                                      ,
+                                        ,
+                                      ),
                                     ),
-                                  ),
-                                );
-                              },
-                            ),
+                                  );
+                                }),
                           ),
                         ),
                       ),
@@ -2243,3 +2298,4 @@ NotyBloc<CarStateVM> statusChangedNoty = new NotyBloc<CarStateVM>();
 NotyBloc<Message> carLockPanelNoty=new NotyBloc<Message>();
 NotyBloc<SendingCommandVM> sendCommandNoty=new NotyBloc<SendingCommandVM>();*/
 NotyBloc<ChangeEvent> valueNotyModelBloc = new NotyBloc<ChangeEvent>();
+NotyBloc<Message> getStatusNoty = NotyBloc<Message>();

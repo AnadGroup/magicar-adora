@@ -1,17 +1,27 @@
 import 'dart:collection';
+import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:anad_magicar/bloc/values/notify_value.dart';
+import 'package:anad_magicar/common/actions_constants.dart';
 import 'package:anad_magicar/common/constants.dart';
 import 'package:anad_magicar/data/rest_ds.dart';
+import 'package:anad_magicar/data/rxbus.dart';
 import 'package:anad_magicar/model/apis/api_route.dart';
+import 'package:anad_magicar/model/apis/notification_model.dart';
 import 'package:anad_magicar/model/cars/car.dart';
+import 'package:anad_magicar/model/change_event.dart';
+import 'package:anad_magicar/model/message.dart';
 import 'package:anad_magicar/model/viewmodel/status_noti_vm.dart';
 import 'package:anad_magicar/repository/center_repository.dart';
 import 'package:anad_magicar/repository/pref_repository.dart';
 import 'package:anad_magicar/service/noti_analyze.dart';
+import 'package:anad_magicar/ui/screen/home/index.dart';
 import 'package:anad_magicar/ui/screen/setting/native_settings_screen.dart';
+import 'package:anad_magicar/utils/checkOS.dart';
 import 'package:anad_magicar/utils/date_utils.dart';
 import 'package:flutter/material.dart';
+import 'package:universal_io/io.dart';
 
 enum MaterialColor { RED, BLUE, GREEN, YELLOW, BLACK, WHITE, GREY }
 enum CarNums { ONE, TWO, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINE, TEN }
@@ -398,6 +408,20 @@ class CarStateVM {
     var result = await restDatasource.getLastPositionRoute(route);
     if (result != null && result.length > 0) {
       ApiRoute apiRoute = result.first;
+
+      //  if (isIos()) {
+      if (apiRoute.HaveNotification != null && apiRoute.HaveNotification) {
+        List<NotificationModelApi> notif = await restDatasource
+            .getNotificationByDeviceId(apiRoute.DeviceId.toString());
+        if (notif != null && notif.isNotEmpty) {
+          String msg = notif.last.Status;
+          int carId = apiRoute.carId;
+          if (msg != null && msg.isNotEmpty) {
+            RxBus.post(
+                ChangeEvent(type: 'FCM_STATUS', message: msg, id: carId));
+          }
+        }
+      }
       cioBinary = apiRoute.cioBinary;
       //برای دریافت تنظیملت GPRS  میباشد
       String GPSDateTime = apiRoute.GPSDateTimeGregorian;

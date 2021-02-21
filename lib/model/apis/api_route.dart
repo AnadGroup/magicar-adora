@@ -24,26 +24,29 @@ class ApiRoute {
   String Time;
   String CreatedDateTime;
   String GPSDateTimeGregorian;
+  bool HaveNotification;
 
-  ApiRoute(
-      {@required this.carId,
-      @required this.startDate,
-      @required this.endDate,
-      @required this.dateTime,
-      @required this.speed,
-      @required this.lat,
-      @required this.long,
-      @required this.enterTime,
-      @required this.carIds,
-      @required this.cioBinary,
-      @required this.DeviceId,
-      @required this.Latitude,
-      @required this.Longitude,
-      @required this.Date,
-      @required this.Time,
-      @required this.CreatedDateTime,
-      @required this.gpsDateTime,
-      @required this.GPSDateTimeGregorian});
+  ApiRoute({
+    @required this.carId,
+    @required this.startDate,
+    @required this.endDate,
+    @required this.dateTime,
+    @required this.speed,
+    @required this.lat,
+    @required this.long,
+    @required this.enterTime,
+    @required this.carIds,
+    @required this.cioBinary,
+    @required this.DeviceId,
+    @required this.Latitude,
+    @required this.Longitude,
+    @required this.Date,
+    @required this.Time,
+    @required this.CreatedDateTime,
+    @required this.gpsDateTime,
+    @required this.GPSDateTimeGregorian,
+    @required this.HaveNotification,
+  });
 
   factory ApiRoute.fromJson(Map<String, dynamic> json) {
     return ApiRoute(
@@ -113,7 +116,8 @@ class ApiRoute {
         CreatedDateTime: map['CreatedDateTime'],
         carId: map['CarId'],
         gpsDateTime: map['GPSDateTime'],
-        GPSDateTimeGregorian: map['GPSDateTimeGregorian']);
+        GPSDateTimeGregorian: map['GPSDateTimeGregorian'],
+        HaveNotification: map['HaveNotification']);
   }
 
   factory ApiRoute.fromJsonResult(Map<String, dynamic> json) {
@@ -137,7 +141,8 @@ class ApiRoute {
         CreatedDateTime: json["CreatedDateTime"],
         gpsDateTime: json["GPSDateTime"],
         cioBinary: json["CIOBinary"],
-        GPSDateTimeGregorian: json["GPSDateTimeGregorian"]);
+        GPSDateTimeGregorian: json["GPSDateTimeGregorian"],
+        HaveNotification: json["HaveNotification"]);
   }
 
   Map<String, dynamic> toJsonForFetchOpenRouteService() {
@@ -167,7 +172,8 @@ class ApiRoute {
       "Latitude": this.Longitude,
       "Longitude": this.Longitude,
       "CreatedDateTime": this.CreatedDateTime,
-      "GPSDateTimeGregorian": this.GPSDateTimeGregorian
+      "GPSDateTimeGregorian": this.GPSDateTimeGregorian,
+      "HaveNotification": this.HaveNotification
     };
   }
 
