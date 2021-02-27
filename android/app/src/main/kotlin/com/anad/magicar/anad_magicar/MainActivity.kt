@@ -6,7 +6,6 @@ import io.flutter.app.FlutterActivity
 import io.flutter.plugins.GeneratedPluginRegistrant
 import io.flutter.app.FlutterFragmentActivity
 import android.view.WindowManager.LayoutParams
-import io.flutter.plugins.firebasemessaging.FlutterFirebaseMessagingService
 
 class MainActivity: FlutterFragmentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
